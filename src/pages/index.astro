@@ -1,0 +1,164 @@
+---
+import Hero from '../components/sections/Hero.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { isSanityConfigured, urlForImage } from '../lib/sanity';
+import { sanityClient } from 'sanity:client';
+
+interface HomePage {
+  seoTitle?: string;
+  seoDescription?: string;
+  logo?: unknown;
+  logoAlt?: string;
+  navItems?: {
+    label?: string;
+    href?: string;
+    hasDropdown?: boolean;
+  }[];
+  reservationText?: string;
+  reservationLink?: string;
+  heroKeywords?: string[];
+  heroTitle?: string;
+  heroBody?: string;
+  primaryCtaText?: string;
+  primaryCtaLink?: string;
+  secondaryCtaText?: string;
+  secondaryCtaLink?: string;
+  heroImage?: {
+    asset?: unknown;
+    metadata?: {
+      dimensions?: {
+        width?: number;
+        height?: number;
+      };
+      lqip?: string;
+      palette?: {
+        dominant?: {
+          background?: string;
+        };
+      };
+    };
+  };
+  heroImageAlt?: string;
+}
+
+const HOME_QUERY = `*[_type == "homePage"] | order(_updatedAt desc)[0]{
+  seoTitle,
+  seoDescription,
+  logo,
+  logoAlt,
+  navItems[]{label, href, hasDropdown},
+  reservationText,
+  reservationLink,
+  heroKeywords,
+  heroTitle,
+  heroBody,
+  primaryCtaText,
+  primaryCtaLink,
+  secondaryCtaText,
+  secondaryCtaLink,
+  heroImage{
+    ...,
+    asset,
+    "metadata": asset->metadata {
+      dimensions,
+      lqip,
+      palette {
+        dominant {
+          background
+        }
+      }
+    }
+  },
+  heroImageAlt
+}`;
+
+const fallbackHome: Required<Omit<HomePage, 'heroImage' | 'logo'>> = {
+  seoTitle: 'Tahiti Guest Boat | Croisiere en Polynesie',
+  seoDescription: 'L’esprit et le charme d’une belle maison d’hotes, version croisiere en Polynesie.',
+  logoAlt: 'Tahiti Guest Boat',
+  navItems: [
+    { label: 'Notre bateau', href: '/notre-bateau', hasDropdown: true },
+    { label: 'Nos croisières', href: '/nos-croisieres', hasDropdown: true },
+    { label: 'Notre blog', href: '/blog', hasDropdown: false },
+  ],
+  reservationText: 'Réserver',
+  reservationLink: '/reservation',
+  heroKeywords: ['Partage', 'Plaisance', 'Polynésie'],
+  heroTitle: 'L’esprit et le charme d’une belle maison d’hôtes, version croisière en Polynésie',
+  heroBody:
+    'Pour celles et ceux... qui rêvent de découvrir ou redécouvrir le plus beau territoire de navigation de la planète, qui veulent profiter de l’incroyable beauté des lagons et atolls à leur rythme et au gré de leurs envies, qui rêvent de farniente et de snorkeling, de bains de soleil et de baignades dans le turquoise, de balades en kayak, d’une session de kite ou de wing foil, d’un apéro au coucher de soleil rougissant et d’un repas aux saveurs de Tahiti... qui ont envie de vivre l’accueil polynésien et s’ouvrir à la culture polynésienne et, pour qui la convivialité et le partage subliment l’expérience.',
+  primaryCtaText: 'Discutez avec nous',
+  primaryCtaLink: '/contact',
+  secondaryCtaText: "Découvrir l'expérience",
+  secondaryCtaLink: '/experience',
+  heroImageAlt: 'Catamaran Tahiti Guest Boat dans un lagon turquoise',
+};
+
+const home = isSanityConfigured
+  ? await sanityClient.fetch<HomePage | null>(HOME_QUERY).catch(() => null)
+  : null;
+
+const heroImage = home?.heroImage;
+const heroImageWidths = [480, 768, 1024, 1440, 2048];
+const heroAspectRatio = 716 / 2048;
+const heroImageUrl = heroImage
+  ? urlForImage(heroImage)
+      ?.width(1440)
+      .height(Math.round(1440 * heroAspectRatio))
+      .fit('crop')
+      .quality(82)
+      .auto('format')
+      .url()
+  : undefined;
+const heroImageSrcset = heroImage
+  ? heroImageWidths
+      .map((width) => {
+        const url = urlForImage(heroImage)
+          ?.width(width)
+          .height(Math.round(width * heroAspectRatio))
+          .fit('crop')
+          .quality(82)
+          .auto('format')
+          .url();
+
+        return url ? `${url} ${width}w` : null;
+      })
+      .filter(Boolean)
+      .join(', ')
+  : undefined;
+const heroPlaceholderUrl = heroImage
+  ? urlForImage(heroImage)?.width(32).height(12).fit('crop').blur(18).quality(35).auto('format').url()
+  : undefined;
+const logoUrl = home?.logo ? urlForImage(home.logo)?.width(360).auto('format').url() : undefined;
+
+const page = { ...fallbackHome, ...home };
+const navItems = (page.navItems || fallbackHome.navItems).map((item) => ({
+  label: item.label || '',
+  href: item.href || '#',
+  hasDropdown: Boolean(item.hasDropdown),
+}));
+---
+
+<BaseLayout title={page.seoTitle} description={page.seoDescription}>
+  <Hero
+    logo={{ url: logoUrl, alt: page.logoAlt }}
+    navItems={navItems}
+    reservationLabel={page.reservationText}
+    reservationHref={page.reservationLink}
+    keywords={page.heroKeywords}
+    title={page.heroTitle}
+    body={page.heroBody}
+    primaryCta={{ label: page.primaryCtaText, href: page.primaryCtaLink }}
+    secondaryCta={{ label: page.secondaryCtaText, href: page.secondaryCtaLink }}
+    image={{
+      url: heroImageUrl,
+      srcset: heroImageSrcset,
+      sizes: '100vw',
+      alt: page.heroImageAlt,
+      width: 2048,
+      height: 716,
+      background: heroImage?.metadata?.palette?.dominant?.background,
+      lqip: heroPlaceholderUrl || heroImage?.metadata?.lqip,
+    }}
+  />
+</BaseLayout>

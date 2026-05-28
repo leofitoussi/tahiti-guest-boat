@@ -1,0 +1,68 @@
+---
+import SiteHeader from '../../components/navigation/SiteHeader.astro';
+import BlogContent from '../../components/blog/BlogContent.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatPostDate, getBlogPost, getBlogPosts, type BlogPost } from '../../lib/blog';
+import { urlForImage } from '../../lib/sanity';
+
+export async function getStaticPaths() {
+  const posts = await getBlogPosts();
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const summary = Astro.props.post as BlogPost;
+const post = (await getBlogPost(summary.slug)) || summary;
+const navItems = [
+  { label: 'Notre bateau', href: '/notre-bateau', hasDropdown: true },
+  { label: 'Nos croisières', href: '/nos-croisieres', hasDropdown: true },
+  { label: 'Notre blog', href: '/blog', hasDropdown: false },
+];
+
+const title = post.seoTitle || `${post.title} | Tahiti Guest Boat`;
+const description = post.seoDescription || post.excerpt || 'Article du blog Tahiti Guest Boat.';
+const mainImageUrl = post.mainImage
+  ? urlForImage(post.mainImage)?.width(1440).height(850).fit('crop').quality(84).auto('format').url()
+  : undefined;
+---
+
+<BaseLayout title={title} description={description}>
+  <SiteHeader navItems={navItems} ctaLabel="Réserver" ctaHref="/reservation" />
+
+  <main class="bg-white">
+    <article>
+      <header class="mx-auto max-w-[1060px] px-5 pb-10 pt-14 md:px-8 md:pb-14 md:pt-20">
+        <a href="/blog" class="font-bold text-[#285aaa] underline underline-offset-4">Retour au blog</a>
+        {post.publishedAt && <p class="mt-8 text-sm font-bold uppercase tracking-[0.16em] text-[#526071]">{formatPostDate(post.publishedAt)}</p>}
+        <h1 class="mt-4 font-serif text-[44px] font-bold leading-tight text-[#071a3a] md:text-[72px]">{post.title}</h1>
+        {post.excerpt && <p class="mt-6 max-w-[820px] text-xl leading-9 text-[#344054]">{post.excerpt}</p>}
+      </header>
+
+      {
+        mainImageUrl && (
+          <figure class="mx-auto max-w-[1180px] px-5 md:px-8">
+            <img
+              src={mainImageUrl}
+              alt={post.mainImage?.alt || ''}
+              width="1440"
+              height="850"
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
+              class="max-h-[680px] w-full rounded-lg object-cover"
+              style={{ backgroundColor: post.mainImage?.metadata?.palette?.dominant?.background || '#eef4f8' }}
+            />
+            {post.mainImage?.caption && <figcaption class="px-1 py-3 text-sm text-[#526071]">{post.mainImage.caption}</figcaption>}
+          </figure>
+        )
+      }
+
+      <section class="mx-auto max-w-[820px] px-5 py-12 md:px-8 md:py-16">
+        <BlogContent value={post.body} />
+      </section>
+    </article>
+  </main>
+</BaseLayout>

@@ -1,0 +1,75 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { TypedObject } from 'astro-portabletext/types';
+import PortableImage from './PortableImage.astro';
+
+interface Props {
+  value?: TypedObject[];
+}
+
+const { value = [] } = Astro.props;
+const components = {
+  type: {
+    image: PortableImage,
+  },
+};
+---
+
+<div class="blog-content">
+  <PortableText value={value} components={components} />
+</div>
+
+<style>
+  .blog-content {
+    color: #111827;
+    font-size: 1.125rem;
+    line-height: 1.8;
+  }
+
+  .blog-content :global(p) {
+    margin: 1.25rem 0;
+  }
+
+  .blog-content :global(h2) {
+    margin: 2.75rem 0 1rem;
+    color: #285aaa;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(2rem, 3vw, 2.75rem);
+    line-height: 1.12;
+  }
+
+  .blog-content :global(h3) {
+    margin: 2.25rem 0 0.75rem;
+    color: #071a3a;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    line-height: 1.2;
+  }
+
+  .blog-content :global(blockquote) {
+    margin: 2rem 0;
+    border-left: 4px solid #285aaa;
+    padding-left: 1.25rem;
+    color: #344054;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 1.35rem;
+    line-height: 1.6;
+  }
+
+  .blog-content :global(ul),
+  .blog-content :global(ol) {
+    margin: 1.25rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .blog-content :global(li) {
+    margin: 0.45rem 0;
+  }
+
+  .blog-content :global(a) {
+    color: #285aaa;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

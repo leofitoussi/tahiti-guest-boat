@@ -1,0 +1,50 @@
+---
+import { urlForImage } from '../../lib/sanity';
+
+interface Props {
+  node: {
+    asset?: unknown;
+    alt?: string;
+    caption?: string;
+    metadata?: {
+      dimensions?: {
+        width?: number;
+        height?: number;
+      };
+      lqip?: string;
+      palette?: {
+        dominant?: {
+          background?: string;
+        };
+      };
+    };
+  };
+}
+
+const { node } = Astro.props;
+const width = Math.min(node.metadata?.dimensions?.width || 1200, 1200);
+const height = node.metadata?.dimensions?.width && node.metadata?.dimensions?.height
+  ? Math.round(width * (node.metadata.dimensions.height / node.metadata.dimensions.width))
+  : 760;
+const imageUrl = node.asset
+  ? urlForImage(node)?.width(width).height(height).fit('crop').quality(82).auto('format').url()
+  : undefined;
+---
+
+{
+  imageUrl && (
+    <figure class="my-10 overflow-hidden rounded-lg bg-[#eef4f8]">
+      <img
+        src={imageUrl}
+        alt={node.alt || ''}
+        width={width}
+        height={height}
+        loading="lazy"
+        decoding="async"
+        class="w-full object-cover"
+        style={{ backgroundColor: node.metadata?.palette?.dominant?.background || '#eef4f8' }}
+      />
+      {node.caption && <figcaption class="px-4 py-3 text-sm text-[#526071]">{node.caption}</figcaption>}
+    </figure>
+  )
+}

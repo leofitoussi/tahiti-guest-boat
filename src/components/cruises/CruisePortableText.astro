@@ -1,0 +1,73 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { TypedObject } from 'astro-portabletext/types';
+import PortableImage from '../blog/PortableImage.astro';
+
+interface Props {
+  value?: TypedObject[];
+  class?: string;
+}
+
+const { value = [], class: className } = Astro.props;
+const components = {
+  type: {
+    image: PortableImage,
+  },
+};
+---
+
+<div class:list={['cruise-content', className]}>
+  <PortableText value={value} components={components} />
+</div>
+
+<style>
+  .cruise-content {
+    color: var(--foreground);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  .cruise-content :global(p) {
+    margin: 1rem 0;
+  }
+
+  .cruise-content :global(h2) {
+    margin: 2.25rem 0 1rem;
+    color: var(--primary);
+  }
+
+  .cruise-content :global(h3) {
+    margin: 2rem 0 0.75rem;
+  }
+
+  .cruise-content :global(blockquote) {
+    margin: 2rem 0;
+    border-left: 4px solid var(--primary);
+    padding-left: 1.25rem;
+    color: var(--muted-foreground);
+    font-family: var(--font-family-heading);
+    font-size: 1.3rem;
+    line-height: 1.6;
+  }
+
+  .cruise-content :global(ul),
+  .cruise-content :global(ol) {
+    margin: 1.25rem 0;
+    padding-left: 1.5rem;
+  }
+
+  .cruise-content :global(li) {
+    margin: 0.45rem 0;
+  }
+
+  .cruise-content :global(a) {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .cruise-content :global(img) {
+    border-radius: var(--radius-surface);
+  }
+</style>

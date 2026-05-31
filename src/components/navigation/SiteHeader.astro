@@ -16,32 +16,32 @@ interface Props {
 const { logoUrl, logoAlt = 'Tahiti Guest Boat', navItems, ctaLabel, ctaHref } = Astro.props;
 ---
 
-<header class="h-20 bg-[#f7f8fb] shadow-sm md:h-[100px]">
-  <div class="mx-auto flex h-full max-w-[2048px] items-center justify-between px-0 md:px-7">
+<header class="border-b border-border/70 bg-background shadow-sm">
+  <div class="mx-auto flex h-20 max-w-site items-center justify-between px-5 md:px-8">
     <a href="/" class="flex h-full items-center" aria-label="Tahiti Guest Boat">
       {
         logoUrl ? (
-          <img src={logoUrl} alt={logoAlt} class="h-16 w-auto object-contain md:h-[74px]" width="300" height="92" />
+          <img src={logoUrl} alt={logoAlt} class="h-12 w-auto object-contain" width="300" height="92" />
         ) : (
-          <div class="flex items-center gap-3 pl-0 text-[#075faa] md:pl-0">
-            <div class="relative h-16 w-16 md:h-[74px] md:w-[76px]" aria-hidden="true">
-              <div class="absolute left-6 top-1 h-14 w-8 skew-x-[-12deg] rounded-t-full bg-[#075faa] md:h-16 md:w-9" />
-              <div class="absolute bottom-2 left-1 h-1 w-14 rounded-full bg-[#075faa]" />
-              <div class="absolute bottom-0 left-0 h-1 w-16 rounded-full bg-[#075faa]" />
+          <div class="flex items-center gap-3 text-primary">
+            <div class="relative h-14 w-14" aria-hidden="true">
+              <div class="absolute left-5 top-1 h-12 w-7 skew-x-[-12deg] rounded-t-full bg-primary" />
+              <div class="absolute bottom-2 left-1 h-1 w-12 rounded-full bg-primary" />
+              <div class="absolute bottom-0 left-0 h-1 w-14 rounded-full bg-primary" />
             </div>
             <div class="leading-none">
-              <p class="font-serif text-[39px] font-bold tracking-[0.18em] md:text-[46px]">Tahiti</p>
-              <p class="font-serif text-[22px] font-bold italic tracking-[0.34em] md:text-[26px]">Guest Boat</p>
+              <p class="font-heading text-[2.15rem] font-semibold tracking-[0.16em] uppercase">Tahiti</p>
+              <p class="font-heading text-[1.15rem] font-semibold italic tracking-[0.26em] uppercase">Guest Boat</p>
             </div>
           </div>
         )
       }
     </a>
 
-    <nav class="hidden items-center gap-16 pr-7 text-[23px] font-bold text-[#060d1f] md:flex">
+    <nav class="hidden items-center gap-10 pr-1 text-sm font-semibold uppercase tracking-[0.14em] text-foreground md:flex">
       {
         navItems.map((item) => (
-          <a href={item.href} class="inline-flex items-center gap-3 whitespace-nowrap transition hover:text-[#285aaa]">
+          <a href={item.href} class="inline-flex items-center gap-3 whitespace-nowrap transition-colors hover:text-primary">
             {item.label}
             {item.hasDropdown && <span class="mt-1 h-0 w-0 border-x-[6px] border-t-[7px] border-x-transparent border-t-current" />}
           </a>
@@ -51,7 +51,7 @@ const { logoUrl, logoAlt = 'Tahiti Guest Boat', navItems, ctaLabel, ctaHref } = 
         ctaLabel && (
           <a
             href={ctaHref || '/contact'}
-            class="inline-flex h-[72px] items-center rounded bg-[#285aaa] px-9 text-[28px] font-bold text-white transition hover:bg-[#1f4a91]"
+            class="inline-flex h-11 items-center rounded-[var(--radius-control)] bg-primary px-7 text-sm font-semibold tracking-[0.12em] uppercase text-primary-foreground transition-colors hover:bg-primary/90"
           >
             {ctaLabel}
           </a>
@@ -59,11 +59,11 @@ const { logoUrl, logoAlt = 'Tahiti Guest Boat', navItems, ctaLabel, ctaHref } = 
       }
     </nav>
 
-    <button class="mr-3 flex h-14 w-16 items-center justify-center text-[#285aaa] md:hidden" aria-label="Ouvrir le menu">
-      <span class="space-y-2">
-        <span class="block h-[7px] w-11 rounded bg-current"></span>
-        <span class="block h-[7px] w-11 rounded bg-current"></span>
-        <span class="block h-[7px] w-11 rounded bg-current"></span>
+    <button class="mr-1 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border border-border/70 text-primary transition-colors hover:bg-muted md:hidden" aria-label="Ouvrir le menu">
+      <span class="flex flex-col gap-1.5">
+        <span class="block h-[2px] w-5 rounded-full bg-current"></span>
+        <span class="block h-[2px] w-5 rounded-full bg-current"></span>
+        <span class="block h-[2px] w-5 rounded-full bg-current"></span>
       </span>
     </button>
   </div>

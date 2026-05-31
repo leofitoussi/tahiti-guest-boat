@@ -1,0 +1,45 @@
+---
+import { buttonVariants } from '../ui/button';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+
+interface Cta {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  body?: string;
+  primaryCta?: Cta;
+  secondaryCta?: Cta;
+  imageUrl?: string;
+  imageAlt?: string;
+}
+
+const { eyebrow, title, body, primaryCta, secondaryCta, imageUrl, imageAlt = '' } = Astro.props;
+---
+
+<Section padding="lg" class="bg-background">
+  <Container>
+    <div class="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
+      <div class="flex flex-col gap-6">
+        {eyebrow && <p class="text-sm font-semibold uppercase tracking-[0.14em] text-primary">{eyebrow}</p>}
+        <h1 class="max-w-4xl font-heading font-semibold text-foreground">{title}</h1>
+        {body && <p class="max-w-2xl text-lg leading-relaxed text-muted-foreground">{body}</p>}
+        <div class="flex flex-col gap-3 sm:flex-row">
+          {primaryCta && <a href={primaryCta.href} class={buttonVariants({ variant: 'primary' })}>{primaryCta.label}</a>}
+          {secondaryCta && <a href={secondaryCta.href} class={buttonVariants({ variant: 'secondary' })}>{secondaryCta.label}</a>}
+        </div>
+      </div>
+      {
+        imageUrl && (
+          <div class="overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-muted shadow-sm">
+            <img src={imageUrl} alt={imageAlt} class="aspect-[4/3] size-full object-cover" width="880" height="660" loading="lazy" decoding="async" />
+          </div>
+        )
+      }
+    </div>
+  </Container>
+</Section>

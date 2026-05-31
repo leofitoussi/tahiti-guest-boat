@@ -1,0 +1,165 @@
+---
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import CruisePortableText from '../cruises/CruisePortableText.astro';
+import { buttonVariants } from '../ui/button';
+import { urlForImage } from '../../lib/sanity';
+import { extractYouTubeVideoId, getYouTubeEmbedUrl, getYouTubePosterUrl, getYouTubeWatchUrl } from '../../lib/video';
+
+interface SanityImage {
+  asset?: unknown;
+  alt?: string;
+  metadata?: {
+    dimensions?: { width?: number; height?: number };
+    lqip?: string;
+    palette?: { dominant?: { background?: string } };
+  };
+}
+
+interface Props {
+  iconImage?: SanityImage;
+  title?: unknown[];
+  body?: unknown[];
+  ctaLabel?: string;
+  ctaUrl?: string;
+  youtubeUrl?: string;
+  posterImage?: SanityImage;
+}
+
+const { iconImage, title = [], body = [], ctaLabel, ctaUrl, youtubeUrl, posterImage } = Astro.props;
+
+const videoId = extractYouTubeVideoId(youtubeUrl);
+const embedUrl = videoId ? getYouTubeEmbedUrl(videoId) : undefined;
+const youtubePoster = videoId ? getYouTubePosterUrl(videoId) : undefined;
+
+const iconUrl = iconImage ? urlForImage(iconImage)?.width(160).auto('format').url() : undefined;
+const posterUrl =
+  posterImage ? urlForImage(posterImage)?.width(1600).height(900).fit('crop').quality(84).auto('format').url() : youtubePoster;
+const posterLqip = posterImage ? urlForImage(posterImage)?.width(32).height(18).fit('crop').blur(18).quality(30).auto('format').url() : undefined;
+---
+
+<Section padding="lg" class="bg-background">
+  <Container>
+    <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
+      {iconUrl && (
+        <img
+          src={iconUrl}
+          alt={iconImage?.alt || ''}
+          width="160"
+          height="160"
+          loading="lazy"
+          decoding="async"
+          class="mb-8 h-16 w-16 object-contain sm:h-20 sm:w-20"
+        />
+      )}
+
+      <div class="max-w-3xl">
+        {title && title.length > 0 && <CruisePortableText value={title as any} class="video-feature-title" />}
+        {body && body.length > 0 && <CruisePortableText value={body as any} class="video-feature-body mt-5" />}
+        {ctaLabel && ctaUrl && (
+          <div class="mt-7">
+            <a href={ctaUrl} class={buttonVariants({ variant: 'primary' })}>
+              {ctaLabel}
+            </a>
+          </div>
+        )}
+      </div>
+    </div>
+
+      {
+        embedUrl && (
+          <div class="mx-auto mt-10 w-full max-w-5xl">
+            <div
+            class="relative aspect-video overflow-hidden rounded-[var(--radius-panel)] border border-border/70 bg-muted shadow-sm"
+            style={{
+              backgroundImage: posterLqip ? `url(${posterLqip})` : undefined,
+              backgroundSize: posterLqip ? 'cover' : undefined,
+              backgroundPosition: posterLqip ? 'center' : undefined,
+            }}
+          >
+            <a
+              href={videoId ? getYouTubeWatchUrl(videoId) : undefined}
+              class="group absolute inset-0 block w-full overflow-hidden bg-background"
+              data-video-trigger
+              data-embed-url={embedUrl}
+              aria-label="Lire la vidéo YouTube"
+            >
+              <img
+                src={posterUrl}
+                alt={posterImage?.alt || 'Aperçu de la vidéo YouTube'}
+                width="1600"
+                height="900"
+                loading="lazy"
+                decoding="async"
+                class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+              />
+
+              <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,14,29,.12),rgba(6,14,29,.34))]" />
+
+              <div class="absolute inset-0 grid place-items-center">
+                <span class="grid size-20 place-items-center rounded-full bg-background/92 text-primary shadow-lg ring-1 ring-border/70 transition group-hover:scale-105 sm:size-24">
+                  <svg viewBox="0 0 24 24" fill="currentColor" class="ml-0.5 size-10">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </span>
+              </div>
+            </a>
+        </div>
+        </div>
+      )
+    }
+  </Container>
+</Section>
+
+<style>
+  .video-feature-title :global(h2) {
+    margin: 0;
+    color: var(--foreground);
+  }
+
+  .video-feature-body :global(p) {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: clamp(1rem, 1.3vw, 1.125rem);
+    line-height: 1.75;
+  }
+
+  .video-feature-body :global(strong) {
+    color: var(--foreground);
+    font-weight: 700;
+  }
+</style>
+
+<script>
+  const activateVideo = (link: HTMLAnchorElement) => {
+    const embedUrl = link.dataset.embedUrl;
+    if (!embedUrl) return;
+
+    const wrapper = link.parentElement;
+    if (!wrapper) return;
+
+    const iframe = document.createElement('iframe');
+    iframe.src = embedUrl;
+    iframe.title = 'Lecteur vidéo YouTube';
+    iframe.loading = 'lazy';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+    iframe.className = 'absolute inset-0 h-full w-full';
+
+    wrapper.replaceChildren(iframe);
+  };
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-video-trigger]').forEach((link) => {
+    link.addEventListener('click', (event: MouseEvent) => {
+      event.preventDefault();
+      activateVideo(link);
+    });
+
+    link.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        activateVideo(link);
+      }
+    });
+  });
+</script>

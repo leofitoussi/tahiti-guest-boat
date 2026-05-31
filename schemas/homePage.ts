@@ -1,14 +1,16 @@
-import { defineField, defineType } from 'sanity';
+import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export const homePage = defineType({
   name: 'homePage',
   title: 'Homepage',
   type: 'document',
   fields: [
+    // ─── SEO ────────────────────────────────────────────────────────────────
     defineField({
       name: 'seoTitle',
       title: 'SEO title',
       type: 'string',
+      group: 'seo',
       validation: (rule) => rule.required().max(70),
     }),
     defineField({
@@ -16,143 +18,49 @@ export const homePage = defineType({
       title: 'SEO description',
       type: 'text',
       rows: 3,
+      group: 'seo',
       validation: (rule) => rule.required().max(160),
     }),
+
+    // ─── Page builder ────────────────────────────────────────────────────────
     defineField({
-      name: 'logo',
-      title: 'Logo',
-      type: 'image',
-      options: {
-        hotspot: false,
-      },
-    }),
-    defineField({
-      name: 'logoAlt',
-      title: 'Logo alt text',
-      type: 'string',
-    }),
-    defineField({
-      name: 'navItems',
-      title: 'Navigation items',
+      name: 'pageBuilder',
+      title: 'Sections de la page',
       type: 'array',
+      group: 'content',
       of: [
-        {
-          type: 'object',
-          fields: [
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: 'href',
-              title: 'Link',
-              type: 'url',
-              validation: (rule) =>
-                rule.required().uri({
-                  allowRelative: true,
-                  scheme: ['http', 'https', 'mailto', 'tel'],
-                }),
-            }),
-            defineField({
-              name: 'hasDropdown',
-              title: 'Show dropdown indicator',
-              type: 'boolean',
-              initialValue: false,
-            }),
-          ],
-          preview: {
-            select: {
-              title: 'label',
-              subtitle: 'href',
-            },
-          },
-        },
+        defineArrayMember({ type: 'heroHeaderBlock' }),
+        defineArrayMember({ type: 'homeHeroBlock' }),
+        defineArrayMember({ type: 'pitchBlock' }),
+        defineArrayMember({ type: 'galleryBlock' }),
+        defineArrayMember({ type: 'editorialBlock' }),
+        defineArrayMember({ type: 'boatBlock' }),
+        defineArrayMember({ type: 'videoFeatureBlock' }),
+        defineArrayMember({ type: 'whyUsBlock' }),
+        defineArrayMember({ type: 'reviewsBlock' }),
+        defineArrayMember({ type: 'bookingBlock' }),
+        defineArrayMember({ type: 'relatedCruisesBlock' }),
+        defineArrayMember({ type: 'fullWidthImageBlock' }),
       ],
     }),
-    defineField({
-      name: 'reservationText',
-      title: 'Reservation button text',
-      type: 'string',
-    }),
-    defineField({
-      name: 'reservationLink',
-      title: 'Reservation button link',
-      type: 'url',
-      validation: (rule) =>
-        rule.uri({
-          allowRelative: true,
-          scheme: ['http', 'https', 'mailto', 'tel'],
-        }),
-    }),
-    defineField({
-      name: 'heroImage',
-      title: 'Hero image',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-    }),
-    defineField({
-      name: 'heroImageAlt',
-      title: 'Hero image alt text',
-      type: 'string',
-    }),
-    defineField({
-      name: 'heroKeywords',
-      title: 'Hero keywords',
-      type: 'array',
-      of: [{ type: 'string' }],
-      validation: (rule) => rule.min(1).max(3),
-    }),
-    defineField({
-      name: 'heroTitle',
-      title: 'Hero title',
-      type: 'string',
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'heroBody',
-      title: 'Hero body',
-      type: 'text',
-      rows: 6,
-    }),
-    defineField({
-      name: 'primaryCtaText',
-      title: 'Primary CTA text',
-      type: 'string',
-    }),
-    defineField({
-      name: 'primaryCtaLink',
-      title: 'Primary CTA link',
-      type: 'url',
-      validation: (rule) =>
-        rule.uri({
-          allowRelative: true,
-          scheme: ['http', 'https', 'mailto', 'tel'],
-        }),
-    }),
-    defineField({
-      name: 'secondaryCtaText',
-      title: 'Secondary CTA text',
-      type: 'string',
-    }),
-    defineField({
-      name: 'secondaryCtaLink',
-      title: 'Secondary CTA link',
-      type: 'url',
-      validation: (rule) =>
-        rule.uri({
-          allowRelative: true,
-          scheme: ['http', 'https', 'mailto', 'tel'],
-        }),
-    }),
   ],
+
+  groups: [
+    { name: 'content', title: 'Contenu', default: true },
+    { name: 'seo', title: 'SEO' },
+  ],
+
   preview: {
     select: {
-      title: 'heroTitle',
-      media: 'heroImage',
+      title: 'seoTitle',
+      media: 'logo',
+    },
+    prepare({ title, media }) {
+      return {
+        title: title || 'Homepage',
+        subtitle: `Page d'accueil`,
+        media,
+      };
     },
   },
 });

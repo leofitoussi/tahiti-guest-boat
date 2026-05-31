@@ -1,0 +1,59 @@
+---
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import CruisePortableText from './CruisePortableText.astro';
+import type { EditorialBlock } from '../../lib/cruises';
+import { urlForImage } from '../../lib/sanity';
+
+interface Props {
+  block: EditorialBlock;
+}
+
+const { block } = Astro.props;
+const reverse = block.layout === 'right';
+---
+
+<Section padding="lg" class="bg-background">
+  <Container>
+    <div class:list={['grid gap-10 lg:grid-cols-2 lg:items-center', reverse && 'lg:[&>*:first-child]:order-2']}>
+      <div class="flex flex-col gap-6">
+        {block.title && block.title.length > 0 && <CruisePortableText value={block.title} class="cruise-title" />}
+        {block.body && block.body.length > 0 && <CruisePortableText value={block.body} />}
+      </div>
+      {
+        block.images && block.images.length > 0 && (
+          <div class="grid gap-4">
+            {block.images.slice(0, 2).map((image, index) => {
+              const imageUrl = urlForImage(image)?.width(index === 0 ? 980 : 760).height(index === 0 ? 760 : 520).fit('crop').quality(82).auto('format').url();
+
+              return imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={image.alt || ''}
+                  width={index === 0 ? '980' : '760'}
+                  height={index === 0 ? '760' : '520'}
+                  loading="lazy"
+                  decoding="async"
+                  class:list={[
+                    'w-full object-cover ring-1 ring-border',
+                    index === 0 ? 'aspect-[1.29]' : 'aspect-[1.46] md:ml-auto md:w-3/4',
+                  ]}
+                  style={{ backgroundColor: image.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                />
+              ) : null;
+            })}
+          </div>
+        )
+      }
+    </div>
+  </Container>
+</Section>
+
+<style>
+  .cruise-title :global(p) {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-size: clamp(2.25rem, 4vw, 4rem);
+    line-height: 1.08;
+  }
+</style>

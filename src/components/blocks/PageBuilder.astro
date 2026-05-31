@@ -1,0 +1,104 @@
+---
+/**
+ * PageBuilder — dispatcher pur.
+ *
+ * Reçoit un tableau de blocs Sanity et rend le bon composant selon _type.
+ * Ne fait AUCUNE transformation de données : chaque bloc gère les siennes.
+ *
+ * Usage :
+ *   <PageBuilder blocks={pageBuilder} />
+ */
+import HeroHeader from './HeroHeader.astro';
+import HomeHero from './HomeHero.astro';
+import EditorialBlock from './EditorialBlock.astro';
+import MasonryGallery from './MasonryGallery.astro';
+import VideoFeature from './VideoFeature.astro';
+// À ajouter au fur et à mesure :
+// import Pitch from './Pitch.astro';
+// import Editorial from './Editorial.astro';
+// import Boat from './Boat.astro';
+// import WhyUs from './WhyUs.astro';
+// import Reviews from './Reviews.astro';
+// import Booking from './Booking.astro';
+
+interface Props {
+  blocks: Record<string, unknown>[];
+}
+
+const { blocks = [] } = Astro.props;
+---
+
+{
+  blocks.map((block: any) => {
+    switch (block._type) {
+      case 'heroHeaderBlock':
+        return (
+          <HeroHeader
+            eyebrow={block.keywords?.[0]}
+            title={block.title}
+            body={block.body}
+            primaryCta={block.primaryCtaLabel && block.primaryCtaLink ? { label: block.primaryCtaLabel, href: block.primaryCtaLink } : undefined}
+            secondaryCta={block.secondaryCtaLabel && block.secondaryCtaLink ? { label: block.secondaryCtaLabel, href: block.secondaryCtaLink } : undefined}
+            image={block.image}
+          />
+        );
+
+      case 'homeHeroBlock':
+        return (
+          <HomeHero
+            keywords={block.keywords}
+            title={block.title}
+            body={block.body}
+            primaryCtaLabel={block.primaryCtaLabel}
+            primaryCtaLink={block.primaryCtaLink}
+            secondaryCtaLabel={block.secondaryCtaLabel}
+            secondaryCtaLink={block.secondaryCtaLink}
+            image={block.image}
+          />
+        );
+
+      case 'galleryBlock':
+        return (
+          <MasonryGallery
+            eyebrow={block.eyebrow}
+            title={block.title}
+            images={block.images ?? []}
+            columns={block.columns ?? 3}
+            gap={block.gap ?? 'md'}
+          />
+        );
+
+      case 'editorialBlock':
+        return (
+          <EditorialBlock
+            title={block.title}
+            body={block.body}
+            image={block.image}
+            desktopLayout={block.desktopLayout ?? 'image-text'}
+            mobileLayout={block.mobileLayout ?? 'text-image'}
+            primaryCtaLabel={block.primaryCtaLabel}
+            primaryCtaLink={block.primaryCtaLink}
+            secondaryCtaLabel={block.secondaryCtaLabel}
+            secondaryCtaLink={block.secondaryCtaLink}
+          />
+        );
+
+      case 'videoFeatureBlock':
+        return (
+          <VideoFeature
+            iconImage={block.iconImage}
+            title={block.title}
+            body={block.body}
+            ctaLabel={block.ctaLabel}
+            ctaUrl={block.ctaUrl}
+            youtubeUrl={block.youtubeUrl}
+            posterImage={block.posterImage}
+          />
+        );
+
+      // Blocs à venir — retournent null jusqu'à implémentation frontend
+      default:
+        return null;
+    }
+  })
+}

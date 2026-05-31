@@ -1,0 +1,134 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { TypedObject } from 'astro-portabletext/types';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import SectionHeading from '../cruises/SectionHeading.astro';
+import { buttonVariants } from '../ui/button';
+import { urlForImage } from '../../lib/sanity';
+
+interface SanityImage {
+  asset?: unknown;
+  alt?: string;
+  metadata?: {
+    dimensions?: { width?: number; height?: number };
+    lqip?: string;
+    palette?: { dominant?: { background?: string } };
+  };
+}
+
+interface Props {
+  title?: TypedObject[];
+  body?: TypedObject[];
+  image?: SanityImage;
+  desktopLayout?: 'image-text' | 'text-image';
+  mobileLayout?: 'image-text' | 'text-image';
+  primaryCtaLabel?: string;
+  primaryCtaLink?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaLink?: string;
+}
+
+const {
+  title = [],
+  body = [],
+  image,
+  desktopLayout = 'image-text',
+  mobileLayout = 'text-image',
+  primaryCtaLabel,
+  primaryCtaLink,
+  secondaryCtaLabel,
+  secondaryCtaLink,
+} = Astro.props;
+
+const imageUrl = image ? urlForImage(image)?.width(1200).height(1200).fit('crop').quality(84).auto('format').url() : undefined;
+const imageLqip = image
+  ? urlForImage(image)?.width(32).height(32).fit('crop').blur(18).quality(30).auto('format').url()
+  : undefined;
+
+const desktopImageFirst = desktopLayout === 'image-text';
+const mobileImageFirst = mobileLayout === 'image-text';
+
+const imageOrderClasses = [
+  mobileImageFirst ? 'order-1' : 'order-2',
+  desktopImageFirst ? 'lg:order-1' : 'lg:order-2',
+];
+
+const textOrderClasses = [
+  mobileImageFirst ? 'order-2' : 'order-1',
+  desktopImageFirst ? 'lg:order-2' : 'lg:order-1',
+];
+---
+
+<Section padding="lg" class="bg-background">
+  <Container>
+    <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div class:list={['relative overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-muted/30 shadow-sm', ...imageOrderClasses]}>
+        {
+          imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={image?.alt || ''}
+              width="1200"
+              height="1200"
+              loading="lazy"
+              decoding="async"
+              class="aspect-square h-full w-full object-cover"
+              style={{
+                backgroundColor: image?.metadata?.palette?.dominant?.background || 'var(--muted)',
+                backgroundImage: imageLqip ? `url(${imageLqip})` : undefined,
+                backgroundSize: imageLqip ? 'cover' : undefined,
+                backgroundPosition: imageLqip ? 'center' : undefined,
+              }}
+            />
+          ) : (
+            <div class="aspect-square w-full bg-muted" />
+          )
+        }
+      </div>
+
+      <div class:list={['flex flex-col gap-6', ...textOrderClasses]}>
+        {title.length > 0 && (
+          <div class="split-title">
+            <SectionHeading value={title} />
+          </div>
+        )}
+        {body.length > 0 && (
+          <div class="split-body">
+            <PortableText value={body} />
+          </div>
+        )}
+
+        <div class="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap">
+          {primaryCtaLabel && primaryCtaLink && (
+            <a href={primaryCtaLink} class={buttonVariants({ variant: 'primary', size: 'lg', className: 'w-fit' })}>
+              {primaryCtaLabel}
+            </a>
+          )}
+          {secondaryCtaLabel && secondaryCtaLink && (
+            <a href={secondaryCtaLink} class={buttonVariants({ variant: 'outline', size: 'lg', className: 'w-fit' })}>
+              {secondaryCtaLabel}
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  </Container>
+</Section>
+
+<style>
+  .split-body :global(p) {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-body);
+  }
+
+  div :global(strong) {
+    font-weight: 700;
+  }
+
+  div :global(em) {
+    font-style: italic;
+  }
+</style>

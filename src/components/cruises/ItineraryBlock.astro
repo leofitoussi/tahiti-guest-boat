@@ -1,0 +1,53 @@
+---
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import CruisePortableText from './CruisePortableText.astro';
+import type { ItineraryBlock } from '../../lib/cruises';
+import { urlForImage } from '../../lib/sanity';
+
+interface Props {
+  block: ItineraryBlock;
+}
+
+const { block } = Astro.props;
+---
+
+<Section padding="lg" class="bg-background">
+  <Container>
+    <div class="mb-12 flex max-w-4xl flex-col gap-4">
+      <p class="text-sm font-bold uppercase tracking-[0.16em] text-primary">Itinéraire indicatif</p>
+      <h2 class="font-heading font-semibold leading-tight text-foreground">{block.title}</h2>
+      {block.route && <p class="text-lg font-semibold text-muted-foreground">{block.route}</p>}
+      {block.disclaimer && <p class="max-w-3xl text-sm leading-relaxed text-muted-foreground">{block.disclaimer}</p>}
+    </div>
+    {
+      block.steps && block.steps.length > 0 && (
+        <div class="grid gap-8">
+          {block.steps.map((step) => {
+            const imageUrl = step.image ? urlForImage(step.image)?.width(760).height(500).fit('crop').quality(82).auto('format').url() : undefined;
+
+            return (
+              <article class="grid gap-6 border-t border-border pt-8 md:grid-cols-[0.8fr_1.2fr]">
+                <div>
+                  {step.dayLabel && <h3 class="font-heading font-semibold text-primary">{step.dayLabel}</h3>}
+                  {imageUrl && (
+                    <img
+                      src={imageUrl}
+                      alt={step.image?.alt || ''}
+                      width="760"
+                      height="500"
+                      loading="lazy"
+                      decoding="async"
+                      class="mt-5 aspect-[1.52] w-full rounded-[var(--radius-surface)] object-cover ring-1 ring-border/70"
+                    />
+                  )}
+                </div>
+                <CruisePortableText value={step.description} />
+              </article>
+            );
+          })}
+        </div>
+      )
+    }
+  </Container>
+</Section>

@@ -33,7 +33,7 @@ const imageUrl = node.asset
 
 {
   imageUrl && (
-    <figure class="my-10 overflow-hidden rounded-lg bg-[#eef4f8]">
+    <figure class="my-10 overflow-hidden rounded-[var(--radius-surface)] bg-muted/30">
       <img
         src={imageUrl}
         alt={node.alt || ''}
@@ -42,9 +42,9 @@ const imageUrl = node.asset
         loading="lazy"
         decoding="async"
         class="w-full object-cover"
-        style={{ backgroundColor: node.metadata?.palette?.dominant?.background || '#eef4f8' }}
+        style={{ backgroundColor: node.metadata?.palette?.dominant?.background || 'var(--muted)' }}
       />
-      {node.caption && <figcaption class="px-4 py-3 text-sm text-[#526071]">{node.caption}</figcaption>}
+      {node.caption && <figcaption class="px-4 py-3 text-sm text-muted-foreground">{node.caption}</figcaption>}
     </figure>
   )
 }

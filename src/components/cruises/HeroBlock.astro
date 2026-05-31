@@ -1,0 +1,56 @@
+---
+import { buttonVariants } from '../ui/button';
+import Container from '../layout/Container.astro';
+import type { CruiseHeroBlock } from '../../lib/cruises';
+import { urlForImage } from '../../lib/sanity';
+
+interface Props {
+  block: CruiseHeroBlock;
+}
+
+const { block } = Astro.props;
+const imageUrl = block.backgroundImage
+  ? urlForImage(block.backgroundImage)?.width(1800).height(980).fit('crop').quality(84).auto('format').url()
+  : undefined;
+const placeholder = block.backgroundImage
+  ? urlForImage(block.backgroundImage)?.width(40).height(22).fit('crop').blur(18).quality(35).auto('format').url()
+  : undefined;
+---
+
+<section class="relative isolate min-h-[76vh] overflow-hidden bg-brand-secondary text-white">
+  {
+    imageUrl ? (
+      <img
+        src={imageUrl}
+        alt={block.backgroundImage?.alt || ''}
+        width="1800"
+        height="980"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+        class="absolute inset-0 h-full w-full object-cover"
+        style={{
+          backgroundImage: placeholder ? `url(${placeholder})` : undefined,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      />
+    ) : (
+      <div class="absolute inset-0 bg-brand-secondary" />
+    )
+  }
+  <div class="absolute inset-0 bg-gradient-to-t from-brand-secondary/85 via-brand-secondary/35 to-brand-secondary/35" />
+  <Container class="relative flex min-h-[76vh] items-end pb-16 pt-36 md:pb-24">
+    <div class="max-w-4xl">
+      <p class="mb-5 text-sm font-bold uppercase tracking-[0.18em] text-brand-accent">Nos croisières</p>
+      <h1 class="font-heading font-semibold leading-tight">{block.title}</h1>
+      {
+        block.ctaLabel && block.ctaUrl && (
+          <a href={block.ctaUrl} class={buttonVariants({ className: 'mt-8' })}>
+            {block.ctaLabel}
+          </a>
+        )
+      }
+    </div>
+  </Container>
+</section>

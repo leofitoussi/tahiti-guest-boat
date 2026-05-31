@@ -1,0 +1,43 @@
+---
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import { buttonVariants } from '../ui/button';
+import type { SiteSettings } from '../../lib/cruises';
+
+interface Props {
+  settings?: SiteSettings | null;
+}
+
+const { settings } = Astro.props;
+const booking = settings?.bookingEmbed;
+const title = booking?.title || 'Préparer votre croisière';
+const ctaLabel = booking?.fallbackCtaLabel || 'Nous contacter';
+const ctaUrl = booking?.fallbackCtaUrl || '/contact';
+---
+
+<Section padding="lg" class="bg-brand-secondary text-white">
+  <Container>
+    <div class="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
+      <div>
+        <p class="text-sm font-bold uppercase tracking-[0.16em] text-brand-accent">Réservation</p>
+        <h2 class="mt-3 font-heading font-semibold leading-tight">{title}</h2>
+        {booking?.providerName && <p class="mt-4 text-sm text-white/70">Module {booking.providerName}</p>}
+      </div>
+      {
+        booking?.embedUrl ? (
+          <iframe
+            src={booking.embedUrl}
+            title={title}
+            loading="lazy"
+            class="h-[720px] w-full rounded-[var(--radius-surface)] border border-white/15 bg-white"
+          />
+        ) : (
+          <div class="rounded-[var(--radius-surface)] border border-white/15 p-8">
+            <p class="mb-6 max-w-xl text-white/75">Le module de réservation sera disponible prochainement. Vous pouvez déjà nous écrire pour construire votre croisière.</p>
+            <a href={ctaUrl} class={buttonVariants({ variant: 'secondary' })}>{ctaLabel}</a>
+          </div>
+        )
+      }
+    </div>
+  </Container>
+</Section>

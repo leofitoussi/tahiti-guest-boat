@@ -1,0 +1,48 @@
+---
+/**
+ * HomeHero — wrapper Sanity du HeroHeader réutilisable.
+ * Reçoit les données brutes du bloc homeHeroBlock et les mappe vers le composant partagé.
+ */
+import HeroHeader from './HeroHeader.astro';
+
+interface SanityImage {
+  asset?: unknown;
+  alt?: string;
+  metadata?: {
+    dimensions?: { width?: number; height?: number };
+    lqip?: string;
+    palette?: { dominant?: { background?: string } };
+  };
+}
+
+interface Props {
+  keywords?: string[];
+  title: string;
+  body?: string;
+  primaryCtaLabel?: string;
+  primaryCtaLink?: string;
+  secondaryCtaLabel?: string;
+  secondaryCtaLink?: string;
+  image?: SanityImage;
+}
+
+const {
+  keywords = [],
+  title,
+  body,
+  primaryCtaLabel,
+  primaryCtaLink,
+  secondaryCtaLabel,
+  secondaryCtaLink,
+  image,
+} = Astro.props;
+---
+
+<HeroHeader
+  eyebrow={keywords[0]}
+  title={title}
+  body={body}
+  primaryCta={primaryCtaLabel && primaryCtaLink ? { label: primaryCtaLabel, href: primaryCtaLink } : undefined}
+  secondaryCta={secondaryCtaLabel && secondaryCtaLink ? { label: secondaryCtaLabel, href: secondaryCtaLink } : undefined}
+  image={image}
+/>

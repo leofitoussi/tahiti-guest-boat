@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tahiti Component Builder"
+  short_description: "Build Astro/Sanity blocks for TGB."
+  default_prompt: "Use $tahiti-component-builder to create or update a reusable Astro/Sanity component for Tahiti Guest Boat."

@@ -1,0 +1,62 @@
+---
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import { buttonVariants } from '../ui/button';
+import CruisePortableText from './CruisePortableText.astro';
+import SectionHeading from './SectionHeading.astro';
+import type { BoatBlock } from '../../lib/cruises';
+import { urlForImage } from '../../lib/sanity';
+
+interface Props {
+  block: BoatBlock;
+}
+
+const { block } = Astro.props;
+const imageUrl = block.boatImage ? urlForImage(block.boatImage)?.width(1200).height(760).fit('crop').quality(84).auto('format').url() : undefined;
+---
+
+<Section padding="lg" class="bg-muted/30">
+  <Container>
+    <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+      {
+        imageUrl && (
+          <img
+            src={imageUrl}
+            alt={block.boatImage?.alt || ''}
+            width="1200"
+            height="760"
+            loading="lazy"
+            decoding="async"
+            class="aspect-[1.58] w-full rounded-[var(--radius-surface)] object-cover shadow-sm ring-1 ring-border/70"
+          />
+        )
+      }
+      <div class="flex flex-col gap-6">
+        {block.title && <SectionHeading value={block.title} class="boat-title" />}
+        {block.body && <CruisePortableText value={block.body} />}
+        {
+          block.arguments && block.arguments.length > 0 && (
+            <div class="grid gap-4 sm:grid-cols-2">
+              {block.arguments.map((argument) => (
+                <div class="border-t border-border/70 pt-4">
+                  <div class="flex items-center gap-3">
+                    {argument.icon && <span class="text-2xl" aria-hidden="true">{argument.icon}</span>}
+                    <h3 class="text-sm font-bold uppercase tracking-[0.14em] text-primary">{argument.label}</h3>
+                  </div>
+                  {argument.body && <p class="mt-3 text-sm leading-relaxed text-muted-foreground">{argument.body}</p>}
+                </div>
+              ))}
+            </div>
+          )
+        }
+        {
+          block.ctaLabel && block.ctaUrl && (
+            <a href={block.ctaUrl} class={buttonVariants({ className: 'w-fit' })}>
+              {block.ctaLabel}
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </Container>
+</Section>

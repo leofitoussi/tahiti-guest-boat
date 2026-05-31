@@ -1,6 +1,10 @@
 ---
-import SiteHeader from '../../components/navigation/SiteHeader.astro';
 import BlogContent from '../../components/blog/BlogContent.astro';
+import Container from '../../components/layout/Container.astro';
+import Section from '../../components/layout/Section.astro';
+import { Badge } from '../../components/ui/badge';
+import { buttonVariants } from '../../components/ui/button';
+import { Separator } from '../../components/ui/separator';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatPostDate, getBlogPost, getBlogPosts, type BlogPost } from '../../lib/blog';
 import { urlForImage } from '../../lib/sanity';
@@ -16,11 +20,6 @@ export async function getStaticPaths() {
 
 const summary = Astro.props.post as BlogPost;
 const post = (await getBlogPost(summary.slug)) || summary;
-const navItems = [
-  { label: 'Notre bateau', href: '/notre-bateau', hasDropdown: true },
-  { label: 'Nos croisières', href: '/nos-croisieres', hasDropdown: true },
-  { label: 'Notre blog', href: '/blog', hasDropdown: false },
-];
 
 const title = post.seoTitle || `${post.title} | Tahiti Guest Boat`;
 const description = post.seoDescription || post.excerpt || 'Article du blog Tahiti Guest Boat.';
@@ -30,39 +29,50 @@ const mainImageUrl = post.mainImage
 ---
 
 <BaseLayout title={title} description={description}>
-  <SiteHeader navItems={navItems} ctaLabel="Réserver" ctaHref="/reservation" />
-
-  <main class="bg-white">
+  <main class="bg-background">
     <article>
-      <header class="mx-auto max-w-[1060px] px-5 pb-10 pt-14 md:px-8 md:pb-14 md:pt-20">
-        <a href="/blog" class="font-bold text-[#285aaa] underline underline-offset-4">Retour au blog</a>
-        {post.publishedAt && <p class="mt-8 text-sm font-bold uppercase tracking-[0.16em] text-[#526071]">{formatPostDate(post.publishedAt)}</p>}
-        <h1 class="mt-4 font-serif text-[44px] font-bold leading-tight text-[#071a3a] md:text-[72px]">{post.title}</h1>
-        {post.excerpt && <p class="mt-6 max-w-[820px] text-xl leading-9 text-[#344054]">{post.excerpt}</p>}
-      </header>
+      <Section padding="lg" class="border-b border-border/70 bg-muted/30">
+        <Container class="max-w-[1060px]">
+          <div class="flex flex-col gap-6">
+            <a href="/blog" class={buttonVariants({ variant: 'ghost', className: 'w-fit px-0' })}>Retour au blog</a>
+            <div class="flex flex-col gap-4">
+              {post.publishedAt && <Badge variant="secondary">{formatPostDate(post.publishedAt)}</Badge>}
+              <h1 class="font-heading font-semibold leading-tight text-foreground">{post.title}</h1>
+              {post.excerpt && <p class="max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">{post.excerpt}</p>}
+            </div>
+          </div>
+        </Container>
+      </Section>
 
       {
         mainImageUrl && (
-          <figure class="mx-auto max-w-[1180px] px-5 md:px-8">
-            <img
-              src={mainImageUrl}
-              alt={post.mainImage?.alt || ''}
-              width="1440"
-              height="850"
-              loading="eager"
-              decoding="async"
-              fetchpriority="high"
-              class="max-h-[680px] w-full rounded-lg object-cover"
-              style={{ backgroundColor: post.mainImage?.metadata?.palette?.dominant?.background || '#eef4f8' }}
-            />
-            {post.mainImage?.caption && <figcaption class="px-1 py-3 text-sm text-[#526071]">{post.mainImage.caption}</figcaption>}
-          </figure>
+          <Section padding="sm">
+            <Container>
+              <figure>
+              <img
+                  src={mainImageUrl}
+                  alt={post.mainImage?.alt || ''}
+                  width="1440"
+                  height="850"
+                  loading="eager"
+                  decoding="async"
+                  fetchpriority="high"
+                  class="max-h-[680px] w-full rounded-[var(--radius-surface)] object-cover shadow-sm ring-1 ring-border/70"
+                  style={{ backgroundColor: post.mainImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                />
+                {post.mainImage?.caption && <figcaption class="px-1 py-3 text-sm text-muted-foreground">{post.mainImage.caption}</figcaption>}
+              </figure>
+            </Container>
+          </Section>
         )
       }
 
-      <section class="mx-auto max-w-[820px] px-5 py-12 md:px-8 md:py-16">
-        <BlogContent value={post.body} />
-      </section>
+      <Section padding={mainImageUrl ? 'md' : 'lg'}>
+        <Container class="max-w-[820px]">
+          <Separator className="mb-10" />
+          <BlogContent value={post.body} />
+        </Container>
+      </Section>
     </article>
   </main>
 </BaseLayout>

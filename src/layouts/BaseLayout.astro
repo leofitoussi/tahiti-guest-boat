@@ -1,5 +1,9 @@
 ---
 import '../styles/global.css';
+import Header from '../components/navigation/Header.astro';
+import Footer from '../components/navigation/Footer.astro';
+import { getSiteSettings } from '../lib/cruises';
+import { urlForImage } from '../lib/sanity';
 
 interface Props {
   title: string;
@@ -10,6 +14,32 @@ const {
   title,
   description = 'Croisieres privees et experiences lagon en Polynesie francaise avec Tahiti Guest Boat.',
 } = Astro.props;
+
+const settings = await getSiteSettings();
+
+const navItems = settings?.nav?.map((item) => ({
+  label: item.label ?? '',
+  href: item.href ?? '#',
+  hasDropdown: item.hasDropdown ?? false,
+})) ?? [];
+
+const logoUrl = settings?.logo
+  ? urlForImage(settings.logo)?.width(360).auto('format').url()
+  : undefined;
+
+const logoAlt = settings?.logoAlt ?? 'Logo';
+
+const brandName = settings?.siteName ?? 'Tahiti Guest Boat';
+
+const ctaLabel = settings?.reservationText ?? 'Réserver';
+const ctaHref = settings?.reservationLink ?? '/reservation';
+
+const footerLinks = settings?.footerLinks?.map((l) => ({
+  label: l.label ?? '',
+  href: l.url ?? '#',
+})) ?? [];
+
+const footerText = settings?.footerText;
 ---
 
 <!doctype html>
@@ -21,6 +51,15 @@ const {
     <title>{title}</title>
   </head>
   <body>
+    <Header
+      logoUrl={logoUrl ?? undefined}
+      logoAlt={logoAlt}
+      brandName={brandName}
+      navItems={navItems}
+      ctaLabel={ctaLabel}
+      ctaHref={ctaHref}
+    />
     <slot />
+    <Footer brandName={brandName} footerLinks={footerLinks} footerText={footerText} />
   </body>
 </html>

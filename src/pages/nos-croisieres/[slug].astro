@@ -1,0 +1,59 @@
+---
+import BoatBlock from '../../components/cruises/BoatBlock.astro';
+import BookingBlock from '../../components/cruises/BookingBlock.astro';
+import FullWidthImageBlock from '../../components/cruises/FullWidthImageBlock.astro';
+import HeroBlock from '../../components/cruises/HeroBlock.astro';
+import ItineraryBlock from '../../components/cruises/ItineraryBlock.astro';
+import PitchBlock from '../../components/cruises/PitchBlock.astro';
+import RelatedCruisesBlock from '../../components/cruises/RelatedCruisesBlock.astro';
+import ReviewsBlock from '../../components/cruises/ReviewsBlock.astro';
+import WhyUsBlock from '../../components/cruises/WhyUsBlock.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import {
+  getCruisePage,
+  getCruisePages,
+  getRelatedCruises,
+  getReviews,
+  getSiteSettings,
+  type CruisePage,
+} from '../../lib/cruises';
+
+export async function getStaticPaths() {
+  const cruises = await getCruisePages();
+
+  return cruises.map((cruise) => ({
+    params: { slug: cruise.slug },
+    props: { cruise },
+  }));
+}
+
+const summary = Astro.props.cruise;
+const cruise = ((await getCruisePage(summary.slug)) || summary) as CruisePage;
+const [settings, reviews, relatedCruises] = await Promise.all([
+  getSiteSettings(),
+  getReviews(3),
+  getRelatedCruises(cruise.slug, 3),
+]);
+
+const title = cruise.seoTitle || `${cruise.title} | Tahiti Guest Boat`;
+const description = cruise.seoDescription || cruise.excerpt || 'Croisière privée en catamaran avec Tahiti Guest Boat.';
+const hero = cruise.hero || { title: cruise.title };
+const pitch = cruise.pitch || { accroche: description };
+const featuredImage = cruise.featuredImage || {};
+const boat = cruise.boat || {};
+const itinerary = cruise.itinerary || { title: 'Itinéraire indicatif', steps: [] };
+---
+
+<BaseLayout title={title} description={description}>
+  <main class="bg-background">
+    <HeroBlock block={hero} />
+    <PitchBlock block={pitch} />
+    <FullWidthImageBlock block={featuredImage} />
+    <BoatBlock block={boat} />
+    <ItineraryBlock block={itinerary} />
+    <WhyUsBlock settings={settings} />
+    <ReviewsBlock reviews={reviews} />
+    <BookingBlock settings={settings} />
+    <RelatedCruisesBlock cruises={relatedCruises} />
+  </main>
+</BaseLayout>

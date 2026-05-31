@@ -1,5 +1,5 @@
 ---
-import SiteHeader from '../navigation/SiteHeader.astro';
+import Header from '../navigation/Header.astro';
 
 interface ImageData {
   url?: string;
@@ -51,7 +51,7 @@ const {
 } = Astro.props;
 ---
 
-<SiteHeader
+<Header
   logoUrl={logo?.url}
   logoAlt={logo?.alt}
   navItems={navItems}

@@ -1,0 +1,96 @@
+---
+import Container from '../../components/layout/Container.astro';
+import Grid from '../../components/layout/Grid.astro';
+import Section from '../../components/layout/Section.astro';
+import { Badge } from '../../components/ui/badge';
+import { buttonVariants } from '../../components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCruisePages } from '../../lib/cruises';
+import { urlForImage } from '../../lib/sanity';
+
+const cruises = await getCruisePages();
+---
+
+<BaseLayout
+  title="Nos croisières | Tahiti Guest Boat"
+  description="Des croisières privées en catamaran en Polynésie, pensées sur mesure selon vos envies, votre rythme et vos escales."
+>
+  <main class="bg-background">
+    <Section padding="lg" class="border-b border-border/70 bg-muted/30">
+      <Container>
+        <div class="flex max-w-4xl flex-col gap-5">
+          <Badge>Nos croisières</Badge>
+          <h1 class="font-heading font-semibold leading-tight text-foreground">
+            Les croisières en catamaran de Tahiti Guest Boat
+          </h1>
+          <div class="max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+            <p class="mb-4 font-bold text-foreground">100% personnalisées</p>
+            <p>
+              Chaque croisière est une aventure unique, pensée sur mesure selon vos envies. Ici, pas d'itinéraires figés ni de programmes rigides : vous choisissez le rythme, les escales et les expériences qui vous ressemblent.
+            </p>
+            <p class="mt-4">
+              Pour vous inspirer, découvrez ci-dessous quelques exemples d'expériences à vivre en mer. Mais souvenez-vous, la plus belle croisière sera celle que nous créerons ensemble !
+            </p>
+          </div>
+        </div>
+      </Container>
+    </Section>
+
+    <Section padding="lg">
+      <Container>
+        {
+          cruises.length > 0 ? (
+            <Grid columns={3}>
+              {cruises.map((cruise) => {
+                const imageUrl = cruise.heroImage
+                  ? urlForImage(cruise.heroImage)?.width(860).height(580).fit('crop').quality(82).auto('format').url()
+                  : undefined;
+
+                return (
+                  <Card className="transition hover:-translate-y-1 hover:shadow-md">
+                    <a href={`/nos-croisieres/${cruise.slug}/`} class="block">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={cruise.heroImage?.alt || ''}
+                          width="860"
+                          height="580"
+                          loading="lazy"
+                          decoding="async"
+                          class="aspect-[1.48] w-full object-cover"
+                        />
+                      ) : (
+                        <div class="aspect-[1.48] w-full bg-muted" />
+                      )}
+                    </a>
+                    <CardHeader>
+                      <CardTitle>
+                        <a href={`/nos-croisieres/${cruise.slug}/`} class="transition hover:text-primary">
+                          {cruise.heroTitle || cruise.title}
+                        </a>
+                      </CardTitle>
+                      {cruise.excerpt && <CardDescription className="line-clamp-4">{cruise.excerpt}</CardDescription>}
+                    </CardHeader>
+                    <CardContent>
+                      <a href={`/nos-croisieres/${cruise.slug}/`} class={buttonVariants({ variant: 'ghost', className: 'px-0' })}>
+                        Découvrir
+                      </a>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </Grid>
+          ) : (
+            <div class="border border-dashed border-border p-8 text-center">
+              <h2 class="font-heading font-semibold text-foreground">Les inspirations de croisière arrivent bientôt</h2>
+              <p class="mx-auto mt-3 max-w-2xl text-muted-foreground">
+                Les pages ajoutées dans Sanity Studio apparaîtront ici après publication et rebuild du site.
+              </p>
+            </div>
+          )
+        }
+      </Container>
+    </Section>
+  </main>
+</BaseLayout>

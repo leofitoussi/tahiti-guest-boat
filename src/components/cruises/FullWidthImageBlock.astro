@@ -1,0 +1,28 @@
+---
+import type { FullWidthImageBlock } from '../../lib/cruises';
+import { urlForImage } from '../../lib/sanity';
+
+interface Props {
+  block: FullWidthImageBlock;
+}
+
+const { block } = Astro.props;
+const imageUrl = block.image ? urlForImage(block.image)?.width(1920).height(920).fit('crop').quality(84).auto('format').url() : undefined;
+---
+
+{
+  imageUrl && (
+    <section class="bg-background py-4 md:py-8">
+      <img
+        src={imageUrl}
+        alt={block.image?.alt || ''}
+        width="1920"
+        height="920"
+        loading="lazy"
+        decoding="async"
+        class="h-[42vh] min-h-[320px] w-full object-cover md:h-[70vh]"
+        style={{ backgroundColor: block.image?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+      />
+    </section>
+  )
+}

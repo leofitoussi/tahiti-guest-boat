@@ -7,6 +7,7 @@ const nodeEnv = typeof process !== 'undefined' ? process.env : {};
 const projectId = env?.PUBLIC_SANITY_PROJECT_ID || nodeEnv.PUBLIC_SANITY_PROJECT_ID || 'hct2hzrl';
 const dataset = env?.PUBLIC_SANITY_DATASET || nodeEnv.PUBLIC_SANITY_DATASET || 'production';
 const homePageDocumentId = 'f512860b-c337-4a81-b057-a93acdc2c961';
+const siteSettingsDocumentId = 'siteSettings';
 
 export default defineConfig({
   name: 'default',
@@ -23,7 +24,13 @@ export default defineConfig({
               .title('Homepage')
               .schemaType('homePage')
               .child(S.document().schemaType('homePage').documentId(homePageDocumentId)),
+            S.listItem()
+              .title('Site settings')
+              .schemaType('siteSettings')
+              .child(S.document().schemaType('siteSettings').documentId(siteSettingsDocumentId)),
             S.divider(),
+            S.documentTypeListItem('cruisePage').title('Cruise pages'),
+            S.documentTypeListItem('review').title('Reviews'),
             S.documentTypeListItem('blogPost').title('Blog posts'),
           ]),
     }),

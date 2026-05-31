@@ -1,0 +1,36 @@
+---
+import Container from '../layout/Container.astro';
+import Grid from '../layout/Grid.astro';
+import Section from '../layout/Section.astro';
+import type { SiteSettings } from '../../lib/cruises';
+
+interface Props {
+  settings?: SiteSettings | null;
+}
+
+const { settings } = Astro.props;
+const title = settings?.whyUsTitle || 'Pourquoi naviguer avec Tahiti Guest Boat ?';
+const argumentsList = settings?.whyUsArguments?.length
+  ? settings.whyUsArguments
+  : [
+      { icon: '⚓', body: 'Une croisière privée pensée autour de votre rythme, de vos envies et de la météo.' },
+      { icon: '☀️', body: 'Une expérience conviviale, simple et attentive, loin des programmes standardisés.' },
+      { icon: '🌊', body: 'Une connaissance sensible des lagons, des mouillages et de la vie à bord.' },
+    ];
+---
+
+<Section padding="lg" class="bg-muted/30">
+  <Container>
+    <div class="mb-10 max-w-3xl">
+      <h2 class="font-heading font-semibold leading-tight text-foreground">{title}</h2>
+    </div>
+    <Grid columns={3}>
+      {argumentsList.map((item) => (
+        <div class="rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
+          {item.icon && <span class="text-3xl" aria-hidden="true">{item.icon}</span>}
+          <p class="mt-4 text-base leading-relaxed text-muted-foreground">{item.body}</p>
+        </div>
+      ))}
+    </Grid>
+  </Container>
+</Section>

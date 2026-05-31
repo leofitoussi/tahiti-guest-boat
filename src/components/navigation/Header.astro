@@ -1,0 +1,48 @@
+---
+import { DesktopNavigation } from './DesktopNavigation';
+import { MobileDrawer } from './MobileDrawer';
+
+interface NavItem {
+  label: string;
+  href: string;
+  hasDropdown?: boolean;
+}
+
+interface Props {
+  logoUrl?: string;
+  logoAlt?: string;
+  brandName?: string;
+  navItems?: NavItem[];
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+
+const {
+  logoUrl,
+  logoAlt = 'Tahiti Guest Boat',
+  brandName = 'Tahiti Guest Boat',
+  navItems = [],
+  ctaLabel,
+  ctaHref = '/contact',
+} = Astro.props;
+---
+
+<header class="border-b border-border/70 bg-background">
+  <div class="mx-auto flex h-20 max-w-site items-center justify-between px-5 md:px-8">
+    <a href="/" class="flex min-w-0 items-center gap-3" aria-label={brandName}>
+      {
+        logoUrl ? (
+          <img src={logoUrl} alt={logoAlt} class="h-12 w-auto shrink-0 object-contain" width="192" height="64" />
+        ) : (
+          <span class="font-heading text-2xl font-semibold tracking-[0.16em] text-primary uppercase">{brandName}</span>
+        )
+      }
+    </a>
+
+    <DesktopNavigation navItems={navItems} ctaLabel={ctaLabel} ctaHref={ctaHref} />
+
+    <div class="md:hidden">
+      <MobileDrawer navItems={navItems} ctaLabel={ctaLabel} ctaHref={ctaHref} client:load />
+    </div>
+  </div>
+</header>

@@ -1,0 +1,100 @@
+---
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import { urlForImage } from '../../lib/sanity';
+import type { SanityImage } from '../../lib/blog';
+
+interface Card {
+  _key?: string;
+  title?: string;
+  description?: string;
+  linkLabel?: string;
+  linkUrl?: string;
+  image?: SanityImage;
+}
+
+interface Props {
+  headingPrefix?: string;
+  headingHighlight?: string;
+  subtitle?: string;
+  cards?: Card[];
+}
+
+const {
+  headingPrefix = 'Quelques idées de',
+  headingHighlight = 'croisière',
+  subtitle = 'juste pour vous inspirer…',
+  cards = [],
+} = Astro.props;
+---
+
+<Section padding="lg">
+  <Container>
+    <h2 class="font-heading text-[clamp(2rem,4vw,3.25rem)] font-semibold leading-[1.1] text-foreground">
+      {headingPrefix} <em>{headingHighlight}</em>,
+      <br />
+      <em class="font-normal text-primary">{subtitle}</em>
+    </h2>
+
+    {cards.length > 0 && (
+      <div class="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
+        {cards.map((card) => {
+          const imageUrl = card.image
+            ? urlForImage(card.image)?.width(760).height(507).fit('crop').quality(82).auto('format').url()
+            : undefined;
+
+          return (
+            <article>
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={card.image?.alt || ''}
+                  width="760"
+                  height="507"
+                  loading="lazy"
+                  decoding="async"
+                  class="aspect-[3/2] w-full object-cover"
+                />
+              ) : (
+                <div class="aspect-[3/2] bg-muted" />
+              )}
+
+              <div class="mt-5">
+                <h3 class="font-heading text-xl font-semibold leading-snug text-foreground">
+                  {card.title}
+                </h3>
+                {card.description && (
+                  <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {card.description}
+                  </p>
+                )}
+                {card.linkUrl && (
+                  <a
+                    href={card.linkUrl}
+                    class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 transition hover:text-primary/80"
+                  >
+                    {card.linkLabel || 'Découvrir'}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      aria-hidden="true"
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                  </a>
+                )}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    )}
+  </Container>
+</Section>

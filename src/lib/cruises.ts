@@ -73,6 +73,24 @@ export interface ItineraryBlock {
   steps?: ItineraryStep[];
 }
 
+export interface CruiseInspirationCard {
+  _key?: string;
+  title?: string;
+  description?: string;
+  linkLabel?: string;
+  linkUrl?: string;
+  image?: SanityImage;
+}
+
+export interface CruiseInspirationBlock {
+  _type?: 'cruiseInspirationBlock';
+  _key?: string;
+  headingPrefix?: string;
+  headingHighlight?: string;
+  subtitle?: string;
+  cards?: CruiseInspirationCard[];
+}
+
 export interface CruisePageSummary {
   _id: string;
   title: string;
@@ -224,7 +242,8 @@ const SITE_SETTINGS_QUERY = `*[${buildLocalizedSingletonDocumentFilter('siteSett
   contactEmail,
   contactPhone,
   whyUsTitle,
-  whyUsArguments[]{icon, body},
+  whyUsDescription,
+  whyUsArguments[]{heading, icon, body},
   bookingEmbed{
     title,
     providerName,

@@ -137,6 +137,25 @@ const pageBuilderFields = `pageBuilder[]{
 
   _type in ["whyUsBlock", "reviewsBlock", "bookingBlock", "relatedCruisesBlock", "fullWidthImageBlock"] => {
     ...
+  },
+
+  _type == "cruiseInspirationBlock" => {
+    headingPrefix,
+    headingHighlight,
+    subtitle,
+    cards[]{
+      _key,
+      title,
+      description,
+      linkLabel,
+      linkUrl,
+      image{
+        ...,
+        asset,
+        alt,
+        "metadata": asset->metadata { dimensions }
+      }
+    }
   }
 }`;
 

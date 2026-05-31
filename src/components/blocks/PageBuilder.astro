@@ -15,7 +15,9 @@ import VideoFeature from './VideoFeature.astro';
 import FullWidthImageBlock from '../cruises/FullWidthImageBlock.astro';
 import BookingBlock from '../cruises/BookingBlock.astro';
 import RelatedCruisesBlock from '../cruises/RelatedCruisesBlock.astro';
+import CruiseInspirationBlock from './CruiseInspirationBlock.astro';
 import ReviewsBlock from '../cruises/ReviewsBlock.astro';
+import PracticalInfoBlock from './PracticalInfoBlock.astro';
 import WhyUsBlock from '../cruises/WhyUsBlock.astro';
 import type { CruisePageSummary, Review, SiteSettings } from '../../lib/cruises';
 import { defaultLocale, type Locale } from '../../lib/localization';
@@ -118,6 +120,15 @@ const { blocks = [], settings = null, reviews = [], cruises = [], locale = defau
       case 'fullWidthImageBlock':
         return <FullWidthImageBlock block={block} />;
 
+      case 'practicalInfoBlock':
+        return (
+          <PracticalInfoBlock
+            sectionTitle={block.sectionTitle as string | undefined}
+            leftColumn={block.leftColumn as any}
+            rightColumn={block.rightColumn as any}
+          />
+        );
+
       case 'whyUsBlock':
         return <WhyUsBlock settings={settings} locale={locale} />;
 
@@ -129,6 +140,16 @@ const { blocks = [], settings = null, reviews = [], cruises = [], locale = defau
 
       case 'relatedCruisesBlock':
         return <RelatedCruisesBlock cruises={cruises} locale={locale} />;
+
+      case 'cruiseInspirationBlock':
+        return (
+          <CruiseInspirationBlock
+            headingPrefix={block.headingPrefix as string | undefined}
+            headingHighlight={block.headingHighlight as string | undefined}
+            subtitle={block.subtitle as string | undefined}
+            cards={block.cards as any}
+          />
+        );
 
       default:
         return null;

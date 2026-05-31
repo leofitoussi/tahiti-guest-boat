@@ -29,7 +29,7 @@ const hasHeadings = argumentsList.some((item) => item.heading);
 {hasHeadings ? (
   <Section padding="lg" class="bg-muted/30">
     <Container>
-      <div class="grid gap-12 md:grid-cols-2 md:items-start md:gap-16">
+      <div class="grid gap-12 md:grid-cols-[2fr_3fr] md:items-start md:gap-16">
         <div class="flex flex-col gap-5">
           <h2 class="font-heading text-3xl font-semibold leading-tight text-foreground md:text-4xl">
             {title}
@@ -39,9 +39,9 @@ const hasHeadings = argumentsList.some((item) => item.heading);
           )}
         </div>
 
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div class="grid grid-cols-1 gap-0 sm:grid-cols-2">
           {argumentsList.map((item) => (
-            <div class="rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
+            <div class="border-t border-border/60 px-2 py-5">
               {item.heading && (
                 <h3 class="font-heading text-base font-semibold leading-snug text-foreground">
                   {item.heading}

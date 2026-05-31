@@ -22,6 +22,8 @@ import { review } from './review';
 import { reviewsBlock } from './reviewsBlock';
 import { siteSettings } from './siteSettings';
 import { videoFeatureBlock } from './videoFeatureBlock';
+import { cruiseInspirationBlock } from './cruiseInspirationBlock';
+import { practicalInfoBlock } from './practicalInfoBlock';
 import { whyUsBlock } from './whyUsBlock';
 
 export const schemaTypes = [
@@ -52,4 +54,6 @@ export const schemaTypes = [
   reviewsBlock,
   bookingBlock,
   relatedCruisesBlock,
+  cruiseInspirationBlock,
+  practicalInfoBlock,
 ];

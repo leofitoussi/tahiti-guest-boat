@@ -1,6 +1,5 @@
 ---
 import HeroBlock from '../components/blocks/Hero.astro';
-import WhyUsBlock from '../components/cruises/WhyUsBlock.astro';
 import MasonryGallery from '../components/blocks/MasonryGallery.astro';
 import MarqueeGallery from '../components/blocks/MarqueeGallery.astro';
 import Container from '../components/layout/Container.astro';
@@ -33,19 +32,7 @@ const sections = [
   { id: 'masonry', label: 'Masonry Gallery' },
   { id: 'marquee', label: 'Marquee Gallery' },
   { id: 'navigation', label: 'Navigation' },
-  { id: 'why-us', label: 'Why Us Block' },
 ];
-
-const whyUsHeadingsSettings = {
-  whyUsTitle: 'Votre croisière en polynésie avec Tahiti Guest Boat',
-  whyUsDescription: 'Laissez-vous guider par les vents et naviguez vers les horizons infinis du Fenua à bord de Na Maka.',
-  whyUsArguments: [
-    { heading: 'Émerveillement naturel', body: 'Plongez dans la splendeur des paysages polynésiens, où chaque île est un joyau de beauté pure.' },
-    { heading: 'Aventures innoubliables', body: 'Explorez, rêvez, et laissez-vous porter par une multitude d\'activités uniques et enrichissantes.' },
-    { heading: 'Authenticité culturelle', body: 'Vivez des moments authentiques, en harmonie avec la culture et les traditions polynésiennes.' },
-    { heading: 'Voyage personnalisé', body: 'Naviguez à votre rythme, avec des expériences sur mesure pour une croisière inoubliable.' },
-  ],
-};
 
 // MarqueeGallery uses ResolvedImage (url-based), split into 3 rows of 5
 const marqueeRow1 = [
@@ -367,25 +354,6 @@ const demoImages = [
           />
         </section>
 
-        <!-- Why Us Block -->
-        <section id="why-us" class="scroll-mt-8">
-          <div class="mb-6 flex flex-col gap-2 border-b border-border pb-6">
-            <Badge variant="secondary">Blocs partagés</Badge>
-            <h2 class="font-heading font-semibold text-foreground">Why Us Block</h2>
-            <p class="text-sm text-muted-foreground">
-              2 variantes : icônes 3 colonnes (données Sanity sans heading) et intro + grille 2×2 (données avec heading).
-            </p>
-          </div>
-          <div class="mb-6 overflow-hidden rounded-[var(--radius-surface)] border border-border/70">
-            <p class="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground bg-muted/50">Variante intro + 2×2</p>
-            <WhyUsBlock settings={whyUsHeadingsSettings} />
-          </div>
-          <div class="overflow-hidden rounded-[var(--radius-surface)] border border-border/70">
-            <p class="px-5 py-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground bg-muted/50">Variante icônes 3 colonnes (fallback)</p>
-            <WhyUsBlock />
-          </div>
-        </section>
-
         <!-- Navigation -->
         <section id="navigation" class="scroll-mt-8">
           <div class="mb-6 flex flex-col gap-2 border-b border-border pb-6">
@@ -406,5 +374,6 @@ const demoImages = [
       </div>
     </div>
   </main>
+
 
 </BaseLayout>

@@ -1,0 +1,57 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { TypedObject } from 'astro-portabletext/types';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+
+interface Column {
+  icon?: string;
+  title?: string;
+  body?: TypedObject[];
+}
+
+interface Props {
+  sectionTitle?: string;
+  leftColumn?: Column;
+  rightColumn?: Column;
+}
+
+const {
+  sectionTitle = 'Informations pratiques',
+  leftColumn,
+  rightColumn,
+} = Astro.props;
+
+const columns = [leftColumn, rightColumn].filter(Boolean) as Column[];
+---
+
+<Section padding="lg">
+  <Container>
+    {sectionTitle && (
+      <h2 class="mb-16 text-center font-heading text-4xl italic text-foreground md:text-5xl">
+        {sectionTitle}
+      </h2>
+    )}
+
+    <div class="grid grid-cols-1 gap-16 md:grid-cols-2 md:gap-24">
+      {columns.map((col) => (
+        <div>
+          <div class="mb-6 flex items-center gap-3">
+            {col.icon && (
+              <span class="text-2xl leading-none" aria-hidden="true">{col.icon}</span>
+            )}
+            {col.title && (
+              <h3 class="font-heading text-2xl text-foreground">{col.title}</h3>
+            )}
+          </div>
+
+          {col.body && col.body.length > 0 && (
+            <div class="prose prose-neutral max-w-none text-base leading-relaxed text-muted-foreground [&_a]:text-brand-primary [&_a]:underline [&_a]:underline-offset-2 [&_strong]:font-semibold [&_strong]:text-foreground">
+              <PortableText value={col.body} />
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </Container>
+</Section>

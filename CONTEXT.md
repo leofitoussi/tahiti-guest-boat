@@ -122,6 +122,14 @@ _Avoid_: main topic, canonical page
 Additional cruise links attached to an article or page as supporting references.
 _Avoid_: related links, tags
 
+**Bloc réutilisable**:
+A shared block definition that can be enabled across multiple page families while still being constrained by page type.
+_Avoid_: duplicated component, page-specific component
+
+**Page builder**:
+A page-level block stack whose blocks can be added, removed, and reordered within the rules of that page family.
+_Avoid_: static layout, fixed section list
+
 **Article SEO**:
 A blog article designed to support a related commercial page through search visibility and contextual links.
 _Avoid_: category page, campaign landing page

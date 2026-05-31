@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity';
+import { defineLocalizationFields } from './localization-fields';
 
 export const cruisePage = defineType({
   name: 'cruisePage',
@@ -21,6 +22,7 @@ export const cruisePage = defineType({
       },
       validation: (rule) => rule.required(),
     }),
+    ...defineLocalizationFields(),
     defineField({
       name: 'seoTitle',
       title: 'SEO title',

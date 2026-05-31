@@ -17,9 +17,14 @@ import {
   getSiteSettings,
   type CruisePage,
 } from '../../lib/cruises';
+import { defaultLocale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
+
+const locale = defaultLocale;
+const copy = getSiteCopy(locale);
 
 export async function getStaticPaths() {
-  const cruises = await getCruisePages();
+  const cruises = await getCruisePages(defaultLocale);
 
   return cruises.map((cruise) => ({
     params: { slug: cruise.slug },
@@ -28,11 +33,11 @@ export async function getStaticPaths() {
 }
 
 const summary = Astro.props.cruise;
-const cruise = ((await getCruisePage(summary.slug)) || summary) as CruisePage;
+const cruise = ((await getCruisePage(summary.slug, locale)) || summary) as CruisePage;
 const [settings, reviews, relatedCruises] = await Promise.all([
-  getSiteSettings(),
+  getSiteSettings(locale),
   getReviews(3),
-  getRelatedCruises(cruise.slug, 3),
+  getRelatedCruises(cruise.slug, 3, locale),
 ]);
 
 const title = cruise.seoTitle || `${cruise.title} | Tahiti Guest Boat`;
@@ -41,19 +46,19 @@ const hero = cruise.hero || { title: cruise.title };
 const pitch = cruise.pitch || { accroche: description };
 const featuredImage = cruise.featuredImage || {};
 const boat = cruise.boat || {};
-const itinerary = cruise.itinerary || { title: 'Itinéraire indicatif', steps: [] };
+const itinerary = cruise.itinerary || { title: copy.blocks.itineraryTitle, steps: [] };
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} settings={settings} locale={locale}>
   <main class="bg-background">
-    <HeroBlock block={hero} />
+    <HeroBlock block={hero} locale={locale} />
     <PitchBlock block={pitch} />
     <FullWidthImageBlock block={featuredImage} />
-    <BoatBlock block={boat} />
-    <ItineraryBlock block={itinerary} />
-    <WhyUsBlock settings={settings} />
-    <ReviewsBlock reviews={reviews} />
-    <BookingBlock settings={settings} />
-    <RelatedCruisesBlock cruises={relatedCruises} />
+    <BoatBlock block={boat} locale={locale} />
+    <ItineraryBlock block={itinerary} locale={locale} />
+    <WhyUsBlock settings={settings} locale={locale} />
+    <ReviewsBlock reviews={reviews} locale={locale} />
+    <BookingBlock settings={settings} locale={locale} />
+    <RelatedCruisesBlock cruises={relatedCruises} locale={locale} />
   </main>
 </BaseLayout>

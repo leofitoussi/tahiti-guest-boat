@@ -3,6 +3,7 @@ import { buttonVariants } from '../ui/button';
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
 import { urlForImage } from '../../lib/sanity';
+import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
 
 interface Cta {
   label: string;
@@ -14,84 +15,68 @@ interface SanityImage {
   alt?: string;
   metadata?: {
     dimensions?: { width?: number; height?: number };
-    lqip?: string;
-    palette?: { dominant?: { background?: string } };
   };
 }
 
 interface Props {
-  eyebrow?: string;
+  eyebrow?: string; // kept for API compatibility, not rendered
   title: string;
   body?: string;
   primaryCta?: Cta;
   secondaryCta?: Cta;
   image?: SanityImage;
+  locale?: Locale;
 }
 
-const { eyebrow, title, body, primaryCta, secondaryCta, image } = Astro.props;
+const { title, body, primaryCta, secondaryCta, image, locale = defaultLocale } = Astro.props;
 
-const makeImageUrl = (media: SanityImage | undefined, width: number, height: number) =>
-  media ? urlForImage(media)?.width(width).height(height).fit('crop').quality(84).auto('format').url() : undefined;
-
-const mainImageUrl = makeImageUrl(image, 1680, 1120);
-const mainImagePlaceholder = makeImageUrl(image, 40, 27);
-const mainImageBackground = image?.metadata?.palette?.dominant?.background || 'var(--muted)';
+const imageUrl = image
+  ? urlForImage(image)?.width(1680).height(1120).fit('crop').quality(84).auto('format').url()
+  : undefined;
 ---
 
-<Section padding="none" class="bg-background">
-  <article class="overflow-hidden bg-background">
-    <div
-      class="relative h-[80vh] w-full overflow-hidden bg-muted"
-      style={{
-        backgroundColor: mainImageBackground,
-        backgroundImage: mainImagePlaceholder ? `url(${mainImagePlaceholder})` : undefined,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
-    >
-      {
-        mainImageUrl ? (
-          <img
-            src={mainImageUrl}
-            alt={image?.alt || ''}
-            width="1680"
-            height="1120"
-            loading="eager"
-            decoding="async"
-            fetchpriority="high"
-            class="absolute inset-0 h-full w-full object-cover"
-          />
-        ) : null
-      }
+{
+  imageUrl && (
+    <div class="h-[60vh] w-full overflow-hidden bg-muted">
+      <img
+        src={imageUrl}
+        alt={image?.alt || ''}
+        width="1680"
+        height="1120"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+        class="h-full w-full object-cover"
+      />
     </div>
+  )
+}
 
-    <Container>
-      <div class="-mt-8 rounded-t-[var(--radius-panel)] border border-border/70 bg-card px-5 py-8 shadow-sm md:-mt-12 md:px-8 md:py-10 lg:-mt-16 lg:px-10 lg:py-12">
-        <div class="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-start">
-          <div class="space-y-5">
-            {eyebrow && <p class="text-xs font-semibold uppercase tracking-[0.18em] text-primary">{eyebrow}</p>}
-            <h1 class="max-w-2xl font-heading font-semibold leading-[0.95] text-foreground">
-              {title}
-            </h1>
-          </div>
-
-          <div class="flex flex-col gap-6">
-            {body && <p class="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">{body}</p>}
+<Section padding="lg">
+  <Container>
+    <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
+      <h1 class="font-heading font-semibold leading-tight text-foreground">
+        {title}
+      </h1>
+      <div class="flex flex-col gap-6">
+        {body && <p class="text-lg leading-relaxed text-muted-foreground md:text-xl">{body}</p>}
+        {
+          (primaryCta || secondaryCta) && (
             <div class="flex flex-wrap gap-3">
               {primaryCta && (
-                <a href={primaryCta.href} class={buttonVariants({ variant: 'primary', size: 'lg' })}>
+                <a href={localizeHref(primaryCta.href, locale)} class={buttonVariants({ variant: 'primary', size: 'lg' })}>
                   {primaryCta.label}
                 </a>
               )}
               {secondaryCta && (
-                <a href={secondaryCta.href} class={buttonVariants({ variant: 'outline', size: 'lg' })}>
+                <a href={localizeHref(secondaryCta.href, locale)} class={buttonVariants({ variant: 'outline', size: 'lg' })}>
                   {secondaryCta.label}
                 </a>
               )}
             </div>
-          </div>
-        </div>
+          )
+        }
       </div>
-    </Container>
-  </article>
+    </div>
+  </Container>
 </Section>

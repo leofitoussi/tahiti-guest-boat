@@ -1,4 +1,6 @@
-import { defineArrayMember, defineField, defineType } from 'sanity';
+import { defineField, defineType } from 'sanity';
+import { defineUniquePageBuilderField } from './pageBuilder';
+import { defineLocalizationFields } from './localization-fields';
 
 export const homePage = defineType({
   name: 'homePage',
@@ -21,28 +23,10 @@ export const homePage = defineType({
       group: 'seo',
       validation: (rule) => rule.required().max(160),
     }),
+    ...defineLocalizationFields(),
 
     // ─── Page builder ────────────────────────────────────────────────────────
-    defineField({
-      name: 'pageBuilder',
-      title: 'Sections de la page',
-      type: 'array',
-      group: 'content',
-      of: [
-        defineArrayMember({ type: 'heroHeaderBlock' }),
-        defineArrayMember({ type: 'homeHeroBlock' }),
-        defineArrayMember({ type: 'pitchBlock' }),
-        defineArrayMember({ type: 'galleryBlock' }),
-        defineArrayMember({ type: 'editorialBlock' }),
-        defineArrayMember({ type: 'boatBlock' }),
-        defineArrayMember({ type: 'videoFeatureBlock' }),
-        defineArrayMember({ type: 'whyUsBlock' }),
-        defineArrayMember({ type: 'reviewsBlock' }),
-        defineArrayMember({ type: 'bookingBlock' }),
-        defineArrayMember({ type: 'relatedCruisesBlock' }),
-        defineArrayMember({ type: 'fullWidthImageBlock' }),
-      ],
-    }),
+    defineUniquePageBuilderField(),
   ],
 
   groups: [

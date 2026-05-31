@@ -1,4 +1,7 @@
 ---
+import { defaultLocale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
+
 interface FooterLink {
   label: string;
   href: string;
@@ -6,36 +9,60 @@ interface FooterLink {
 
 interface Props {
   brandName?: string;
+  homeHref?: string;
   footerLinks?: FooterLink[];
   footerText?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  navigationLabel?: string;
 }
 
 const {
   brandName = 'Tahiti Guest Boat',
+  homeHref = '/',
   footerLinks = [],
   footerText,
+  contactEmail,
+  contactPhone,
 } = Astro.props;
+const copy = getSiteCopy(defaultLocale);
+const navigationLabel = Astro.props.navigationLabel ?? copy.shell.footerNavigationLabel;
 
 const year = new Date().getFullYear();
+const phoneHref = contactPhone
+  ? `tel:${contactPhone.replace(/[^+\d]/g, '')}`
+  : undefined;
 ---
 
 <footer class="border-t border-border/70 bg-muted/40">
-  <div class="mx-auto grid max-w-site gap-8 px-5 py-12 md:grid-cols-[1fr_auto] md:px-8">
+  <div class="mx-auto grid max-w-site gap-8 px-5 py-12 md:grid-cols-[1.2fr_0.8fr] md:px-8">
     <div class="flex flex-col gap-3">
-      <a href="/" class="font-heading text-2xl font-semibold tracking-[0.16em] text-primary uppercase">{brandName}</a>
+      <a href={homeHref} class="font-heading text-2xl font-semibold tracking-[0.16em] text-primary uppercase">{brandName}</a>
       {footerText ? (
         <p class="max-w-xl text-sm leading-relaxed text-muted-foreground">{footerText}</p>
       ) : (
-        <p class="max-w-xl text-sm leading-relaxed text-muted-foreground">
-          Croisieres privees et experiences lagon en Polynesie francaise.
-        </p>
+        <p class="max-w-xl text-sm leading-relaxed text-muted-foreground">{copy.shell.defaultFooterText}</p>
+      )}
+      {(contactEmail || contactPhone) && (
+        <div class="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-foreground">
+          {contactEmail && (
+            <a href={`mailto:${contactEmail}`} class="transition hover:text-primary">
+              {contactEmail}
+            </a>
+          )}
+          {contactPhone && (
+            <a href={phoneHref} class="transition hover:text-primary">
+              {contactPhone}
+            </a>
+          )}
+        </div>
       )}
       <p class="text-sm text-muted-foreground">© {year} {brandName}</p>
     </div>
 
     {footerLinks.length > 0 && (
       <div class="flex flex-col gap-3 md:items-end">
-        <nav class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold uppercase tracking-[0.14em]" aria-label="Navigation footer">
+        <nav class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold uppercase tracking-[0.14em]" aria-label={navigationLabel}>
           {footerLinks.map((item) => (
             <a href={item.href} class="transition hover:text-primary">{item.label}</a>
           ))}

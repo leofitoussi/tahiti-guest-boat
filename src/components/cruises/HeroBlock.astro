@@ -3,12 +3,16 @@ import { buttonVariants } from '../ui/button';
 import Container from '../layout/Container.astro';
 import type { CruiseHeroBlock } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
+import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
 
 interface Props {
   block: CruiseHeroBlock;
+  locale?: Locale;
 }
 
-const { block } = Astro.props;
+const { block, locale = defaultLocale } = Astro.props;
+const copy = getSiteCopy(locale);
 const imageUrl = block.backgroundImage
   ? urlForImage(block.backgroundImage)?.width(1800).height(980).fit('crop').quality(84).auto('format').url()
   : undefined;
@@ -42,11 +46,11 @@ const placeholder = block.backgroundImage
   <div class="absolute inset-0 bg-gradient-to-t from-brand-secondary/85 via-brand-secondary/35 to-brand-secondary/35" />
   <Container class="relative flex min-h-[76vh] items-end pb-16 pt-36 md:pb-24">
     <div class="max-w-4xl">
-      <p class="mb-5 text-sm font-bold uppercase tracking-[0.18em] text-brand-accent">Nos croisières</p>
+      <p class="mb-5 text-sm font-bold uppercase tracking-[0.18em] text-brand-accent">{copy.blocks.heroEyebrow}</p>
       <h1 class="font-heading font-semibold leading-tight">{block.title}</h1>
       {
         block.ctaLabel && block.ctaUrl && (
-          <a href={block.ctaUrl} class={buttonVariants({ className: 'mt-8' })}>
+          <a href={localizeHref(block.ctaUrl, locale)} class={buttonVariants({ className: 'mt-8' })}>
             {block.ctaLabel}
           </a>
         )

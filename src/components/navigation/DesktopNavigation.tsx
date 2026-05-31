@@ -7,6 +7,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu"
+import { defaultLocale, localizeHref, type Locale } from "../../lib/localization"
 
 interface NavItem {
   label: string
@@ -17,12 +18,14 @@ interface DesktopNavigationProps {
   navItems: NavItem[]
   ctaLabel?: string
   ctaHref?: string
+  locale?: Locale
 }
 
 export function DesktopNavigation({
   navItems,
   ctaLabel,
   ctaHref = "/contact",
+  locale = defaultLocale,
 }: DesktopNavigationProps) {
   return (
     <div className="hidden items-center gap-4 md:flex">
@@ -38,7 +41,7 @@ export function DesktopNavigation({
         </NavigationMenuList>
       </NavigationMenu>
       {ctaLabel ? (
-        <a href={ctaHref} className={buttonVariants({ variant: "primary" })}>
+        <a href={localizeHref(ctaHref, locale)} className={buttonVariants({ variant: "primary" })}>
           {ctaLabel}
         </a>
       ) : null}

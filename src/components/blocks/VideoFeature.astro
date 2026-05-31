@@ -5,6 +5,8 @@ import CruisePortableText from '../cruises/CruisePortableText.astro';
 import { buttonVariants } from '../ui/button';
 import { urlForImage } from '../../lib/sanity';
 import { extractYouTubeVideoId, getYouTubeEmbedUrl, getYouTubePosterUrl, getYouTubeWatchUrl } from '../../lib/video';
+import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
 
 interface SanityImage {
   asset?: unknown;
@@ -24,9 +26,11 @@ interface Props {
   ctaUrl?: string;
   youtubeUrl?: string;
   posterImage?: SanityImage;
+  locale?: Locale;
 }
 
-const { iconImage, title = [], body = [], ctaLabel, ctaUrl, youtubeUrl, posterImage } = Astro.props;
+const { iconImage, title = [], body = [], ctaLabel, ctaUrl, youtubeUrl, posterImage, locale = defaultLocale } = Astro.props;
+const copy = getSiteCopy(locale);
 
 const videoId = extractYouTubeVideoId(youtubeUrl);
 const embedUrl = videoId ? getYouTubeEmbedUrl(videoId) : undefined;
@@ -58,7 +62,7 @@ const posterLqip = posterImage ? urlForImage(posterImage)?.width(32).height(18).
         {body && body.length > 0 && <CruisePortableText value={body as any} class="video-feature-body mt-5" />}
         {ctaLabel && ctaUrl && (
           <div class="mt-7">
-            <a href={ctaUrl} class={buttonVariants({ variant: 'primary' })}>
+            <a href={localizeHref(ctaUrl, locale)} class={buttonVariants({ variant: 'primary' })}>
               {ctaLabel}
             </a>
           </div>
@@ -82,11 +86,12 @@ const posterLqip = posterImage ? urlForImage(posterImage)?.width(32).height(18).
               class="group absolute inset-0 block w-full overflow-hidden bg-background"
               data-video-trigger
               data-embed-url={embedUrl}
-              aria-label="Lire la vidéo YouTube"
+              data-frame-title={copy.blocks.videoFrameTitle}
+              aria-label={copy.blocks.videoPlayLabel}
             >
               <img
                 src={posterUrl}
-                alt={posterImage?.alt || 'Aperçu de la vidéo YouTube'}
+                alt={posterImage?.alt || copy.blocks.videoPosterAlt}
                 width="1600"
                 height="900"
                 loading="lazy"
@@ -111,28 +116,12 @@ const posterLqip = posterImage ? urlForImage(posterImage)?.width(32).height(18).
   </Container>
 </Section>
 
-<style>
-  .video-feature-title :global(h2) {
-    margin: 0;
-    color: var(--foreground);
-  }
-
-  .video-feature-body :global(p) {
-    margin: 0;
-    color: var(--muted-foreground);
-    font-size: clamp(1rem, 1.3vw, 1.125rem);
-    line-height: 1.75;
-  }
-
-  .video-feature-body :global(strong) {
-    color: var(--foreground);
-    font-weight: 700;
-  }
-</style>
+<!-- Styles for video-feature-title and video-feature-body live in CruisePortableText.astro -->
 
 <script>
   const activateVideo = (link: HTMLAnchorElement) => {
     const embedUrl = link.dataset.embedUrl;
+    const frameTitle = link.dataset.frameTitle || 'YouTube video player';
     if (!embedUrl) return;
 
     const wrapper = link.parentElement;
@@ -140,7 +129,7 @@ const posterLqip = posterImage ? urlForImage(posterImage)?.width(32).height(18).
 
     const iframe = document.createElement('iframe');
     iframe.src = embedUrl;
-    iframe.title = 'Lecteur vidéo YouTube';
+    iframe.title = frameTitle;
     iframe.loading = 'lazy';
     iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
     iframe.allowFullscreen = true;

@@ -42,11 +42,12 @@ interface Props {
   title?: string;
   columns?: 2 | 3 | 4;
   gap?: 'sm' | 'md' | 'lg';
+  layout?: 'masonry' | 'rows-3-4' | 'bleed-rows';
 }
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
-const { images, eyebrow, title, columns = 3, gap = 'md' } = Astro.props;
+const { images, eyebrow, title, columns = 3, gap = 'md', layout = 'masonry' } = Astro.props;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -92,7 +93,24 @@ function resolveImage(img: GalleryImage): {
 
 const resolvedImages = images.map(resolveImage);
 
-// ─── Classes ─────────────────────────────────────────────────────────────────
+// ─── Rows-3-4 layout: group images into alternating rows of 3 then 4 ────────
+
+function chunkRows34(imgs: typeof resolvedImages) {
+  const rows: { items: typeof resolvedImages; cols: 3 | 4 }[] = [];
+  let i = 0;
+  let toggle = true;
+  while (i < imgs.length) {
+    const cols = toggle ? 3 : 4;
+    rows.push({ items: imgs.slice(i, i + cols), cols });
+    i += cols;
+    toggle = !toggle;
+  }
+  return rows;
+}
+
+const rows34 = (layout === 'rows-3-4' || layout === 'bleed-rows') ? chunkRows34(resolvedImages) : [];
+
+// ─── Masonry classes ─────────────────────────────────────────────────────────
 
 const colClass = {
   2: 'columns-1 sm:columns-2',
@@ -107,46 +125,123 @@ const gapClass = {
 }[gap];
 ---
 
-<Section class="bg-background">
-  <Container>
-    {
-      (eyebrow || title) && (
+{layout === 'bleed-rows' ? (
+  <Section class="bg-background overflow-hidden">
+    {(eyebrow || title) && (
+      <Container>
         <div class="mb-10 flex flex-col gap-3">
           {eyebrow && (
             <p class="text-sm font-semibold uppercase tracking-[0.14em] text-primary">{eyebrow}</p>
           )}
           {title && <h2 class="font-heading font-semibold text-foreground">{title}</h2>}
         </div>
-      )
-    }
-
-    <div class={`${colClass} ${gapClass}`}>
-      {
-        resolvedImages.map((img) =>
-          img.src ? (
-            <figure class="break-inside-avoid overflow-hidden rounded-[var(--radius-surface)]">
-              <div
-                style={img.lqip ? { backgroundImage: `url(${img.lqip})`, backgroundSize: 'cover' } : undefined}
-              >
-                <img
-                  src={img.src}
-                  srcset={img.srcset}
-                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                  alt={img.alt}
-                  width={img.width}
-                  height={img.height}
-                  class="w-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-              {img.caption && (
-                <figcaption class="mt-2 px-1 text-sm text-muted-foreground">{img.caption}</figcaption>
-              )}
-            </figure>
-          ) : null,
-        )
-      }
+      </Container>
+    )}
+    {/* Gallery breaks out of Container: calc(100% + 4rem) gives ~2rem bleed on each side */}
+    <div
+      class="flex flex-col gap-1"
+      style="width: calc(100% + 4rem); margin-left: -2rem;"
+    >
+      {rows34.map((row) => (
+        <div class={`grid gap-1 ${row.cols === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
+          {row.items.map((img) =>
+            img.src ? (
+              <figure class="overflow-hidden">
+                <div
+                  class="aspect-[4/3] w-full"
+                  style={img.lqip ? { backgroundImage: `url(${img.lqip})`, backgroundSize: 'cover' } : undefined}
+                >
+                  <img
+                    src={img.src}
+                    srcset={img.srcset}
+                    sizes={row.cols === 3 ? '(min-width: 768px) 34vw, 100vw' : '(min-width: 768px) 26vw, 50vw'}
+                    alt={img.alt}
+                    width={img.width}
+                    height={img.height}
+                    class="h-full w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              </figure>
+            ) : null,
+          )}
+        </div>
+      ))}
     </div>
-  </Container>
-</Section>
+  </Section>
+) : (
+  <Section class="bg-background">
+    <Container>
+      {(eyebrow || title) && (
+        <div class="mb-10 flex flex-col gap-3">
+          {eyebrow && (
+            <p class="text-sm font-semibold uppercase tracking-[0.14em] text-primary">{eyebrow}</p>
+          )}
+          {title && <h2 class="font-heading font-semibold text-foreground">{title}</h2>}
+        </div>
+      )}
+
+      {layout === 'rows-3-4' ? (
+        <div class="flex flex-col gap-1">
+          {rows34.map((row) => (
+            <div class={`grid gap-1 ${row.cols === 3 ? 'grid-cols-3' : 'grid-cols-4'}`}>
+              {row.items.map((img) =>
+                img.src ? (
+                  <figure class="overflow-hidden rounded-[var(--radius-surface)]">
+                    <div
+                      class="aspect-[4/3] w-full"
+                      style={img.lqip ? { backgroundImage: `url(${img.lqip})`, backgroundSize: 'cover' } : undefined}
+                    >
+                      <img
+                        src={img.src}
+                        srcset={img.srcset}
+                        sizes="(min-width: 1024px) 25vw, 50vw"
+                        alt={img.alt}
+                        width={img.width}
+                        height={img.height}
+                        class="h-full w-full object-cover"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                    {img.caption && (
+                      <figcaption class="mt-1 px-1 text-sm text-muted-foreground">{img.caption}</figcaption>
+                    )}
+                  </figure>
+                ) : null,
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div class={`${colClass} ${gapClass}`}>
+          {resolvedImages.map((img) =>
+            img.src ? (
+              <figure class="break-inside-avoid overflow-hidden rounded-[var(--radius-surface)]">
+                <div
+                  style={img.lqip ? { backgroundImage: `url(${img.lqip})`, backgroundSize: 'cover' } : undefined}
+                >
+                  <img
+                    src={img.src}
+                    srcset={img.srcset}
+                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                    alt={img.alt}
+                    width={img.width}
+                    height={img.height}
+                    class="w-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                {img.caption && (
+                  <figcaption class="mt-2 px-1 text-sm text-muted-foreground">{img.caption}</figcaption>
+                )}
+              </figure>
+            ) : null,
+          )}
+        </div>
+      )}
+    </Container>
+  </Section>
+)}

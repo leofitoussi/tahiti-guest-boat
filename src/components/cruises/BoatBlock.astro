@@ -6,12 +6,14 @@ import CruisePortableText from './CruisePortableText.astro';
 import SectionHeading from './SectionHeading.astro';
 import type { BoatBlock } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
+import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
 
 interface Props {
   block: BoatBlock;
+  locale?: Locale;
 }
 
-const { block } = Astro.props;
+const { block, locale = defaultLocale } = Astro.props;
 const imageUrl = block.boatImage ? urlForImage(block.boatImage)?.width(1200).height(760).fit('crop').quality(84).auto('format').url() : undefined;
 ---
 
@@ -51,7 +53,7 @@ const imageUrl = block.boatImage ? urlForImage(block.boatImage)?.width(1200).hei
         }
         {
           block.ctaLabel && block.ctaUrl && (
-            <a href={block.ctaUrl} class={buttonVariants({ className: 'w-fit' })}>
+            <a href={localizeHref(block.ctaUrl, locale)} class={buttonVariants({ className: 'w-fit' })}>
               {block.ctaLabel}
             </a>
           )

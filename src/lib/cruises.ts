@@ -1,6 +1,12 @@
 import { sanityClient } from 'sanity:client';
 import type { TypedObject } from 'astro-portabletext/types';
 import { isSanityConfigured } from './sanity';
+import { defaultLocale, type Locale } from './localization';
+import {
+  buildLocalizedSingletonDocumentFilter,
+  buildLocalizedSluggedDocumentFilter,
+  localizedDocumentFields,
+} from './sanity-localization';
 import type { SanityImage } from './blog';
 
 export interface CruiseHeroBlock {
@@ -71,6 +77,8 @@ export interface CruisePageSummary {
   _id: string;
   title: string;
   slug: string;
+  locale?: Locale;
+  translationGroup?: string;
   heroTitle?: string;
   heroImage?: SanityImage;
   excerpt?: string;
@@ -78,6 +86,8 @@ export interface CruisePageSummary {
 }
 
 export interface CruisePage extends CruisePageSummary {
+  locale?: Locale;
+  translationGroup?: string;
   seoTitle?: string;
   seoDescription?: string;
   hero?: CruiseHeroBlock;
@@ -88,6 +98,8 @@ export interface CruisePage extends CruisePageSummary {
 }
 
 export interface SiteSettings {
+  locale?: Locale;
+  translationGroup?: string;
   siteName?: string;
   logo?: SanityImage;
   logoAlt?: string;
@@ -106,7 +118,9 @@ export interface SiteSettings {
   contactEmail?: string;
   contactPhone?: string;
   whyUsTitle?: string;
+  whyUsDescription?: string;
   whyUsArguments?: {
+    heading?: string;
     icon?: string;
     body?: string;
   }[];
@@ -147,6 +161,7 @@ const imageFields = `{
 }`;
 
 const cruisePageFields = `
+  ${localizedDocumentFields},
   seoTitle,
   seoDescription,
   hero{
@@ -171,11 +186,12 @@ const cruisePageFields = `
   }
 `;
 
-const cruisePageFilter = `_type == "cruisePage" && defined(slug.current) && !(_id in path("drafts.**"))`;
+const cruisePageFilter = buildLocalizedSluggedDocumentFilter('cruisePage');
 
 const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter}] | order(_createdAt desc) {
   _id,
   _createdAt,
+  ${localizedDocumentFields},
   title,
   "slug": slug.current,
   "heroTitle": hero.title,
@@ -186,6 +202,7 @@ const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter}] | order(_createdAt desc) {
 const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
   _id,
   _createdAt,
+  ${localizedDocumentFields},
   title,
   "slug": slug.current,
   "heroTitle": hero.title,
@@ -194,7 +211,8 @@ const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
   ${cruisePageFields}
 }`;
 
-const SITE_SETTINGS_QUERY = `*[_type == "siteSettings" && !(_id in path("drafts.**"))] | order(_updatedAt desc)[0] {
+const SITE_SETTINGS_QUERY = `*[${buildLocalizedSingletonDocumentFilter('siteSettings')}] | order(_updatedAt desc)[0] {
+  ${localizedDocumentFields},
   siteName,
   logo${imageFields},
   logoAlt,
@@ -237,6 +255,7 @@ const RELATED_CRUISES_QUERY = `*[
 ] | order(_createdAt desc)[0...$limit] {
   _id,
   _createdAt,
+  ${localizedDocumentFields},
   title,
   "slug": slug.current,
   "heroTitle": hero.title,
@@ -244,28 +263,28 @@ const RELATED_CRUISES_QUERY = `*[
   "excerpt": pitch.accroche
 }`;
 
-export async function getCruisePages() {
+export async function getCruisePages(locale: Locale = defaultLocale) {
   if (!isSanityConfigured) {
     return [];
   }
 
-  return sanityClient.fetch<CruisePageSummary[]>(CRUISE_SUMMARY_QUERY).catch(() => []);
+  return sanityClient.fetch<CruisePageSummary[]>(CRUISE_SUMMARY_QUERY, { locale }).catch(() => []);
 }
 
-export async function getCruisePage(slug: string) {
+export async function getCruisePage(slug: string, locale: Locale = defaultLocale) {
   if (!isSanityConfigured) {
     return null;
   }
 
-  return sanityClient.fetch<CruisePage | null>(CRUISE_PAGE_QUERY, { slug }).catch(() => null);
+  return sanityClient.fetch<CruisePage | null>(CRUISE_PAGE_QUERY, { slug, locale }).catch(() => null);
 }
 
-export async function getSiteSettings() {
+export async function getSiteSettings(locale: Locale = defaultLocale) {
   if (!isSanityConfigured) {
     return null;
   }
 
-  return sanityClient.fetch<SiteSettings | null>(SITE_SETTINGS_QUERY).catch(() => null);
+  return sanityClient.fetch<SiteSettings | null>(SITE_SETTINGS_QUERY, { locale }).catch(() => null);
 }
 
 export async function getReviews(limit = 3) {
@@ -276,10 +295,10 @@ export async function getReviews(limit = 3) {
   return sanityClient.fetch<Review[]>(REVIEWS_QUERY, { limit }).catch(() => []);
 }
 
-export async function getRelatedCruises(slug: string, limit = 3) {
+export async function getRelatedCruises(slug: string, limit = 3, locale: Locale = defaultLocale) {
   if (!isSanityConfigured) {
     return [];
   }
 
-  return sanityClient.fetch<CruisePageSummary[]>(RELATED_CRUISES_QUERY, { slug, limit }).catch(() => []);
+  return sanityClient.fetch<CruisePageSummary[]>(RELATED_CRUISES_QUERY, { slug, limit, locale }).catch(() => []);
 }

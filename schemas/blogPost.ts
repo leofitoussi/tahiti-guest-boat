@@ -1,5 +1,6 @@
 import { DocumentTextIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { defineLocalizationFields } from './localization-fields';
 
 export const blogPost = defineType({
   name: 'blogPost',
@@ -23,6 +24,7 @@ export const blogPost = defineType({
       },
       validation: (rule) => rule.required(),
     }),
+    ...defineLocalizationFields(),
     defineField({
       name: 'excerpt',
       title: 'Excerpt',
@@ -122,6 +124,25 @@ export const blogPost = defineType({
         }),
       ],
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'primaryCruise',
+      title: 'Croisière principale',
+      type: 'reference',
+      to: [{ type: 'cruisePage' }],
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'secondaryCruises',
+      title: 'Croisières secondaires',
+      type: 'array',
+      of: [
+        defineArrayMember({
+          type: 'reference',
+          to: [{ type: 'cruisePage' }],
+        }),
+      ],
+      validation: (rule) => rule.max(3),
     }),
     defineField({
       name: 'seoTitle',

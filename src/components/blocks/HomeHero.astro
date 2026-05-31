@@ -4,6 +4,7 @@
  * Reçoit les données brutes du bloc homeHeroBlock et les mappe vers le composant partagé.
  */
 import HeroHeader from './HeroHeader.astro';
+import { defaultLocale, type Locale } from '../../lib/localization';
 
 interface SanityImage {
   asset?: unknown;
@@ -24,6 +25,7 @@ interface Props {
   secondaryCtaLabel?: string;
   secondaryCtaLink?: string;
   image?: SanityImage;
+  locale?: Locale;
 }
 
 const {
@@ -35,6 +37,7 @@ const {
   secondaryCtaLabel,
   secondaryCtaLink,
   image,
+  locale = defaultLocale,
 } = Astro.props;
 ---
 
@@ -45,4 +48,5 @@ const {
   primaryCta={primaryCtaLabel && primaryCtaLink ? { label: primaryCtaLabel, href: primaryCtaLink } : undefined}
   secondaryCta={secondaryCtaLabel && secondaryCtaLink ? { label: secondaryCtaLabel, href: secondaryCtaLink } : undefined}
   image={image}
+  locale={locale}
 />

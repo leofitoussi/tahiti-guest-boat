@@ -1,5 +1,6 @@
 ---
 import Header from '../navigation/Header.astro';
+import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
 
 interface ImageData {
   url?: string;
@@ -35,6 +36,7 @@ interface Props {
     label?: string;
     href?: string;
   };
+  locale?: Locale;
 }
 
 const {
@@ -48,6 +50,7 @@ const {
   body,
   primaryCta,
   secondaryCta,
+  locale = defaultLocale,
 } = Astro.props;
 ---
 
@@ -118,7 +121,7 @@ const {
         {
           primaryCta?.label && (
             <a
-              href={primaryCta.href || '/contact'}
+              href={localizeHref(primaryCta.href || '/contact', locale)}
               class="inline-flex min-h-[76px] items-center justify-center rounded-lg bg-[#285aaa] px-9 text-center text-[24px] font-bold text-white underline decoration-2 underline-offset-2 transition hover:bg-[#1f4a91] md:min-h-[74px]"
             >
               {primaryCta.label}
@@ -128,7 +131,7 @@ const {
         {
           secondaryCta?.label && (
             <a
-              href={secondaryCta.href || '#'}
+              href={localizeHref(secondaryCta.href || '#', locale)}
               class="inline-flex min-h-[76px] items-center justify-center rounded-lg border-2 border-[#285aaa] px-9 text-center text-[24px] font-bold text-[#285aaa] underline decoration-2 underline-offset-2 transition hover:bg-[#eef4ff] md:min-h-[74px]"
             >
               {secondaryCta.label}

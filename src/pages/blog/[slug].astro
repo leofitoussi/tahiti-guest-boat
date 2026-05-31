@@ -7,10 +7,15 @@ import { buttonVariants } from '../../components/ui/button';
 import { Separator } from '../../components/ui/separator';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatPostDate, getBlogPost, getBlogPosts, type BlogPost } from '../../lib/blog';
+import { defaultLocale, localizePath } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
 import { urlForImage } from '../../lib/sanity';
 
+const locale = defaultLocale;
+const copy = getSiteCopy(locale);
+
 export async function getStaticPaths() {
-  const posts = await getBlogPosts();
+  const posts = await getBlogPosts(defaultLocale);
 
   return posts.map((post) => ({
     params: { slug: post.slug },
@@ -19,24 +24,25 @@ export async function getStaticPaths() {
 }
 
 const summary = Astro.props.post as BlogPost;
-const post = (await getBlogPost(summary.slug)) || summary;
+const post = (await getBlogPost(summary.slug, locale)) || summary;
 
 const title = post.seoTitle || `${post.title} | Tahiti Guest Boat`;
-const description = post.seoDescription || post.excerpt || 'Article du blog Tahiti Guest Boat.';
+const description = post.seoDescription || post.excerpt || copy.pages.blogPost.fallbackDescription;
 const mainImageUrl = post.mainImage
   ? urlForImage(post.mainImage)?.width(1440).height(850).fit('crop').quality(84).auto('format').url()
   : undefined;
+const secondaryCruises = post.secondaryCruises ?? [];
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} locale={locale}>
   <main class="bg-background">
     <article>
       <Section padding="lg" class="border-b border-border/70 bg-muted/30">
         <Container class="max-w-[1060px]">
           <div class="flex flex-col gap-6">
-            <a href="/blog" class={buttonVariants({ variant: 'ghost', className: 'w-fit px-0' })}>Retour au blog</a>
+            <a href={localizePath('/blog', locale)} class={buttonVariants({ variant: 'ghost', className: 'w-fit px-0' })}>{copy.pages.blogPost.backToBlog}</a>
             <div class="flex flex-col gap-4">
-              {post.publishedAt && <Badge variant="secondary">{formatPostDate(post.publishedAt)}</Badge>}
+              {post.publishedAt && <Badge variant="secondary">{formatPostDate(post.publishedAt, locale)}</Badge>}
               <h1 class="font-heading font-semibold leading-tight text-foreground">{post.title}</h1>
               {post.excerpt && <p class="max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">{post.excerpt}</p>}
             </div>
@@ -73,6 +79,50 @@ const mainImageUrl = post.mainImage
           <BlogContent value={post.body} />
         </Container>
       </Section>
+
+      {
+        (post.primaryCruise || secondaryCruises.length > 0) && (
+          <Section padding="lg" class="border-t border-border/70 bg-muted/30">
+            <Container class="max-w-[1060px]">
+              <div class="grid gap-6 lg:grid-cols-2">
+                {post.primaryCruise && (
+                  <article class="rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
+                    <Badge variant="secondary">{copy.pages.blogPost.primaryCruise}</Badge>
+                    <h2 class="mt-4 font-heading text-2xl font-semibold leading-tight text-foreground">
+                      {post.primaryCruise.heroTitle || post.primaryCruise.title}
+                    </h2>
+                    {post.primaryCruise.excerpt && (
+                      <p class="mt-4 text-sm leading-relaxed text-muted-foreground">{post.primaryCruise.excerpt}</p>
+                    )}
+                    <a
+                      href={localizePath(`/nos-croisieres/${post.primaryCruise.slug}/`, locale)}
+                      class={buttonVariants({ variant: 'primary', className: 'mt-6 w-fit' })}
+                    >
+                      {copy.pages.blogPost.discoverCruise}
+                    </a>
+                  </article>
+                )}
+
+                {secondaryCruises.length > 0 && (
+                  <article class="rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
+                    <Badge variant="secondary">{copy.pages.blogPost.secondaryCruises}</Badge>
+                    <ul class="mt-4 space-y-4">
+                      {secondaryCruises.map((cruise) => (
+                        <li class="border-t border-border/60 pt-4 first:border-t-0 first:pt-0">
+                          <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class="font-heading text-lg font-semibold text-foreground transition hover:text-primary">
+                            {cruise.heroTitle || cruise.title}
+                          </a>
+                          {cruise.excerpt && <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{cruise.excerpt}</p>}
+                        </li>
+                      ))}
+                    </ul>
+                  </article>
+                )}
+              </div>
+            </Container>
+          </Section>
+        )
+      }
     </article>
   </main>
 </BaseLayout>

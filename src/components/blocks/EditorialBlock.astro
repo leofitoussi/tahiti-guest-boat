@@ -6,6 +6,7 @@ import Section from '../layout/Section.astro';
 import SectionHeading from '../cruises/SectionHeading.astro';
 import { buttonVariants } from '../ui/button';
 import { urlForImage } from '../../lib/sanity';
+import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
 
 interface SanityImage {
   asset?: unknown;
@@ -27,6 +28,7 @@ interface Props {
   primaryCtaLink?: string;
   secondaryCtaLabel?: string;
   secondaryCtaLink?: string;
+  locale?: Locale;
 }
 
 const {
@@ -39,6 +41,7 @@ const {
   primaryCtaLink,
   secondaryCtaLabel,
   secondaryCtaLink,
+  locale = defaultLocale,
 } = Astro.props;
 
 const imageUrl = image ? urlForImage(image)?.width(1200).height(1200).fit('crop').quality(84).auto('format').url() : undefined;
@@ -101,12 +104,12 @@ const textOrderClasses = [
 
         <div class="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap">
           {primaryCtaLabel && primaryCtaLink && (
-            <a href={primaryCtaLink} class={buttonVariants({ variant: 'primary', size: 'lg', className: 'w-fit' })}>
+            <a href={localizeHref(primaryCtaLink, locale)} class={buttonVariants({ variant: 'primary', size: 'lg', className: 'w-fit' })}>
               {primaryCtaLabel}
             </a>
           )}
           {secondaryCtaLabel && secondaryCtaLink && (
-            <a href={secondaryCtaLink} class={buttonVariants({ variant: 'outline', size: 'lg', className: 'w-fit' })}>
+            <a href={localizeHref(secondaryCtaLink, locale)} class={buttonVariants({ variant: 'outline', size: 'lg', className: 'w-fit' })}>
               {secondaryCtaLabel}
             </a>
           )}

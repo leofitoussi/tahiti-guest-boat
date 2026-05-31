@@ -4,18 +4,22 @@ import Section from '../layout/Section.astro';
 import CruisePortableText from './CruisePortableText.astro';
 import type { ItineraryBlock } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
+import { defaultLocale, type Locale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
 
 interface Props {
   block: ItineraryBlock;
+  locale?: Locale;
 }
 
-const { block } = Astro.props;
+const { block, locale = defaultLocale } = Astro.props;
+const copy = getSiteCopy(locale);
 ---
 
 <Section padding="lg" class="bg-background">
   <Container>
     <div class="mb-12 flex max-w-4xl flex-col gap-4">
-      <p class="text-sm font-bold uppercase tracking-[0.16em] text-primary">Itinéraire indicatif</p>
+      <p class="text-sm font-bold uppercase tracking-[0.16em] text-primary">{copy.blocks.itineraryEyebrow}</p>
       <h2 class="font-heading font-semibold leading-tight text-foreground">{block.title}</h2>
       {block.route && <p class="text-lg font-semibold text-muted-foreground">{block.route}</p>}
       {block.disclaimer && <p class="max-w-3xl text-sm leading-relaxed text-muted-foreground">{block.disclaimer}</p>}

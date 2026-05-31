@@ -8,26 +8,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Separator } from '../../components/ui/separator';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getBlogPosts, formatPostDate } from '../../lib/blog';
+import { defaultLocale, localizePath } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
 import { urlForImage } from '../../lib/sanity';
 
-const posts = await getBlogPosts();
+const locale = defaultLocale;
+const copy = getSiteCopy(locale);
+const posts = await getBlogPosts(locale);
 ---
 
 <BaseLayout
-  title="Blog | Tahiti Guest Boat"
-  description="Articles, conseils et inspirations pour préparer une croisiere en Polynesie avec Tahiti Guest Boat."
+  title={copy.pages.blogIndex.title}
+  description={copy.pages.blogIndex.description}
+  locale={locale}
 >
   <main class="bg-background">
     <Section padding="lg" class="border-b border-border/70 bg-muted/30">
       <Container>
         <div class="flex max-w-4xl flex-col gap-5">
-          <Badge>Notre blog</Badge>
-          <h1 class="font-heading font-semibold leading-tight text-foreground">
-            Conseils et inspirations pour naviguer en Polynésie
-          </h1>
-          <p class="max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-            Retrouvez les derniers articles de Tahiti Guest Boat pour préparer votre expérience dans les lagons.
-          </p>
+          <Badge>{copy.pages.blogIndex.badge}</Badge>
+          <h1 class="font-heading font-semibold leading-tight text-foreground">{copy.pages.blogIndex.heading}</h1>
+          <p class="max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">{copy.pages.blogIndex.intro}</p>
         </div>
       </Container>
     </Section>
@@ -44,7 +45,7 @@ const posts = await getBlogPosts();
 
               return (
                 <Card className="transition hover:-translate-y-1 hover:shadow-md">
-                  <a href={`/blog/${post.slug}`} class="block">
+                  <a href={localizePath(`/blog/${post.slug}/`, locale)} class="block">
                     {imageUrl ? (
                       <img
                         src={imageUrl}
@@ -62,18 +63,18 @@ const posts = await getBlogPosts();
                   <CardHeader>
                     <div class="flex flex-col gap-3">
                       {post.publishedAt && (
-                        <Badge variant="secondary">{formatPostDate(post.publishedAt)}</Badge>
+                        <Badge variant="secondary">{formatPostDate(post.publishedAt, locale)}</Badge>
                       )}
                       <CardTitle>
-                        <a href={`/blog/${post.slug}`} class="transition hover:text-primary">{post.title}</a>
+                        <a href={localizePath(`/blog/${post.slug}/`, locale)} class="transition hover:text-primary">{post.title}</a>
                       </CardTitle>
                       {post.excerpt && <CardDescription>{post.excerpt}</CardDescription>}
                     </div>
                   </CardHeader>
                   <CardContent>
                     <Separator className="mb-5" />
-                    <a href={`/blog/${post.slug}`} class={buttonVariants({ variant: 'ghost', className: 'px-0' })}>
-                      Lire l'article
+                    <a href={localizePath(`/blog/${post.slug}/`, locale)} class={buttonVariants({ variant: 'ghost', className: 'px-0' })}>
+                      {copy.pages.blogIndex.readArticle}
                     </a>
                   </CardContent>
                 </Card>
@@ -83,10 +84,8 @@ const posts = await getBlogPosts();
         ) : (
           <Card className="border border-dashed border-border text-center">
             <CardHeader>
-              <CardTitle>Aucun article publié pour le moment</CardTitle>
-              <CardDescription className="mx-auto max-w-2xl">
-                Les articles ajoutés dans Sanity Studio apparaîtront ici après publication et rebuild du site.
-              </CardDescription>
+              <CardTitle>{copy.pages.blogIndex.emptyTitle}</CardTitle>
+              <CardDescription className="mx-auto max-w-2xl">{copy.pages.blogIndex.emptyDescription}</CardDescription>
             </CardHeader>
           </Card>
         )

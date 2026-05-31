@@ -3,7 +3,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity';
 
 export const galleryBlock = defineType({
   name: 'galleryBlock',
-  title: 'Galerie photos (masonry)',
+  title: 'Galerie photos',
   type: 'object',
   icon: ImageIcon,
   fields: [
@@ -16,6 +16,21 @@ export const galleryBlock = defineType({
       name: 'title',
       title: 'Titre',
       type: 'string',
+    }),
+    defineField({
+      name: 'layout',
+      title: 'Disposition',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Masonry (colonnes libres)', value: 'masonry' },
+          { title: 'Lignes 3-4 (dans le container)', value: 'rows-3-4' },
+          { title: 'Lignes 3-4 pleine largeur (bleed)', value: 'bleed-rows' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'masonry',
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'columns',

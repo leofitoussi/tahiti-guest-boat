@@ -1,10 +1,15 @@
 import { blogPost } from './blogPost';
+import { legalPage } from './legalPage';
 import { boatBlock } from './boatBlock';
+import { boatPage } from './boatPage';
 import { bookingBlock } from './bookingBlock';
+import { contactPage } from './contactPage';
+import { componentsTestPage } from './componentsTestPage';
 import { cruisePage } from './cruisePage';
 import { editorialBlock } from './editorialBlock';
 import { fullWidthImageBlock } from './fullWidthImageBlock';
 import { galleryBlock } from './galleryBlock';
+import { marqueeGalleryBlock } from './marqueeGalleryBlock';
 import { heroBlock } from './heroBlock';
 import { heroHeaderBlock } from './heroHeaderBlock';
 import { homeHeroBlock } from './homeHeroBlock';
@@ -22,7 +27,11 @@ import { whyUsBlock } from './whyUsBlock';
 export const schemaTypes = [
   // Documents
   homePage,
+  boatPage,
+  contactPage,
+  componentsTestPage,
   blogPost,
+  legalPage,
   siteSettings,
   review,
   cruisePage,
@@ -31,6 +40,7 @@ export const schemaTypes = [
   heroHeaderBlock,
   heroBlock,
   galleryBlock,
+  marqueeGalleryBlock,
   pitchBlock,
   fullWidthImageBlock,
   editorialBlock,

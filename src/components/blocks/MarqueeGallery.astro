@@ -1,0 +1,222 @@
+---
+import { urlForImage } from '../../lib/sanity';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface SanityImage {
+  asset?: unknown;
+  alt?: string;
+  metadata?: {
+    dimensions?: { width?: number; height?: number };
+    lqip?: string;
+  };
+}
+
+interface ResolvedImage {
+  url: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+}
+
+type RowImage = SanityImage | ResolvedImage;
+
+interface ResolvedItem {
+  src: string;
+  srcset: string | undefined;
+  alt: string;
+  width: number;
+  height: number;
+}
+
+interface Props {
+  eyebrow?: string;
+  title?: string;
+  row1?: RowImage[];
+  row2?: RowImage[];
+  row3?: RowImage[];
+}
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+const { eyebrow, title, row1 = [], row2 = [], row3 = [] } = Astro.props;
+
+const SRCSET_WIDTHS = [400, 800, 1200];
+
+function isSanityImage(img: RowImage): img is SanityImage {
+  return 'asset' in img && img.asset != null;
+}
+
+function resolveRow(images: RowImage[]): ResolvedItem[] {
+  return images
+    .map((img): ResolvedItem | null => {
+      if (isSanityImage(img)) {
+        const builder = urlForImage(img);
+        if (!builder) return null;
+        const src = builder.height(480).quality(82).auto('format').url();
+        if (!src) return null;
+        const srcset = SRCSET_WIDTHS
+          .map((w) => { const u = urlForImage(img)?.width(w).quality(82).auto('format').url(); return u ? `${u} ${w}w` : null; })
+          .filter(Boolean).join(', ') || undefined;
+        const w = img.metadata?.dimensions?.width ?? 800;
+        const h = img.metadata?.dimensions?.height ?? 600;
+        return { src, srcset, alt: img.alt ?? '', width: w, height: h };
+      }
+      if (!img.url) return null;
+      return { src: img.url, srcset: undefined, alt: img.alt ?? '', width: img.width ?? 800, height: img.height ?? 600 };
+    })
+    .filter((x): x is ResolvedItem => x !== null);
+}
+
+// direction: 1 = right, -1 = left. speed in px/frame at 60fps (relative).
+const rows = [
+  { images: resolveRow(row1), direction:  1, speed: 0.12 },
+  { images: resolveRow(row2), direction: -1, speed: 0.165 },
+  { images: resolveRow(row3), direction:  1, speed: 0.141 },
+];
+---
+
+<Section class="bg-background overflow-hidden">
+  {(eyebrow || title) && (
+    <Container>
+      <div class="mb-10 flex flex-col gap-3">
+        {eyebrow && (
+          <p class="text-sm font-semibold uppercase tracking-[0.14em] text-primary">{eyebrow}</p>
+        )}
+        {title && <h2 class="font-heading font-semibold text-foreground">{title}</h2>}
+      </div>
+    </Container>
+  )}
+
+  <div class="marquee-gallery flex flex-col gap-3">
+    {rows.map((row) => (
+      <div
+        class="marquee-row overflow-hidden"
+        data-direction={row.direction}
+        data-speed={row.speed}
+      >
+        {row.images.length > 0 ? (
+          <div class="marquee-track flex gap-3 will-change-transform">
+            {[...row.images, ...row.images].map((img, i) => (
+              <figure
+                class="marquee-item shrink-0 overflow-hidden"
+                style={`height: clamp(9rem, 18vw, 16rem); aspect-ratio: ${img.width} / ${img.height};`}
+                aria-hidden={i >= row.images.length ? 'true' : undefined}
+              >
+                <img
+                  src={img.src}
+                  srcset={img.srcset}
+                  sizes="(min-width: 768px) 30vw, 60vw"
+                  alt={i >= row.images.length ? '' : img.alt}
+                  width={img.width}
+                  height={img.height}
+                  class="h-full w-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </figure>
+            ))}
+          </div>
+        ) : (
+          <div
+            class="flex gap-3"
+            style="height: clamp(9rem, 18vw, 16rem);"
+          >
+            {Array.from({ length: 5 }).map(() => (
+              <div
+                class="shrink-0 rounded-[var(--radius-surface)] bg-muted"
+                style="height: 100%; aspect-ratio: 4 / 3;"
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+</Section>
+
+<script>
+  function initMarquee(gallery: HTMLElement) {
+    const rowEls = gallery.querySelectorAll<HTMLElement>('.marquee-row');
+    if (!rowEls.length) return;
+
+    const isPointerFine = window.matchMedia('(pointer: fine)').matches;
+
+    type RowState = {
+      track: HTMLElement;
+      direction: number;
+      baseSpeed: number;
+      x: number;
+      setWidth: number;
+    };
+
+    const rows: RowState[] = [];
+
+    rowEls.forEach((rowEl) => {
+      const track = rowEl.querySelector<HTMLElement>('.marquee-track');
+      if (!track) return;
+
+      const direction = Number(rowEl.dataset.direction) || 1;
+      const baseSpeed = Number(rowEl.dataset.speed) || 0.5;
+
+      // setWidth = width of one image set (half the track, which holds 2 copies)
+      const setWidth = track.scrollWidth / 2;
+
+      // Rightward rows (direction=1): start at -setWidth, move toward 0 → images scroll right.
+      // Leftward rows (direction=-1): start at 0, move toward -setWidth → images scroll left.
+      const x = direction > 0 ? -setWidth : 0;
+
+      rows.push({ track, direction, baseSpeed, x, setWidth });
+    });
+
+    let scrollBoost = 0;
+    let rafId: number;
+
+    if (isPointerFine) {
+      window.addEventListener('wheel', (e) => {
+        // Always positive — all rows speed up on scroll regardless of direction
+        scrollBoost += Math.abs(e.deltaY) * 0.003;
+      }, { passive: true });
+    }
+
+    function tick() {
+      scrollBoost *= 0.92;
+
+      rows.forEach((row) => {
+        const speed = row.direction * (row.baseSpeed + scrollBoost);
+        row.x += speed;
+
+        // Seamless loop
+        if (row.direction > 0 && row.x >= 0) row.x -= row.setWidth;       // rightward: 0 → -setWidth
+        if (row.direction < 0 && row.x <= -row.setWidth) row.x += row.setWidth; // leftward: -setWidth → 0
+
+        row.track.style.transform = `translateX(${row.x}px)`;
+      });
+
+      rafId = requestAnimationFrame(tick);
+    }
+
+    tick();
+    return () => cancelAnimationFrame(rafId);
+  }
+
+  function setup() {
+    const cleanups: (() => void)[] = [];
+
+    document.querySelectorAll<HTMLElement>('.marquee-gallery').forEach((gallery) => {
+      const cleanup = initMarquee(gallery);
+      if (cleanup) cleanups.push(cleanup);
+    });
+
+    return () => cleanups.forEach((fn) => fn());
+  }
+
+  let cleanup = setup();
+
+  document.addEventListener('astro:before-swap', () => cleanup(), { once: true });
+  document.addEventListener('astro:page-load', () => {
+    cleanup = setup();
+  });
+</script>

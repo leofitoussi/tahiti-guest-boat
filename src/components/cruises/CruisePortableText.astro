@@ -21,14 +21,38 @@ const components = {
 </div>
 
 <style>
+  /* text-base / leading-relaxed */
   .cruise-content {
     color: var(--foreground);
-    font-size: 1.0625rem;
-    line-height: 1.75;
+    font-size: 1rem;
+    line-height: 1.625;
   }
 
   .cruise-content :global(p) {
     margin: 1rem 0;
+  }
+
+  /* ── Modifier : intro / feature body (video-feature-body) ── */
+  .cruise-content.video-feature-body :global(p) {
+    margin: 0;
+    font-size: 1.125rem; /* text-lg */
+    line-height: 1.625;  /* leading-relaxed */
+    color: var(--muted-foreground);
+  }
+  @media (min-width: 768px) {
+    .cruise-content.video-feature-body :global(p) {
+      font-size: 1.25rem; /* md:text-xl */
+    }
+  }
+  .cruise-content.video-feature-body :global(strong) {
+    font-weight: 700;
+    color: var(--foreground);
+  }
+
+  /* ── Modifier : video feature title ── */
+  .cruise-content.video-feature-title :global(h2) {
+    margin: 0;
+    color: var(--foreground);
   }
 
   .cruise-content :global(h2) {

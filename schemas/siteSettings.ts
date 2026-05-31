@@ -1,4 +1,5 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { defineLocalizationFields } from './localization-fields';
 
 export const siteSettings = defineType({
   name: 'siteSettings',
@@ -19,6 +20,7 @@ export const siteSettings = defineType({
         hotspot: false,
       },
     }),
+    ...defineLocalizationFields(),
     defineField({
       name: 'logoAlt',
       title: 'Logo — texte alternatif',
@@ -125,27 +127,41 @@ export const siteSettings = defineType({
     }),
     defineField({
       name: 'whyUsTitle',
-      title: 'Why us title',
+      title: 'Why us — titre principal',
       type: 'string',
     }),
     defineField({
+      name: 'whyUsDescription',
+      title: 'Why us — description intro',
+      type: 'text',
+      rows: 3,
+      description: "Phrase d'accroche affichée sous le titre principal dans la mise en page deux colonnes.",
+    }),
+    defineField({
       name: 'whyUsArguments',
-      title: 'Why us arguments',
+      title: 'Why us — arguments',
       type: 'array',
       of: [
         defineArrayMember({
           name: 'whyUsArgument',
-          title: 'Why us argument',
+          title: 'Argument',
           type: 'object',
           fields: [
             defineField({
-              name: 'icon',
-              title: 'Icon',
+              name: 'heading',
+              title: "Titre de l'argument",
               type: 'string',
+              description: 'Titre court affiché en h3. Laissez vide pour afficher uniquement le corps.',
+            }),
+            defineField({
+              name: 'icon',
+              title: 'Icône (emoji)',
+              type: 'string',
+              description: 'Affiché uniquement dans la mise en page icônes (sans titre).',
             }),
             defineField({
               name: 'body',
-              title: 'Body',
+              title: 'Corps',
               type: 'text',
               rows: 3,
               validation: (rule) => rule.required(),
@@ -153,8 +169,11 @@ export const siteSettings = defineType({
           ],
           preview: {
             select: {
-              title: 'body',
-              subtitle: 'icon',
+              title: 'heading',
+              subtitle: 'body',
+            },
+            prepare({ title, subtitle }) {
+              return { title: title || subtitle, subtitle: title ? subtitle : undefined };
             },
           },
         }),

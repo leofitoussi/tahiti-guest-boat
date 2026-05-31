@@ -3,29 +3,32 @@
  * PageBuilder — dispatcher pur.
  *
  * Reçoit un tableau de blocs Sanity et rend le bon composant selon _type.
- * Ne fait AUCUNE transformation de données : chaque bloc gère les siennes.
- *
- * Usage :
- *   <PageBuilder blocks={pageBuilder} />
+ * Les blocs dynamiques reçoivent leurs données depuis les ressources globales
+ * du site, afin de garder un seul point d'assemblage côté page.
  */
 import HeroHeader from './HeroHeader.astro';
 import HomeHero from './HomeHero.astro';
 import EditorialBlock from './EditorialBlock.astro';
 import MasonryGallery from './MasonryGallery.astro';
+import MarqueeGallery from './MarqueeGallery.astro';
 import VideoFeature from './VideoFeature.astro';
-// À ajouter au fur et à mesure :
-// import Pitch from './Pitch.astro';
-// import Editorial from './Editorial.astro';
-// import Boat from './Boat.astro';
-// import WhyUs from './WhyUs.astro';
-// import Reviews from './Reviews.astro';
-// import Booking from './Booking.astro';
+import FullWidthImageBlock from '../cruises/FullWidthImageBlock.astro';
+import BookingBlock from '../cruises/BookingBlock.astro';
+import RelatedCruisesBlock from '../cruises/RelatedCruisesBlock.astro';
+import ReviewsBlock from '../cruises/ReviewsBlock.astro';
+import WhyUsBlock from '../cruises/WhyUsBlock.astro';
+import type { CruisePageSummary, Review, SiteSettings } from '../../lib/cruises';
+import { defaultLocale, type Locale } from '../../lib/localization';
 
 interface Props {
   blocks: Record<string, unknown>[];
+  settings?: SiteSettings | null;
+  reviews?: Review[];
+  cruises?: CruisePageSummary[];
+  locale?: Locale;
 }
 
-const { blocks = [] } = Astro.props;
+const { blocks = [], settings = null, reviews = [], cruises = [], locale = defaultLocale } = Astro.props;
 ---
 
 {
@@ -40,6 +43,7 @@ const { blocks = [] } = Astro.props;
             primaryCta={block.primaryCtaLabel && block.primaryCtaLink ? { label: block.primaryCtaLabel, href: block.primaryCtaLink } : undefined}
             secondaryCta={block.secondaryCtaLabel && block.secondaryCtaLink ? { label: block.secondaryCtaLabel, href: block.secondaryCtaLink } : undefined}
             image={block.image}
+            locale={locale}
           />
         );
 
@@ -54,6 +58,7 @@ const { blocks = [] } = Astro.props;
             secondaryCtaLabel={block.secondaryCtaLabel}
             secondaryCtaLink={block.secondaryCtaLink}
             image={block.image}
+            locale={locale}
           />
         );
 
@@ -63,8 +68,20 @@ const { blocks = [] } = Astro.props;
             eyebrow={block.eyebrow}
             title={block.title}
             images={block.images ?? []}
+            layout={block.layout ?? 'bleed-rows'}
             columns={block.columns ?? 3}
             gap={block.gap ?? 'md'}
+          />
+        );
+
+      case 'marqueeGalleryBlock':
+        return (
+          <MarqueeGallery
+            eyebrow={block.eyebrow}
+            title={block.title}
+            row1={block.row1 ?? []}
+            row2={block.row2 ?? []}
+            row3={block.row3 ?? []}
           />
         );
 
@@ -80,6 +97,7 @@ const { blocks = [] } = Astro.props;
             primaryCtaLink={block.primaryCtaLink}
             secondaryCtaLabel={block.secondaryCtaLabel}
             secondaryCtaLink={block.secondaryCtaLink}
+            locale={locale}
           />
         );
 
@@ -93,10 +111,25 @@ const { blocks = [] } = Astro.props;
             ctaUrl={block.ctaUrl}
             youtubeUrl={block.youtubeUrl}
             posterImage={block.posterImage}
+            locale={locale}
           />
         );
 
-      // Blocs à venir — retournent null jusqu'à implémentation frontend
+      case 'fullWidthImageBlock':
+        return <FullWidthImageBlock block={block} />;
+
+      case 'whyUsBlock':
+        return <WhyUsBlock settings={settings} locale={locale} />;
+
+      case 'reviewsBlock':
+        return <ReviewsBlock reviews={reviews} locale={locale} />;
+
+      case 'bookingBlock':
+        return <BookingBlock settings={settings} locale={locale} />;
+
+      case 'relatedCruisesBlock':
+        return <RelatedCruisesBlock cruises={cruises} locale={locale} />;
+
       default:
         return null;
     }

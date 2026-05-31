@@ -12,6 +12,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { defaultLocale, localizeHref, type Locale } from "../../lib/localization"
+import { getSiteCopy } from "../../lib/site-copy"
 
 interface NavItem {
   label: string
@@ -22,23 +24,33 @@ interface MobileDrawerProps {
   navItems: NavItem[]
   ctaLabel?: string
   ctaHref?: string
+  menuLabel?: string
+  navigationLabel?: string
+  locale?: Locale
 }
 
 export function MobileDrawer({
   navItems,
   ctaLabel,
   ctaHref = "/contact",
+  menuLabel,
+  navigationLabel,
+  locale = defaultLocale,
 }: MobileDrawerProps) {
+  const copy = getSiteCopy(locale)
+  const resolvedMenuLabel = menuLabel ?? copy.shell.mobileMenuLabel
+  const resolvedNavigationLabel = navigationLabel ?? copy.shell.navigationLabel
+
   return (
     <Sheet>
-      <SheetTrigger render={<Button variant="ghost" size="icon" aria-label="Ouvrir le menu" />}>
+      <SheetTrigger render={<Button variant="ghost" size="icon" aria-label={resolvedMenuLabel} />}>
         <MenuIcon data-icon="inline-start" />
       </SheetTrigger>
       <SheetContent side="right" className="w-[min(24rem,88vw)]">
         <SheetHeader>
-          <SheetTitle>Navigation</SheetTitle>
+          <SheetTitle>{resolvedNavigationLabel}</SheetTitle>
         </SheetHeader>
-        <nav className="flex flex-col gap-1 px-8" aria-label="Navigation mobile">
+        <nav className="flex flex-col gap-1 px-8" aria-label={resolvedNavigationLabel}>
           {navItems.map((item) => (
             <SheetClose
               key={item.href}
@@ -60,7 +72,7 @@ export function MobileDrawer({
               nativeButton={false}
               render={
                 <a
-                  href={ctaHref}
+                  href={localizeHref(ctaHref, locale)}
                   className={buttonVariants({ variant: "primary", className: "w-full" })}
                 />
               }

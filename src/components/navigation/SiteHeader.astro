@@ -1,4 +1,7 @@
 ---
+import { defaultLocale, localizeHref, localizePath } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
+
 interface NavItem {
   label: string;
   href: string;
@@ -14,11 +17,13 @@ interface Props {
 }
 
 const { logoUrl, logoAlt = 'Tahiti Guest Boat', navItems, ctaLabel, ctaHref } = Astro.props;
+const homeHref = localizePath('/', defaultLocale);
+const copy = getSiteCopy(defaultLocale);
 ---
 
 <header class="border-b border-border/70 bg-background shadow-sm">
   <div class="mx-auto flex h-20 max-w-site items-center justify-between px-5 md:px-8">
-    <a href="/" class="flex h-full items-center" aria-label="Tahiti Guest Boat">
+    <a href={homeHref} class="flex h-full items-center" aria-label="Tahiti Guest Boat">
       {
         logoUrl ? (
           <img src={logoUrl} alt={logoAlt} class="h-12 w-auto object-contain" width="300" height="92" />
@@ -49,17 +54,17 @@ const { logoUrl, logoAlt = 'Tahiti Guest Boat', navItems, ctaLabel, ctaHref } = 
       }
       {
         ctaLabel && (
-          <a
-            href={ctaHref || '/contact'}
-            class="inline-flex h-11 items-center rounded-[var(--radius-control)] bg-primary px-7 text-sm font-semibold tracking-[0.12em] uppercase text-primary-foreground transition-colors hover:bg-primary/90"
-          >
+            <a
+              href={localizeHref(ctaHref || '/contact', defaultLocale)}
+              class="inline-flex h-11 items-center rounded-[var(--radius-control)] bg-primary px-7 text-sm font-semibold tracking-[0.12em] uppercase text-primary-foreground transition-colors hover:bg-primary/90"
+            >
             {ctaLabel}
           </a>
         )
       }
     </nav>
 
-    <button class="mr-1 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border border-border/70 text-primary transition-colors hover:bg-muted md:hidden" aria-label="Ouvrir le menu">
+    <button class="mr-1 flex h-11 w-11 items-center justify-center rounded-[var(--radius-control)] border border-border/70 text-primary transition-colors hover:bg-muted md:hidden" aria-label={copy.shell.mobileMenuLabel}>
       <span class="flex flex-col gap-1.5">
         <span class="block h-[2px] w-5 rounded-full bg-current"></span>
         <span class="block h-[2px] w-5 rounded-full bg-current"></span>

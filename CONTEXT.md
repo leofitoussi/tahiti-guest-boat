@@ -56,6 +56,24 @@ _Avoid_: content hub, main acquisition channel
 The public route of a page, treated as stable and preserved when the site is refactored.
 _Avoid_: slug change, path rename
 
+## Localization
+
+**French version**:
+The default language version of a page, kept on the existing site URLs.
+_Avoid_: main locale, source page
+
+**English version**:
+The translated language version of a page, published under the `/en/` path prefix.
+_Avoid_: alternate page, mirror page
+
+**Translation group**:
+The linked pair or set of documents that represent the same content across languages.
+_Avoid_: duplicate page, copy set
+
+**Source version**:
+The canonical language version used to create the first translated draft.
+_Avoid_: master copy, origin document
+
 **Page unique**:
 A one-off page with its own editable block stack and no shared template siblings.
 _Avoid_: singleton page, custom page
@@ -114,6 +132,10 @@ _Avoid_: hardcoded menu, page-local nav
 The single global Sanity document that stores shared site data such as navigation, CTA, logo, and contact details.
 _Avoid_: settings page, config file
 
+**Sanity Studio**:
+The hosted Sanity editing surface for this project, used online only.
+_Avoid_: local studio, self-hosted studio
+
 **Croisière principale**:
 The primary cruise linked to an article or page for SEO and navigation purposes.
 _Avoid_: main topic, canonical page
@@ -126,11 +148,47 @@ _Avoid_: related links, tags
 A shared block definition that can be enabled across multiple page families while still being constrained by page type.
 _Avoid_: duplicated component, page-specific component
 
+**Composant cohérent**:
+A reusable Astro/Sanity section or block that respects the design system, page family, content ownership, SEO, performance, and the project's premium editorial identity.
+_Avoid_: UI component, styled section, one-off component
+
+**Option responsive**:
+A constrained editor choice that changes layout behavior across breakpoints, such as independent text/image ordering on desktop and mobile, without exposing free-form styling controls.
+_Avoid_: custom CSS field, free layout setting, style override
+
+**Cadrage responsive**:
+The breakpoint-aware rendering of one Sanity image asset using its hotspot and crop data so the subject remains visible on mobile and desktop without uploading a second image.
+_Avoid_: mobile image, duplicate asset, CSS-only crop hack
+
+**Page de test composants**:
+A dedicated `/composants` page managed from Sanity where new page-builder blocks are deployed with dummy content and rendered full width for real-site validation before being used on public business pages.
+_Avoid_: UI kit sandbox, local-only preview, component mock page
+
 **Page builder**:
 A page-level block stack whose blocks can be added, removed, and reordered within the rules of that page family.
 _Avoid_: static layout, fixed section list
+
+**Version linguistique**:
+A document variant for one language within the same content family.
+_Avoid_: translation, locale copy
+
+**Groupe de traduction**:
+The linked set of version linguistiques that represent the same content across languages.
+_Avoid_: translation set, locale group
+
+**Langue source**:
+The canonical language version that other languages are generated from.
+_Avoid_: source language, master copy
+
+**Synchronisation de traduction**:
+Automatic regeneration of a target language version from the langue source after the source changes.
+_Avoid_: auto-translate, translation sync
 
 **Article SEO**:
 A blog article designed to support a related commercial page through search visibility and contextual links.
 _Avoid_: category page, campaign landing page
 _Structure_: uniform template
+
+## Editing workflow
+
+- Sanity is edited online only for this repo; there is no local Studio workflow to rely on.

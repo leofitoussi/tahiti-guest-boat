@@ -7,31 +7,30 @@ import { buttonVariants } from '../../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCruisePages } from '../../lib/cruises';
+import { defaultLocale, localizePath } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
 import { urlForImage } from '../../lib/sanity';
 
-const cruises = await getCruisePages();
+const locale = defaultLocale;
+const copy = getSiteCopy(locale);
+const cruises = await getCruisePages(locale);
 ---
 
 <BaseLayout
-  title="Nos croisières | Tahiti Guest Boat"
-  description="Des croisières privées en catamaran en Polynésie, pensées sur mesure selon vos envies, votre rythme et vos escales."
+  title={copy.pages.cruisesIndex.title}
+  description={copy.pages.cruisesIndex.description}
+  locale={locale}
 >
   <main class="bg-background">
     <Section padding="lg" class="border-b border-border/70 bg-muted/30">
       <Container>
         <div class="flex max-w-4xl flex-col gap-5">
-          <Badge>Nos croisières</Badge>
-          <h1 class="font-heading font-semibold leading-tight text-foreground">
-            Les croisières en catamaran de Tahiti Guest Boat
-          </h1>
+          <Badge>{copy.pages.cruisesIndex.badge}</Badge>
+          <h1 class="font-heading font-semibold leading-tight text-foreground">{copy.pages.cruisesIndex.heading}</h1>
           <div class="max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-            <p class="mb-4 font-bold text-foreground">100% personnalisées</p>
-            <p>
-              Chaque croisière est une aventure unique, pensée sur mesure selon vos envies. Ici, pas d'itinéraires figés ni de programmes rigides : vous choisissez le rythme, les escales et les expériences qui vous ressemblent.
-            </p>
-            <p class="mt-4">
-              Pour vous inspirer, découvrez ci-dessous quelques exemples d'expériences à vivre en mer. Mais souvenez-vous, la plus belle croisière sera celle que nous créerons ensemble !
-            </p>
+            <p class="mb-4 font-bold text-foreground">{copy.pages.cruisesIndex.introLead}</p>
+            <p>{copy.pages.cruisesIndex.introBody}</p>
+            <p class="mt-4">{copy.pages.cruisesIndex.introTail}</p>
           </div>
         </div>
       </Container>
@@ -49,7 +48,7 @@ const cruises = await getCruisePages();
 
                 return (
                   <Card className="transition hover:-translate-y-1 hover:shadow-md">
-                    <a href={`/nos-croisieres/${cruise.slug}/`} class="block">
+                    <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class="block">
                       {imageUrl ? (
                         <img
                           src={imageUrl}
@@ -66,29 +65,27 @@ const cruises = await getCruisePages();
                     </a>
                     <CardHeader>
                       <CardTitle>
-                        <a href={`/nos-croisieres/${cruise.slug}/`} class="transition hover:text-primary">
-                          {cruise.heroTitle || cruise.title}
-                        </a>
+                      <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class="transition hover:text-primary">
+                        {cruise.heroTitle || cruise.title}
+                      </a>
                       </CardTitle>
                       {cruise.excerpt && <CardDescription className="line-clamp-4">{cruise.excerpt}</CardDescription>}
                     </CardHeader>
                     <CardContent>
-                      <a href={`/nos-croisieres/${cruise.slug}/`} class={buttonVariants({ variant: 'ghost', className: 'px-0' })}>
-                        Découvrir
+                      <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class={buttonVariants({ variant: 'ghost', className: 'px-0' })}>
+                        {copy.blocks.discoverCta}
                       </a>
                     </CardContent>
                   </Card>
                 );
               })}
-            </Grid>
-          ) : (
-            <div class="border border-dashed border-border p-8 text-center">
-              <h2 class="font-heading font-semibold text-foreground">Les inspirations de croisière arrivent bientôt</h2>
-              <p class="mx-auto mt-3 max-w-2xl text-muted-foreground">
-                Les pages ajoutées dans Sanity Studio apparaîtront ici après publication et rebuild du site.
-              </p>
-            </div>
-          )
+          </Grid>
+        ) : (
+          <div class="border border-dashed border-border p-8 text-center">
+              <h2 class="font-heading font-semibold text-foreground">{copy.pages.cruisesIndex.emptyTitle}</h2>
+              <p class="mx-auto mt-3 max-w-2xl text-muted-foreground">{copy.pages.cruisesIndex.emptyDescription}</p>
+          </div>
+        )
         }
       </Container>
     </Section>

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Project documentation
+    url: https://github.com/leofitoussi/tahiti-guest-boat/blob/main/docs/agents/issue-tracker.md
+    about: Use the repository issue workflow and conventions documented for this project.

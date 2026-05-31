@@ -1,0 +1,40 @@
+name: Feature request
+description: Propose an improvement or new capability for the site.
+title: "[Idea]: "
+labels:
+  - needs-triage
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Focus on the user problem and the outcome you want, not only the implementation.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user need or business goal is not being met?
+      placeholder: Describe the gap this request addresses.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What change would address it?
+      placeholder: A concise description of the desired behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: value
+    attributes:
+      label: Value
+      description: Why is this worth doing?
+      placeholder: Explain the expected impact.
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Related pages, issues, or examples.
+      placeholder: Links, screenshots, or notes.

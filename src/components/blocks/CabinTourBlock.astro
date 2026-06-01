@@ -1,0 +1,276 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { TypedObject } from 'astro-portabletext/types';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import { urlForImage } from '../../lib/sanity';
+
+interface CabinTab {
+  _key: string;
+  label?: string;
+  body?: TypedObject[];
+  image?: { asset?: unknown; alt?: string };
+}
+
+interface Props {
+  title?: TypedObject[];
+  tabs?: CabinTab[];
+}
+
+const { title = [], tabs = [] } = Astro.props;
+
+const resolvedTabs = tabs.map((tab) => ({
+  ...tab,
+  imgSrc: tab.image?.asset
+    ? (urlForImage(tab.image)?.width(900).quality(85).auto('format').url() ?? '')
+    : '',
+  imgAlt: tab.image?.alt ?? '',
+}));
+---
+
+<Section padding="lg">
+  <Container>
+    <div class="flex flex-col gap-8">
+
+      <!-- Section heading -->
+      {title.length > 0 && (
+        <div class="cabin-tour-title">
+          <PortableText value={title} />
+        </div>
+      )}
+
+      {resolvedTabs.length > 0 && (
+        <div class="cabin-tour-root">
+          <!-- Tab bar -->
+          <div class="tab-bar" role="tablist">
+            {resolvedTabs.map((tab, i) => (
+              <button
+                class={`tab-btn${i === 0 ? ' active' : ''}`}
+                role="tab"
+                aria-selected={i === 0 ? 'true' : 'false'}
+                aria-controls={`cabin-panel-${i}`}
+                data-index={i}
+                type="button"
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <!-- Tab panels -->
+          <div class="panels">
+            {resolvedTabs.map((tab, i) => (
+              <div
+                id={`cabin-panel-${i}`}
+                class={`panel${i === 0 ? ' visible' : ''}`}
+                role="tabpanel"
+                data-panel={i}
+                aria-hidden={i === 0 ? 'false' : 'true'}
+              >
+                <!-- Mobile: h3 → body → image -->
+                <!-- Desktop: text col (h3 + body) left | image right -->
+                <div class="panel-inner">
+                  <div class="text-col">
+                    {tab.label && <h3 class="cabin-label">{tab.label}</h3>}
+                    {tab.body && tab.body.length > 0 && (
+                      <div class="cabin-tour-body">
+                        <PortableText value={tab.body} />
+                      </div>
+                    )}
+                  </div>
+                  {tab.imgSrc && (
+                    <div class="image-col">
+                      <img
+                        src={tab.imgSrc}
+                        alt={tab.imgAlt}
+                        loading="lazy"
+                        decoding="async"
+                        class="cabin-img"
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+    </div>
+  </Container>
+</Section>
+
+<style>
+  /* ── Section heading ── */
+  .cabin-tour-title :global(h2),
+  .cabin-tour-title :global(h3),
+  .cabin-tour-title :global(h4),
+  .cabin-tour-title :global(p) {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-size: clamp(2rem, 4.2vw, 3.6rem);
+    line-height: 1.14;
+    color: var(--foreground);
+  }
+  .cabin-tour-title :global(strong) { font-weight: 700; }
+  .cabin-tour-title :global(em)     { font-style: italic; }
+
+  /* ── Tab bar ── */
+  .tab-bar {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px; /* prevent clipping of border */
+  }
+  .tab-bar::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0.5rem 1.25rem;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--foreground);
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+  }
+  .tab-btn.active,
+  .tab-btn[aria-selected="true"] {
+    background: var(--primary);
+    color: #fff;
+    border-color: var(--primary);
+  }
+  .tab-btn:not(.active):hover {
+    background: color-mix(in srgb, var(--primary) 8%, transparent);
+  }
+
+  /* ── Panels ── */
+  .panel {
+    display: none;
+  }
+  .panel.visible {
+    display: block;
+    animation: fadeIn 150ms ease both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Panel inner — mobile stacked ── */
+  .panel-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 1.5rem;
+    border: 1px solid var(--primary);
+    overflow: hidden;
+  }
+
+  /* ── Panel inner — desktop grid ── */
+  @media (min-width: 1024px) {
+    .panel-inner {
+      display: grid;
+      grid-template-columns: 2fr 3fr;
+      gap: 0;
+      align-items: stretch;
+    }
+  }
+
+  /* ── Text column padding ── */
+  .text-col {
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 1024px) {
+    .text-col {
+      padding: 2rem;
+    }
+  }
+
+  /* ── Text column ── */
+  .cabin-label {
+    margin: 0 0 1rem;
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-2xl);
+    line-height: 1.2;
+    color: var(--primary);
+  }
+
+  .cabin-tour-body {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-body);
+    color: var(--foreground);
+  }
+  .cabin-tour-body :global(p)     { margin: 0; }
+  .cabin-tour-body :global(p + p) { margin-top: 1.125rem; }
+  .cabin-tour-body :global(strong) { font-weight: 700; }
+  .cabin-tour-body :global(em)     { font-style: italic; }
+  .cabin-tour-body :global(a) {
+    color: var(--primary);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* ── Image column ── */
+  .image-col {
+    display: flex;
+  }
+
+  .cabin-img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+  }
+
+  @media (min-width: 1024px) {
+    .cabin-img {
+      aspect-ratio: unset;
+      height: 100%;
+      min-height: 300px;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelectorAll<HTMLElement>('.cabin-tour-root');
+
+  root.forEach((el) => {
+    const tabs   = el.querySelectorAll<HTMLButtonElement>('.tab-btn');
+    const panels = el.querySelectorAll<HTMLElement>('.panel');
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const idx = Number(tab.dataset.index);
+
+        // Deactivate all
+        tabs.forEach((t) => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        panels.forEach((p) => {
+          p.classList.remove('visible');
+          p.setAttribute('aria-hidden', 'true');
+        });
+
+        // Activate selected
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+
+        const panel = panels[idx];
+        if (panel) {
+          panel.classList.add('visible');
+          panel.setAttribute('aria-hidden', 'false');
+        }
+      });
+    });
+  });
+</script>

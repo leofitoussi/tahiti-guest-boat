@@ -17,7 +17,9 @@ import VideoFeature from './VideoFeature.astro';
 import FullWidthImageBlock from '../cruises/FullWidthImageBlock.astro';
 import BookingBlock from '../cruises/BookingBlock.astro';
 import RelatedCruisesBlock from '../cruises/RelatedCruisesBlock.astro';
+import BoatArgumentsBlock from './BoatArgumentsBlock.astro';
 import BoatPresentationBlock from './BoatPresentationBlock.astro';
+import CabinTourBlock from './CabinTourBlock.astro';
 import CruiseInspirationBlock from './CruiseInspirationBlock.astro';
 import FaqBlock from './FaqBlock.astro';
 import ActivitiesBlock from './ActivitiesBlock.astro';
@@ -115,6 +117,7 @@ const { blocks = [], settings = null, reviews = [], cruises = [], activities = [
             primaryCtaLink={block.primaryCtaLink}
             secondaryCtaLabel={block.secondaryCtaLabel}
             secondaryCtaLink={block.secondaryCtaLink}
+            invertBackground={block.invertBackground ?? false}
             locale={locale}
           />
         );
@@ -170,12 +173,30 @@ const { blocks = [], settings = null, reviews = [], cruises = [], activities = [
       case 'relatedCruisesBlock':
         return <RelatedCruisesBlock cruises={cruises} locale={locale} />;
 
+      case 'boatArgumentsBlock':
+        return (
+          <BoatArgumentsBlock
+            title={block.title as any}
+            body={block.body as any}
+            features={block.features as any}
+            image={block.image as any}
+          />
+        );
+
       case 'boatPresentationBlock':
         return (
           <BoatPresentationBlock
             title={block.title as any}
             body={block.body as any}
             blueprintImages={block.blueprintImages as any}
+          />
+        );
+
+      case 'cabinTourBlock':
+        return (
+          <CabinTourBlock
+            title={block.title as any}
+            tabs={block.tabs as any}
           />
         );
 

@@ -107,6 +107,10 @@ _Avoid_: features list, benefits block
 A dynamic related-cruises block that shows a subset of available cruises and excludes the current page.
 _Avoid_: manual cross-links, static related list
 
+**Autres croisières**:
+A dynamic section on a Page croisière that lists every other Page croisière, excludes the current page, and uses editorial priority for ordering.
+_Avoid_: croisières similaires, manual selection, related cruises
+
 **Archive de page**:
 A listing page that primarily reflects a collection of entries and may include limited page-specific content.
 _Avoid_: landing page, editorial page
@@ -139,6 +143,45 @@ _Avoid_: local studio, self-hosted studio
 **Croisière principale**:
 The primary cruise linked to an article or page for SEO and navigation purposes.
 _Avoid_: main topic, canonical page
+
+**Page croisière**:
+A commercial cruise page managed as a fixed editorial template, with rich fields filled in Sanity and no page-level block stack for editors.
+_Avoid_: article, landing page, page éditoriale
+_Structure_: template de page
+_Publication_: may be public before every template section is complete
+
+**Libellé destination**:
+A short destination name stored on a Page croisière for context-aware shared sections and grammar-sensitive copy.
+_Avoid_: page title, H1, slug
+
+**Mot-clé principal croisière**:
+The primary search phrase for a Page croisière, derived from "croisière" plus the page's Libellé destination.
+_Avoid_: editable keyword, SEO tag, manual query
+
+**Accroche croisière**:
+The opening section of a Page croisière that states the cruise promise, presents short practical markers, and establishes the destination visually.
+_Avoid_: résumé de croisière, pitch, intro block
+
+**Introduction destination**:
+A section of a Page croisière that presents the destination or archipelago, explains why it suits private cruising, and supports search intent with rich editorial text and destination imagery.
+_Avoid_: intro croisière, carousel block, destination summary
+
+**Expérience croisière**:
+A section of a Page croisière that explains why private cruising is the right way to discover the destination.
+_Avoid_: editorial block, destination argument, cruise text
+
+**Bateau recommandé**:
+A section of a Page croisière that explains why Tahiti Guest Boat's boat suits the destination and leads toward booking.
+_Avoid_: boat block, boat pitch, vessel section
+
+**Itinéraire indicatif**:
+An inspirational example route within a Page croisière that shows how the cruise could unfold without defining a contractual program.
+_Avoid_: programme, circuit, planning
+_Disclaimer_: shared across all Page croisière entries
+
+**Bloc réservation**:
+A shared booking section that combines reusable booking copy and the shared reservation form, with the destination name injected from the current page context when needed.
+_Avoid_: appel à la réservation, page-specific booking copy, form block
 
 **Croisières secondaires**:
 Additional cruise links attached to an article or page as supporting references.

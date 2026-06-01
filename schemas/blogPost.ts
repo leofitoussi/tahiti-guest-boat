@@ -130,7 +130,6 @@ export const blogPost = defineType({
       title: 'Croisière principale',
       type: 'reference',
       to: [{ type: 'cruisePage' }],
-      validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'secondaryCruises',

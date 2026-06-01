@@ -28,6 +28,7 @@ interface Props {
   primaryCtaLink?: string;
   secondaryCtaLabel?: string;
   secondaryCtaLink?: string;
+  invertBackground?: boolean;
   locale?: Locale;
 }
 
@@ -41,6 +42,7 @@ const {
   primaryCtaLink,
   secondaryCtaLabel,
   secondaryCtaLink,
+  invertBackground = false,
   locale = defaultLocale,
 } = Astro.props;
 
@@ -63,10 +65,16 @@ const textOrderClasses = [
 ];
 ---
 
-<Section padding="lg" class="bg-background">
+<Section padding="lg" class:list={[invertBackground ? 'bg-(--brand-secondary)' : 'bg-background']}>
   <Container>
     <div class="grid gap-10 lg:grid-cols-2 lg:items-center">
-      <div class:list={['relative overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-muted/30 shadow-sm', ...imageOrderClasses]}>
+      <div class:list={[
+        'relative overflow-hidden rounded-[var(--radius-surface)] shadow-sm',
+        invertBackground
+          ? 'border border-white/15 bg-white/5'
+          : 'border border-border/70 bg-muted/30',
+        ...imageOrderClasses,
+      ]}>
         {
           imageUrl ? (
             <img
@@ -93,11 +101,11 @@ const textOrderClasses = [
       <div class:list={['flex flex-col gap-6', ...textOrderClasses]}>
         {title.length > 0 && (
           <div class="split-title">
-            <SectionHeading value={title} />
+            <SectionHeading value={title} inverted={invertBackground} />
           </div>
         )}
         {body.length > 0 && (
-          <div class="split-body">
+          <div class:list={['split-body', invertBackground && 'split-body--inverted']}>
             <PortableText value={body} />
           </div>
         )}
@@ -109,7 +117,13 @@ const textOrderClasses = [
             </a>
           )}
           {secondaryCtaLabel && secondaryCtaLink && (
-            <a href={localizeHref(secondaryCtaLink, locale)} class={buttonVariants({ variant: 'outline', size: 'lg', className: 'w-fit' })}>
+            <a
+              href={localizeHref(secondaryCtaLink, locale)}
+              class:list={[
+                buttonVariants({ variant: 'outline', size: 'lg', className: 'w-fit' }),
+                invertBackground && 'btn-outline-inverted',
+              ]}
+            >
               {secondaryCtaLabel}
             </a>
           )}
@@ -123,8 +137,12 @@ const textOrderClasses = [
   .split-body :global(p) {
     margin: 0;
     color: var(--muted-foreground);
-    font-size: var(--font-size-lg);
+    font-size: var(--font-size-base);
     line-height: var(--line-height-body);
+  }
+
+  .split-body--inverted :global(p) {
+    color: rgb(255 255 255 / 0.78);
   }
 
   div :global(strong) {
@@ -133,5 +151,15 @@ const textOrderClasses = [
 
   div :global(em) {
     font-style: italic;
+  }
+
+  .btn-outline-inverted {
+    border-color: rgb(255 255 255 / 0.35);
+    background-color: transparent;
+    color: #ffffff;
+  }
+
+  .btn-outline-inverted:hover {
+    background-color: rgb(255 255 255 / 0.08);
   }
 </style>

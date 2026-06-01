@@ -5,12 +5,13 @@ import type { TypedObject } from 'astro-portabletext/types';
 interface Props {
   value?: TypedObject[];
   class?: string;
+  inverted?: boolean;
 }
 
-const { value = [], class: className } = Astro.props;
+const { value = [], class: className, inverted = false } = Astro.props;
 ---
 
-<div class:list={['section-heading', className]}>
+<div class:list={['section-heading', inverted && 'section-heading--inverted', className]}>
   <PortableText value={value} />
 </div>
 
@@ -33,5 +34,23 @@ const { value = [], class: className } = Astro.props;
   .section-heading :global(p) {
     margin: 0;
     color: var(--muted-foreground);
+  }
+
+  .section-heading--inverted :global(h2),
+  .section-heading--inverted :global(h3),
+  .section-heading--inverted :global(h4) {
+    color: #ffffff;
+  }
+
+  .section-heading--inverted :global(p) {
+    color: rgb(255 255 255 / 0.75);
+  }
+
+  .section-heading--inverted :global(strong) {
+    color: #ffffff;
+  }
+
+  .section-heading--inverted :global(em) {
+    color: rgb(255 255 255 / 0.9);
   }
 </style>

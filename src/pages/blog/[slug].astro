@@ -34,7 +34,7 @@ const mainImageUrl = post.mainImage
 const secondaryCruises = post.secondaryCruises ?? [];
 ---
 
-<BaseLayout title={title} description={description} locale={locale}>
+<BaseLayout title={title} description={description} image={mainImageUrl} locale={locale}>
   <main class="bg-background">
     <article>
       <Section padding="lg" class="border-b border-border/70 bg-muted/30">

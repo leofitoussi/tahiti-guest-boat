@@ -18,9 +18,11 @@ export const uniquePageBuilderBlockTypes = [
   'fullWidthImageBlock',
   'cruiseInspirationBlock',
   'boatPresentationBlock',
+  'cabinTourBlock',
   'faqBlock',
   'practicalInfoBlock',
   'activitiesBlock',
+  'boatArgumentsBlock',
 ] as const;
 
 export function defineUniquePageBuilderField() {

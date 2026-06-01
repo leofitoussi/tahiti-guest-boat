@@ -11,6 +11,7 @@ import { getSiteCopy } from '../lib/site-copy';
 interface Props {
   title: string;
   description?: string;
+  image?: string;
   settings?: SiteSettings | null;
   locale?: Locale;
   alternatePaths?: Partial<Record<Locale, string>>;
@@ -20,6 +21,7 @@ interface Props {
 const {
   title,
   description,
+  image,
   settings: providedSettings,
   locale = defaultLocale,
   alternatePaths = {},
@@ -52,6 +54,15 @@ const metadata = buildLocalizedMetadata(Astro.url.pathname, {
       <link rel="alternate" hreflang={alternate.locale} href={alternate.path} />
     ))}
     <title>{title}</title>
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description ?? copy.shell.defaultDescription} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={metadata.canonical} />
+    {image && <meta property="og:image" content={image} />}
+    <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description ?? copy.shell.defaultDescription} />
+    {image && <meta name="twitter:image" content={image} />}
   </head>
   <body>
     <Header

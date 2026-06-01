@@ -1,15 +1,13 @@
 "use client"
 
 import * as React from "react"
-import { MenuIcon } from "lucide-react"
+import { MenuIcon, XIcon } from "lucide-react"
 
 import { Button, buttonVariants } from "@/components/ui/button"
 import {
   Sheet,
   SheetClose,
   SheetContent,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
 import { defaultLocale, localizeHref, type Locale } from "../../lib/localization"
@@ -43,14 +41,22 @@ export function MobileDrawer({
 
   return (
     <Sheet>
-      <SheetTrigger render={<Button variant="ghost" size="icon" aria-label={resolvedMenuLabel} />}>
-        <MenuIcon data-icon="inline-start" />
+      <SheetTrigger render={<Button variant="ghost" size="icon-lg" aria-label={resolvedMenuLabel} />}>
+        <MenuIcon className="size-6" />
       </SheetTrigger>
-      <SheetContent side="right" className="w-[min(24rem,88vw)]">
-        <SheetHeader>
-          <SheetTitle>{resolvedNavigationLabel}</SheetTitle>
-        </SheetHeader>
-        <nav className="flex flex-col gap-1 px-8" aria-label={resolvedNavigationLabel}>
+      <SheetContent side="right" className="flex w-[min(22rem,88vw)] flex-col p-0" showCloseButton={false}>
+        <div className="flex h-16 shrink-0 items-center justify-between border-b border-border/70 px-5">
+          <span className="text-xs font-semibold tracking-[0.22em] text-muted-foreground uppercase">
+            {resolvedNavigationLabel}
+          </span>
+          <SheetClose
+            render={<Button variant="ghost" size="icon-sm" aria-label="Fermer" />}
+          >
+            <XIcon />
+          </SheetClose>
+        </div>
+
+        <nav className="flex flex-1 flex-col divide-y divide-border/50 px-5" aria-label={resolvedNavigationLabel}>
           {navItems.map((item) => (
             <SheetClose
               key={item.href}
@@ -58,7 +64,7 @@ export function MobileDrawer({
               render={
                 <a
                   href={item.href}
-                  className="py-3 font-heading text-xl font-semibold tracking-[0.14em] text-foreground uppercase transition hover:text-primary"
+                  className="py-5 font-heading text-2xl text-foreground transition-colors hover:text-primary"
                 />
               }
             >
@@ -66,8 +72,9 @@ export function MobileDrawer({
             </SheetClose>
           ))}
         </nav>
+
         {ctaLabel ? (
-          <div className="mt-8 px-8">
+          <div className="shrink-0 px-5 pb-8 pt-4">
             <SheetClose
               nativeButton={false}
               render={

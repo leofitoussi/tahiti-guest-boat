@@ -99,7 +99,8 @@ const pageBuilderFields = `pageBuilder[]{
     primaryCtaLabel,
     primaryCtaLink,
     secondaryCtaLabel,
-    secondaryCtaLink
+    secondaryCtaLink,
+    invertBackground
   },
 
   _type == "boatBlock" => {
@@ -235,6 +236,37 @@ const pageBuilderFields = `pageBuilder[]{
       _key,
       question,
       answer
+    }
+  },
+
+  _type == "boatArgumentsBlock" => {
+    title,
+    body,
+    features[]{
+      _key,
+      title,
+      description
+    },
+    image{
+      ...,
+      asset,
+      alt,
+      "metadata": asset->metadata { dimensions }
+    }
+  },
+
+  _type == "cabinTourBlock" => {
+    title,
+    tabs[]{
+      _key,
+      label,
+      body,
+      image{
+        ...,
+        asset,
+        alt,
+        "metadata": asset->metadata { dimensions }
+      }
     }
   }
 }`;

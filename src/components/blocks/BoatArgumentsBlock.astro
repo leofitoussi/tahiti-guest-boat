@@ -1,0 +1,147 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { TypedObject } from 'astro-portabletext/types';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import { urlForImage } from '../../lib/sanity';
+
+interface Feature {
+  _key?: string;
+  title: string;
+  description: string;
+}
+
+interface SanityImage {
+  asset?: unknown;
+  alt?: string;
+  metadata?: {
+    dimensions?: { width?: number; height?: number };
+  };
+}
+
+interface Props {
+  title?: TypedObject[];
+  body?: TypedObject[];
+  features?: Feature[];
+  image?: SanityImage;
+}
+
+const { title = [], body = [], features = [], image } = Astro.props;
+
+const w = image?.metadata?.dimensions?.width ?? 900;
+const h = image?.metadata?.dimensions?.height ?? 600;
+const imgSrc = image?.asset
+  ? urlForImage(image)?.width(900).quality(85).auto('format').url() ?? ''
+  : '';
+---
+
+<Section padding="lg">
+  <Container>
+    <div class="grid gap-12 lg:grid-cols-[3fr_2fr] lg:items-start lg:gap-16">
+
+      <!-- Left: title + body + features -->
+      <div class="flex flex-col gap-8">
+        {title.length > 0 && (
+          <div class="boat-args-title">
+            <PortableText value={title} />
+          </div>
+        )}
+
+        {body.length > 0 && (
+          <div class="boat-args-body">
+            <PortableText value={body} />
+          </div>
+        )}
+
+        {features.length > 0 && (
+          <div class="boat-args-features">
+            {features.map((f) => (
+              <div class="flex flex-col gap-1">
+                <p class="boat-args-feature-title">{f.title}</p>
+                <p class="boat-args-feature-desc">{f.description}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <!-- Right: photo — naturally last on mobile via DOM order -->
+      {imgSrc && (
+        <div class="boat-args-image-wrap">
+          <img
+            src={imgSrc}
+            alt={image?.alt ?? ''}
+            width={w}
+            height={h}
+            loading="lazy"
+            decoding="async"
+            class="h-auto w-full rounded-[var(--radius-surface)] object-cover"
+          />
+        </div>
+      )}
+    </div>
+  </Container>
+</Section>
+
+<style>
+  .boat-args-title :global(h2),
+  .boat-args-title :global(h3),
+  .boat-args-title :global(h4) {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-size: clamp(1.75rem, 3.6vw, 3rem);
+    line-height: 1.16;
+    color: var(--foreground);
+  }
+
+  .boat-args-title :global(strong) {
+    font-weight: 700;
+  }
+
+  .boat-args-title :global(em) {
+    font-style: italic;
+  }
+
+  .boat-args-body {
+    font-size: var(--font-size-base);
+    line-height: var(--line-height-body);
+    color: var(--foreground);
+  }
+
+  .boat-args-body :global(p) {
+    margin: 0;
+  }
+
+  .boat-args-body :global(p + p) {
+    margin-top: 1.125rem;
+  }
+
+  .boat-args-body :global(strong) {
+    font-weight: 700;
+  }
+
+  .boat-args-body :global(em) {
+    font-style: italic;
+  }
+
+  .boat-args-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: 1.5rem;
+  }
+
+  .boat-args-feature-title {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .boat-args-feature-desc {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-body);
+    color: var(--foreground);
+  }
+</style>

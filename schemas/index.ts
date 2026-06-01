@@ -29,8 +29,10 @@ import { siteSettings } from './siteSettings';
 import { videoFeatureBlock } from './videoFeatureBlock';
 import { cruiseInspirationBlock } from './cruiseInspirationBlock';
 import { boatPresentationBlock } from './boatPresentationBlock';
+import { cabinTourBlock } from './cabinTourBlock';
 import { faqBlock } from './faqBlock';
 import { practicalInfoBlock } from './practicalInfoBlock';
+import { boatArgumentsBlock } from './boatArgumentsBlock';
 import { whyUsBlock } from './whyUsBlock';
 
 export const schemaTypes = [
@@ -68,6 +70,8 @@ export const schemaTypes = [
   relatedCruisesBlock,
   cruiseInspirationBlock,
   boatPresentationBlock,
+  cabinTourBlock,
   faqBlock,
   practicalInfoBlock,
+  boatArgumentsBlock,
 ];

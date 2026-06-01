@@ -92,12 +92,22 @@ export const editorialBlock = defineType({
           scheme: ['http', 'https', 'mailto', 'tel'],
         }),
     }),
+    defineField({
+      name: 'invertBackground',
+      title: 'Fond foncé (bleu marine)',
+      description: 'Active un fond bleu marine foncé avec texte blanc.',
+      type: 'boolean',
+      initialValue: false,
+    }),
   ],
   preview: {
-    prepare() {
+    select: {
+      inverted: 'invertBackground',
+    },
+    prepare({ inverted }: { inverted?: boolean }) {
       return {
         title: 'Editorial block',
-        subtitle: 'Image + texte + CTA',
+        subtitle: inverted ? 'Image + texte + CTA — fond foncé' : 'Image + texte + CTA',
       };
     },
   },

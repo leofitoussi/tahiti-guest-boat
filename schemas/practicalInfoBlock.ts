@@ -1,13 +1,7 @@
-import { defineArrayMember, defineField, defineType } from 'sanity';
+import { defineField, defineType } from 'sanity';
 import { richText } from './portableText';
 
-const columnFields = (prefix: string) => [
-  defineField({
-    name: 'icon',
-    title: 'Icône (emoji)',
-    type: 'string',
-    description: 'Ex : 📞  ✉️  💬  ⚓  💶',
-  }),
+const columnFields = () => [
   defineField({
     name: 'title',
     title: 'Titre',
@@ -38,13 +32,13 @@ export const practicalInfoBlock = defineType({
       name: 'leftColumn',
       title: 'Colonne gauche',
       type: 'object',
-      fields: columnFields('left'),
+      fields: columnFields(),
     }),
     defineField({
       name: 'rightColumn',
       title: 'Colonne droite',
       type: 'object',
-      fields: columnFields('right'),
+      fields: columnFields(),
     }),
   ],
   preview: {

@@ -5,7 +5,6 @@ import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
 
 interface Column {
-  icon?: string;
   title?: string;
   body?: TypedObject[];
 }
@@ -28,7 +27,7 @@ const columns = [leftColumn, rightColumn].filter(Boolean) as Column[];
 <Section padding="lg">
   <Container>
     {sectionTitle && (
-      <h2 class="mb-16 text-center font-heading text-4xl italic text-foreground md:text-5xl">
+      <h2 class="mb-20 text-center font-heading text-4xl italic text-foreground md:text-5xl">
         {sectionTitle}
       </h2>
     )}
@@ -37,9 +36,21 @@ const columns = [leftColumn, rightColumn].filter(Boolean) as Column[];
       {columns.map((col) => (
         <div>
           <div class="mb-6 flex items-center gap-3">
-            {col.icon && (
-              <span class="text-2xl leading-none" aria-hidden="true">{col.icon}</span>
-            )}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="26"
+              height="26"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="shrink-0 text-foreground"
+              aria-hidden="true"
+            >
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
             {col.title && (
               <h3 class="font-heading text-2xl text-foreground">{col.title}</h3>
             )}

@@ -156,6 +156,24 @@ const pageBuilderFields = `pageBuilder[]{
         "metadata": asset->metadata { dimensions }
       }
     }
+  },
+
+  _type == "practicalInfoBlock" => {
+    sectionTitle,
+    leftColumn{ title, body },
+    rightColumn{ title, body }
+  },
+
+  _type == "faqBlock" => {
+    title,
+    description,
+    ctaLabel,
+    ctaHref,
+    items[]{
+      _key,
+      question,
+      answer
+    }
   }
 }`;
 

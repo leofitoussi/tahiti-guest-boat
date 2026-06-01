@@ -1,7 +1,7 @@
 ---
 import PageBuilder from '../components/blocks/PageBuilder.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCruisePages, getReviews, getSiteSettings } from '../lib/cruises';
+import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../lib/cruises';
 import { isSanityConfigured } from '../lib/sanity';
 import { defaultLocale } from '../lib/localization';
 import { getSiteCopy } from '../lib/site-copy';
@@ -148,6 +148,23 @@ const HOME_QUERY = `*[_type == "homePage"] | order(_updatedAt desc)[0]{
 
       _type in ["whyUsBlock", "reviewsBlock", "bookingBlock", "relatedCruisesBlock", "fullWidthImageBlock"] => {
         ...
+      },
+
+      _type == "activitiesBlock" => {
+        anchorId,
+        title,
+        intro,
+        groups[]{
+          _key,
+          heading,
+          description,
+          tagFilters[]->{
+            _id,
+            ${localizedDocumentFields},
+            title,
+            "slug": slug.current
+          }
+        }
       }
   }
 }`;
@@ -161,10 +178,11 @@ const home = isSanityConfigured
     ).catch(() => null)
   : null;
 
-const [settings, reviews, cruises] = await Promise.all([
+const [settings, reviews, cruises, activities] = await Promise.all([
   getSiteSettings(defaultLocale),
   getReviews(3),
   getCruisePages(defaultLocale),
+  getActivities(defaultLocale),
 ]);
 
 // ─── Page builder ─────────────────────────────────────────────────────────────
@@ -180,6 +198,6 @@ const seoDescription = home?.seoDescription ?? copy.pages.home.description;
 
 <BaseLayout title={seoTitle} description={seoDescription} settings={settings} locale={defaultLocale}>
   <main class="bg-background">
-    <PageBuilder blocks={pageBuilder} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} locale={defaultLocale} />
+    <PageBuilder blocks={pageBuilder} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} activities={activities} locale={defaultLocale} />
   </main>
 </BaseLayout>

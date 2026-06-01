@@ -26,6 +26,13 @@ const pageBuilderFields = `pageBuilder[]{
     image{ ..., asset, alt, "metadata": asset->metadata { dimensions } }
   },
 
+  _type == "heroImageOverlayBlock" => {
+    firstLine,
+    secondLine,
+    overlayOpacity,
+    image{ ..., asset, alt, "metadata": asset->metadata { dimensions } }
+  },
+
   _type == "homeHeroBlock" => {
     keywords,
     title,
@@ -107,6 +114,33 @@ const pageBuilderFields = `pageBuilder[]{
     }
   },
 
+  _type == "boatStoryVideoBlock" => {
+    iconImage{
+      ...,
+      asset,
+      alt,
+      "metadata": asset->metadata {
+        dimensions,
+        lqip,
+        palette { dominant { background } }
+      }
+    },
+    title,
+    body,
+    youtubeUrl,
+    videoTitle,
+    posterImage{
+      ...,
+      asset,
+      alt,
+      "metadata": asset->metadata {
+        dimensions,
+        lqip,
+        palette { dominant { background } }
+      }
+    }
+  },
+
   _type == "videoFeatureBlock" => {
     iconImage{
       ...,
@@ -162,6 +196,34 @@ const pageBuilderFields = `pageBuilder[]{
     sectionTitle,
     leftColumn{ title, body },
     rightColumn{ title, body }
+  },
+
+  _type == "activitiesBlock" => {
+    anchorId,
+    title,
+    intro,
+    groups[]{
+      _key,
+      heading,
+      description,
+      tagFilters[]->{
+        _id,
+        ${localizedDocumentFields},
+        title,
+        "slug": slug.current
+      }
+    }
+  },
+
+  _type == "boatPresentationBlock" => {
+    title,
+    body,
+    blueprintImages[]{
+      ...,
+      asset,
+      alt,
+      "metadata": asset->metadata { dimensions }
+    }
   },
 
   _type == "faqBlock" => {

@@ -7,19 +7,24 @@
  * du site, afin de garder un seul point d'assemblage côté page.
  */
 import HeroHeader from './HeroHeader.astro';
+import HeroImageOverlayBlock from './HeroImageOverlayBlock.astro';
 import HomeHero from './HomeHero.astro';
 import EditorialBlock from './EditorialBlock.astro';
 import MasonryGallery from './MasonryGallery.astro';
 import MarqueeGallery from './MarqueeGallery.astro';
+import BoatStoryVideoBlock from './BoatStoryVideoBlock.astro';
 import VideoFeature from './VideoFeature.astro';
 import FullWidthImageBlock from '../cruises/FullWidthImageBlock.astro';
 import BookingBlock from '../cruises/BookingBlock.astro';
 import RelatedCruisesBlock from '../cruises/RelatedCruisesBlock.astro';
+import BoatPresentationBlock from './BoatPresentationBlock.astro';
 import CruiseInspirationBlock from './CruiseInspirationBlock.astro';
+import FaqBlock from './FaqBlock.astro';
+import ActivitiesBlock from './ActivitiesBlock.astro';
 import ReviewsBlock from '../cruises/ReviewsBlock.astro';
 import PracticalInfoBlock from './PracticalInfoBlock.astro';
 import WhyUsBlock from '../cruises/WhyUsBlock.astro';
-import type { CruisePageSummary, Review, SiteSettings } from '../../lib/cruises';
+import type { Activity, CruisePageSummary, Review, SiteSettings } from '../../lib/cruises';
 import { defaultLocale, type Locale } from '../../lib/localization';
 
 interface Props {
@@ -27,10 +32,11 @@ interface Props {
   settings?: SiteSettings | null;
   reviews?: Review[];
   cruises?: CruisePageSummary[];
+  activities?: Activity[];
   locale?: Locale;
 }
 
-const { blocks = [], settings = null, reviews = [], cruises = [], locale = defaultLocale } = Astro.props;
+const { blocks = [], settings = null, reviews = [], cruises = [], activities = [], locale = defaultLocale } = Astro.props;
 ---
 
 {
@@ -49,10 +55,20 @@ const { blocks = [], settings = null, reviews = [], cruises = [], locale = defau
           />
         );
 
+      case 'heroImageOverlayBlock':
+        return (
+          <HeroImageOverlayBlock
+            firstLine={block.firstLine}
+            secondLine={block.secondLine}
+            overlayOpacity={block.overlayOpacity}
+            image={block.image}
+          />
+        );
+
       case 'homeHeroBlock':
         return (
           <HomeHero
-            keywords={block.keywords}
+            keywords={block.keywords ?? []}
             title={block.title}
             body={block.body}
             primaryCtaLabel={block.primaryCtaLabel}
@@ -103,6 +119,19 @@ const { blocks = [], settings = null, reviews = [], cruises = [], locale = defau
           />
         );
 
+      case 'boatStoryVideoBlock':
+        return (
+          <BoatStoryVideoBlock
+            iconImage={block.iconImage}
+            title={block.title}
+            body={block.body}
+            youtubeUrl={block.youtubeUrl}
+            videoTitle={block.videoTitle}
+            posterImage={block.posterImage}
+            locale={locale}
+          />
+        );
+
       case 'videoFeatureBlock':
         return (
           <VideoFeature
@@ -141,6 +170,15 @@ const { blocks = [], settings = null, reviews = [], cruises = [], locale = defau
       case 'relatedCruisesBlock':
         return <RelatedCruisesBlock cruises={cruises} locale={locale} />;
 
+      case 'boatPresentationBlock':
+        return (
+          <BoatPresentationBlock
+            title={block.title as any}
+            body={block.body as any}
+            blueprintImages={block.blueprintImages as any}
+          />
+        );
+
       case 'cruiseInspirationBlock':
         return (
           <CruiseInspirationBlock
@@ -148,6 +186,29 @@ const { blocks = [], settings = null, reviews = [], cruises = [], locale = defau
             headingHighlight={block.headingHighlight as string | undefined}
             subtitle={block.subtitle as string | undefined}
             cards={block.cards as any}
+          />
+        );
+
+      case 'faqBlock':
+        return (
+          <FaqBlock
+            title={block.title as string | undefined}
+            description={block.description as string | undefined}
+            ctaLabel={block.ctaLabel as string | undefined}
+            ctaHref={block.ctaHref as string | undefined}
+            items={block.items as any}
+            locale={locale}
+          />
+        );
+
+      case 'activitiesBlock':
+        return (
+          <ActivitiesBlock
+            anchorId={block.anchorId as string | undefined}
+            title={block.title as any}
+            intro={block.intro as any}
+            groups={block.groups as any}
+            activities={activities}
           />
         );
 

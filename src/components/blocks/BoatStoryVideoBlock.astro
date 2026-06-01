@@ -1,0 +1,212 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { TypedObject } from 'astro-portabletext/types';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import { urlForImage } from '../../lib/sanity';
+import { extractYouTubeVideoId, getYouTubeEmbedUrl, getYouTubePosterUrl, getYouTubeWatchUrl } from '../../lib/video';
+import { defaultLocale, type Locale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
+
+interface SanityImage {
+  asset?: unknown;
+  alt?: string;
+  metadata?: {
+    dimensions?: { width?: number; height?: number };
+    lqip?: string;
+    palette?: { dominant?: { background?: string } };
+  };
+}
+
+interface Props {
+  iconImage?: SanityImage;
+  title?: TypedObject[];
+  body?: TypedObject[];
+  youtubeUrl?: string;
+  videoTitle?: string;
+  posterImage?: SanityImage;
+  locale?: Locale;
+}
+
+const {
+  iconImage,
+  title = [],
+  body = [],
+  youtubeUrl,
+  videoTitle,
+  posterImage,
+  locale = defaultLocale,
+} = Astro.props;
+
+const copy = getSiteCopy(locale);
+const videoId = extractYouTubeVideoId(youtubeUrl);
+const embedUrl = videoId ? getYouTubeEmbedUrl(videoId) : undefined;
+const posterUrl =
+  posterImage ? urlForImage(posterImage)?.width(1600).height(900).fit('crop').quality(84).auto('format').url() : videoId ? getYouTubePosterUrl(videoId) : undefined;
+const posterLqip = posterImage ? urlForImage(posterImage)?.width(32).height(18).fit('crop').blur(18).quality(30).auto('format').url() : undefined;
+const iconUrl = iconImage ? urlForImage(iconImage)?.width(240).auto('format').url() : undefined;
+const frameTitle = videoTitle || copy.blocks.videoFrameTitle;
+---
+
+<Section padding="lg" class="bg-muted/40">
+  <Container>
+    <div class="mx-auto flex max-w-5xl flex-col items-center">
+      {
+        iconUrl && (
+          <img
+            src={iconUrl}
+            alt={iconImage?.alt || ''}
+            width="240"
+            height="180"
+            loading="lazy"
+            decoding="async"
+            class="mb-10 h-auto w-32 object-contain sm:w-40"
+          />
+        )
+      }
+
+      <div class="grid w-full gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start lg:gap-12">
+        {title.length > 0 && (
+          <div class="boat-story-title">
+            <PortableText value={title} />
+          </div>
+        )}
+
+        {body.length > 0 && (
+          <div class="boat-story-body">
+            <PortableText value={body} />
+          </div>
+        )}
+      </div>
+
+      {
+        embedUrl && posterUrl && (
+          <div class="mt-10 w-full">
+            <div
+              class="relative aspect-video overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-muted shadow-sm"
+              style={{
+                backgroundImage: posterLqip ? `url(${posterLqip})` : undefined,
+                backgroundSize: posterLqip ? 'cover' : undefined,
+                backgroundPosition: posterLqip ? 'center' : undefined,
+              }}
+            >
+              <a
+                href={videoId ? getYouTubeWatchUrl(videoId) : undefined}
+                class="group absolute inset-0 block w-full overflow-hidden bg-background"
+                data-boat-story-video-trigger
+                data-embed-url={embedUrl}
+                data-frame-title={frameTitle}
+                aria-label={copy.blocks.videoPlayLabel}
+              >
+                <img
+                  src={posterUrl}
+                  alt={posterImage?.alt || copy.blocks.videoPosterAlt}
+                  width="1600"
+                  height="900"
+                  loading="lazy"
+                  decoding="async"
+                  class="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.015]"
+                  style={{
+                    backgroundColor: posterImage?.metadata?.palette?.dominant?.background || 'var(--muted)',
+                  }}
+                />
+                <div class="absolute inset-0 bg-[linear-gradient(180deg,rgba(6,14,29,.08),rgba(6,14,29,.2))]" />
+                <div class="absolute inset-0 grid place-items-center">
+                  <span class="grid size-16 place-items-center rounded-[var(--radius-control)] bg-primary text-primary-foreground shadow-lg transition group-hover:scale-105 sm:size-20">
+                    <svg viewBox="0 0 24 24" fill="currentColor" class="ml-1 size-8 sm:size-10" aria-hidden="true">
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </span>
+                </div>
+              </a>
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </Container>
+</Section>
+
+<style>
+  .boat-story-title :global(h2),
+  .boat-story-title :global(h3),
+  .boat-story-title :global(h4) {
+    margin: 0;
+    color: var(--primary);
+    font-size: clamp(2.6rem, 5vw, 4.4rem);
+    line-height: 1.12;
+  }
+
+  .boat-story-title :global(strong) {
+    font-weight: 700;
+  }
+
+  .boat-story-title :global(em) {
+    font-style: italic;
+  }
+
+  .boat-story-body {
+    color: var(--foreground);
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-body);
+  }
+
+  .boat-story-body :global(p) {
+    margin: 0;
+  }
+
+  .boat-story-body :global(p + p) {
+    margin-top: 1.25rem;
+  }
+
+  .boat-story-body :global(strong) {
+    color: var(--foreground);
+    font-weight: 800;
+  }
+
+  .boat-story-body :global(em) {
+    font-style: italic;
+  }
+
+  .boat-story-body :global(a) {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>
+
+<script>
+  const activateBoatStoryVideo = (link: HTMLAnchorElement) => {
+    const embedUrl = link.dataset.embedUrl;
+    const frameTitle = link.dataset.frameTitle || 'YouTube video player';
+    if (!embedUrl) return;
+
+    const wrapper = link.parentElement;
+    if (!wrapper) return;
+
+    const iframe = document.createElement('iframe');
+    iframe.src = embedUrl;
+    iframe.title = frameTitle;
+    iframe.loading = 'lazy';
+    iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+    iframe.allowFullscreen = true;
+    iframe.className = 'absolute inset-0 h-full w-full';
+
+    wrapper.replaceChildren(iframe);
+  };
+
+  document.querySelectorAll<HTMLAnchorElement>('[data-boat-story-video-trigger]').forEach((link) => {
+    link.addEventListener('click', (event: MouseEvent) => {
+      event.preventDefault();
+      activateBoatStoryVideo(link);
+    });
+
+    link.addEventListener('keydown', (event: KeyboardEvent) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        activateBoatStoryVideo(link);
+      }
+    });
+  });
+</script>

@@ -1,0 +1,98 @@
+---
+import Container from '../layout/Container.astro';
+import { urlForImage } from '../../lib/sanity';
+
+interface PortableTextSpan {
+  text?: string;
+  marks?: string[];
+}
+
+interface PortableTextBlock {
+  children?: PortableTextSpan[];
+}
+
+interface LegacyTitleLine {
+  text?: string;
+}
+
+interface SanityImage {
+  asset?: unknown;
+  alt?: string;
+  metadata?: {
+    dimensions?: { width?: number; height?: number };
+  };
+}
+
+interface Props {
+  firstLine?: PortableTextBlock[] | LegacyTitleLine;
+  secondLine?: PortableTextBlock[] | LegacyTitleLine;
+  overlayOpacity?: number;
+  image?: SanityImage;
+}
+
+const { firstLine = [], secondLine = [], overlayOpacity = 45, image } = Astro.props;
+
+const imageUrl = image ? urlForImage(image)?.width(1920).height(1180).fit('crop').quality(86).auto('format').url() : undefined;
+const clampedOverlayOpacity = Math.min(Math.max(overlayOpacity, 0), 80) / 100;
+
+const toSpans = (line: PortableTextBlock[] | LegacyTitleLine | undefined): PortableTextSpan[] => {
+  if (Array.isArray(line)) {
+    return line.flatMap((block) => block.children ?? []);
+  }
+
+  return line?.text ? [{ text: line.text, marks: ['strong'] }] : [];
+};
+
+const firstLineSpans = toSpans(firstLine);
+const secondLineSpans = toSpans(secondLine);
+
+const spanClasses = (marks: string[] = []) => [
+  marks.includes('strong') ? 'font-semibold' : 'font-normal',
+  marks.includes('em') ? 'italic' : 'not-italic',
+];
+---
+
+<section class="relative isolate min-h-[520px] overflow-hidden bg-muted md:min-h-[660px] lg:min-h-[760px]">
+  {
+    imageUrl && (
+      <img
+        src={imageUrl}
+        alt={image?.alt || ''}
+        width="1920"
+        height="1180"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+        class="absolute inset-0 -z-10 h-full w-full object-cover"
+      />
+    )
+  }
+  <div class="absolute inset-0 -z-10 bg-background" style={`opacity: ${clampedOverlayOpacity}`}></div>
+
+  <Container class="flex min-h-[520px] items-start justify-center pb-24 pt-28 text-center md:min-h-[660px] md:pb-32 md:pt-36 lg:min-h-[760px] lg:pt-44">
+    <div class="mx-auto flex max-w-6xl flex-col items-center">
+      <h1 class="font-heading leading-tight text-foreground">
+        {
+          firstLineSpans.length > 0 && (
+            <span class="block text-5xl md:text-6xl">
+              {firstLineSpans.map((span) => (
+                <span class:list={spanClasses(span.marks)}>{span.text}</span>
+              ))}
+            </span>
+          )
+        }
+        {
+          secondLineSpans.length > 0 && (
+            <span class="mt-2 block text-4xl md:text-5xl">
+              {secondLineSpans.map((span) => (
+                <span class:list={spanClasses(span.marks)}>{span.text}</span>
+              ))}
+            </span>
+          )
+        }
+      </h1>
+    </div>
+  </Container>
+
+  <div class="pointer-events-none absolute inset-x-[-8%] bottom-[-1px] h-20 rounded-t-[100%] bg-background md:h-28 lg:h-32"></div>
+</section>

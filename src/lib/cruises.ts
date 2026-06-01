@@ -162,6 +162,23 @@ export interface Review {
   authorImage?: SanityImage;
 }
 
+export interface ActivityTag {
+  _id: string;
+  title?: string;
+  slug?: string;
+  locale?: Locale;
+  translationGroup?: string;
+}
+
+export interface Activity {
+  _id: string;
+  title?: string;
+  image?: SanityImage;
+  description?: TypedObject[];
+  priority?: 1 | 2 | 3;
+  tags?: ActivityTag[];
+}
+
 const imageFields = `{
   ...,
   asset,
@@ -268,6 +285,25 @@ const REVIEWS_QUERY = `*[
   authorImage${imageFields}
 }`;
 
+const ACTIVITIES_QUERY = `*[
+  _type == "activity" &&
+  locale == $locale &&
+  isPublished == true &&
+  !(_id in path("drafts.**"))
+] | order(priority desc, title asc) {
+  _id,
+  title,
+  image${imageFields},
+  description,
+  priority,
+  tags[]->{
+    _id,
+    ${localizedDocumentFields},
+    title,
+    "slug": slug.current
+  }
+}`;
+
 const RELATED_CRUISES_QUERY = `*[
   ${cruisePageFilter} &&
   slug.current != $slug
@@ -312,6 +348,14 @@ export async function getReviews(limit = 3) {
   }
 
   return sanityClient.fetch<Review[]>(REVIEWS_QUERY, { limit }).catch(() => []);
+}
+
+export async function getActivities(locale: Locale = defaultLocale) {
+  if (!isSanityConfigured) {
+    return [];
+  }
+
+  return sanityClient.fetch<Activity[]>(ACTIVITIES_QUERY, { locale }).catch(() => []);
 }
 
 export async function getRelatedCruises(slug: string, limit = 3, locale: Locale = defaultLocale) {

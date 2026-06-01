@@ -1,7 +1,7 @@
 ---
 import PageBuilder from '../components/blocks/PageBuilder.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCruisePages, getReviews, getSiteSettings } from '../lib/cruises';
+import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../lib/cruises';
 import { getUniquePage } from '../lib/page-builder';
 import { defaultLocale } from '../lib/localization';
 import { getSiteCopy } from '../lib/site-copy';
@@ -10,10 +10,11 @@ const locale = defaultLocale;
 const copy = getSiteCopy(locale);
 
 const page = await getUniquePage('boatPage', locale);
-const [settings, reviews, cruises] = await Promise.all([
+const [settings, reviews, cruises, activities] = await Promise.all([
   getSiteSettings(locale),
   getReviews(3),
   getCruisePages(locale),
+  getActivities(locale),
 ]);
 
 const title = page?.seoTitle ?? copy.pages.boat.title;
@@ -23,6 +24,6 @@ const pageBuilder = (page?.pageBuilder as Record<string, unknown>[] | undefined)
 
 <BaseLayout title={title} description={description} settings={settings} locale={locale}>
   <main class="bg-background">
-    <PageBuilder blocks={pageBuilder} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} locale={locale} />
+    <PageBuilder blocks={pageBuilder} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} activities={activities} locale={locale} />
   </main>
 </BaseLayout>

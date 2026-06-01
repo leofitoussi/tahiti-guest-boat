@@ -34,6 +34,21 @@ export const headingText = [
   }),
 ];
 
+export const h2HeadingText = [
+  defineArrayMember({
+    type: 'block',
+    styles: [{ title: 'Heading 2', value: 'h2' }],
+    lists: [],
+    marks: {
+      decorators: [
+        { title: 'Bold', value: 'strong' },
+        { title: 'Italic', value: 'em' },
+      ],
+      annotations: [],
+    },
+  }),
+];
+
 export const richText = [
   defineArrayMember({
     type: 'block',
@@ -43,6 +58,42 @@ export const richText = [
       { title: 'Heading 3', value: 'h3' },
       { title: 'Quote', value: 'blockquote' },
     ],
+    lists: [
+      { title: 'Bullet', value: 'bullet' },
+      { title: 'Numbered', value: 'number' },
+    ],
+    marks: {
+      decorators: [
+        { title: 'Bold', value: 'strong' },
+        { title: 'Italic', value: 'em' },
+      ],
+      annotations: [
+        defineArrayMember({
+          name: 'link',
+          title: 'Link',
+          type: 'object',
+          fields: [
+            {
+              name: 'href',
+              title: 'URL',
+              type: 'url',
+              validation: (rule) =>
+                rule.required().uri({
+                  allowRelative: true,
+                  scheme: ['http', 'https', 'mailto', 'tel'],
+                }),
+            },
+          ],
+        }),
+      ],
+    },
+  }),
+];
+
+export const activityDescriptionText = [
+  defineArrayMember({
+    type: 'block',
+    styles: [{ title: 'Normal', value: 'normal' }],
     lists: [
       { title: 'Bullet', value: 'bullet' },
       { title: 'Numbered', value: 'number' },

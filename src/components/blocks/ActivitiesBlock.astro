@@ -1,0 +1,166 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { TypedObject } from 'astro-portabletext/types';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import SectionHeading from '../cruises/SectionHeading.astro';
+import type { Activity, ActivityTag } from '../../lib/cruises';
+import { urlForImage } from '../../lib/sanity';
+
+interface ActivityGroup {
+  _key?: string;
+  heading?: string;
+  description?: TypedObject[];
+  tagFilters?: ActivityTag[];
+}
+
+interface Props {
+  anchorId?: string;
+  title?: TypedObject[];
+  intro?: TypedObject[];
+  groups?: ActivityGroup[];
+  activities?: Activity[];
+}
+
+const { anchorId, title = [], intro = [], groups = [], activities = [] } = Astro.props;
+
+function getMatchingActivities(group: ActivityGroup) {
+  const filterIds = (group.tagFilters ?? []).map((tag) => tag._id).filter(Boolean);
+
+  if (filterIds.length === 0) {
+    return [];
+  }
+
+  return activities.filter((activity) => {
+    const activityTagIds = new Set((activity.tags ?? []).map((tag) => tag._id).filter(Boolean));
+    return filterIds.every((tagId) => activityTagIds.has(tagId));
+  });
+}
+
+const visibleGroups = groups
+  .map((group) => ({
+    ...group,
+    activities: getMatchingActivities(group),
+  }))
+  .filter((group) => group.activities.length > 0);
+---
+
+{
+  visibleGroups.length > 0 && (
+    <Section id={anchorId} padding="lg" class="bg-background">
+      <Container>
+        <div class="mx-auto max-w-3xl text-center">
+          {title.length > 0 && (
+            <div class="activities-title">
+              <SectionHeading value={title} />
+            </div>
+          )}
+          {intro.length > 0 && (
+            <div class="activities-copy mt-5">
+              <PortableText value={intro} />
+            </div>
+          )}
+        </div>
+
+        <div class="mt-14 flex flex-col gap-16">
+          {visibleGroups.map((group) => (
+            <section aria-labelledby={group._key ? `activity-group-${group._key}` : undefined}>
+              <div class="mb-8 max-w-3xl">
+                {group.heading && (
+                  <h3 id={group._key ? `activity-group-${group._key}` : undefined} class="font-heading text-2xl font-semibold leading-tight text-foreground md:text-3xl">
+                    {group.heading}
+                  </h3>
+                )}
+                {group.description && group.description.length > 0 && (
+                  <div class="activities-copy mt-4">
+                    <PortableText value={group.description} />
+                  </div>
+                )}
+              </div>
+
+              <div class="grid gap-x-8 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
+                {group.activities.map((activity) => {
+                  const imageUrl = activity.image ? urlForImage(activity.image)?.width(900).height(675).fit('crop').quality(84).auto('format').url() : undefined;
+                  const imageLqip = activity.image ? urlForImage(activity.image)?.width(32).height(24).fit('crop').blur(18).quality(30).auto('format').url() : undefined;
+
+                  return (
+                    <article class="flex flex-col gap-5">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={activity.image?.alt || ''}
+                          width="900"
+                          height="675"
+                          loading="lazy"
+                          decoding="async"
+                          class="aspect-[4/3] w-full object-cover"
+                          style={{
+                            backgroundColor: activity.image?.metadata?.palette?.dominant?.background || 'var(--muted)',
+                            backgroundImage: imageLqip ? `url(${imageLqip})` : undefined,
+                            backgroundSize: imageLqip ? 'cover' : undefined,
+                            backgroundPosition: imageLqip ? 'center' : undefined,
+                          }}
+                        />
+                      ) : (
+                        <div class="aspect-[4/3] w-full bg-muted" />
+                      )}
+
+                      <div>
+                        {activity.title && <h4 class="font-heading text-xl font-semibold leading-tight text-foreground">{activity.title}</h4>}
+                        {activity.description && activity.description.length > 0 && (
+                          <div class="activities-copy mt-3">
+                            <PortableText value={activity.description} />
+                          </div>
+                        )}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+          ))}
+        </div>
+      </Container>
+    </Section>
+  )
+}
+
+<style>
+  .activities-copy :global(p) {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 1rem;
+    line-height: var(--line-height-body);
+  }
+
+  .activities-copy :global(p + p) {
+    margin-top: 0.85rem;
+  }
+
+  .activities-copy :global(ul),
+  .activities-copy :global(ol) {
+    margin: 0.85rem 0 0;
+    padding-left: 1.25rem;
+    color: var(--muted-foreground);
+  }
+
+  .activities-copy :global(li + li) {
+    margin-top: 0.35rem;
+  }
+
+  .activities-copy :global(a) {
+    color: var(--primary);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .activities-copy :global(strong) {
+    color: var(--foreground);
+    font-weight: 700;
+  }
+
+  .activities-copy :global(em) {
+    font-style: italic;
+  }
+</style>

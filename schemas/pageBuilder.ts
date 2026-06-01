@@ -2,12 +2,14 @@ import { defineArrayMember, defineField } from 'sanity';
 
 export const uniquePageBuilderBlockTypes = [
   'heroHeaderBlock',
+  'heroImageOverlayBlock',
   'homeHeroBlock',
   'pitchBlock',
   'galleryBlock',
   'marqueeGalleryBlock',
   'editorialBlock',
   'boatBlock',
+  'boatStoryVideoBlock',
   'videoFeatureBlock',
   'whyUsBlock',
   'reviewsBlock',
@@ -15,7 +17,10 @@ export const uniquePageBuilderBlockTypes = [
   'relatedCruisesBlock',
   'fullWidthImageBlock',
   'cruiseInspirationBlock',
+  'boatPresentationBlock',
+  'faqBlock',
   'practicalInfoBlock',
+  'activitiesBlock',
 ] as const;
 
 export function defineUniquePageBuilderField() {

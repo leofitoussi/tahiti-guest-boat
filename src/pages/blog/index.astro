@@ -1,11 +1,8 @@
 ---
 import Container from '../../components/layout/Container.astro';
-import Grid from '../../components/layout/Grid.astro';
 import Section from '../../components/layout/Section.astro';
 import { Badge } from '../../components/ui/badge';
-import { buttonVariants } from '../../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
-import { Separator } from '../../components/ui/separator';
+import { Card, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getBlogPosts, formatPostDate } from '../../lib/blog';
 import { defaultLocale, localizePath } from '../../lib/localization';
@@ -15,6 +12,8 @@ import { urlForImage } from '../../lib/sanity';
 const locale = defaultLocale;
 const copy = getSiteCopy(locale);
 const posts = await getBlogPosts(locale);
+
+const [featured, ...rest] = posts;
 ---
 
 <BaseLayout
@@ -23,74 +22,143 @@ const posts = await getBlogPosts(locale);
   locale={locale}
 >
   <main class="bg-background">
+
     <Section padding="lg" class="border-b border-border/70 bg-muted/30">
       <Container>
-        <div class="flex max-w-4xl flex-col gap-5">
+        <div class="flex max-w-3xl flex-col gap-4">
           <Badge>{copy.pages.blogIndex.badge}</Badge>
-          <h1 class="font-heading font-semibold leading-tight text-foreground">{copy.pages.blogIndex.heading}</h1>
-          <p class="max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">{copy.pages.blogIndex.intro}</p>
+          <h1 class="font-heading font-semibold leading-[--line-height-heading] text-foreground" style="font-size: var(--heading-2)">
+            {copy.pages.blogIndex.heading}
+          </h1>
+          <p class="max-w-2xl text-lg leading-relaxed text-muted-foreground md:text-xl">{copy.pages.blogIndex.intro}</p>
         </div>
       </Container>
     </Section>
 
-    <Section padding="lg">
-      <Container>
-      {
-        posts.length > 0 ? (
-          <Grid columns={3}>
-            {posts.map((post) => {
-              const imageUrl = post.mainImage
-                ? urlForImage(post.mainImage)?.width(760).height(500).fit('crop').quality(82).auto('format').url()
-                : undefined;
-
-              return (
-                <Card className="transition hover:-translate-y-1 hover:shadow-md">
-                  <a href={localizePath(`/blog/${post.slug}/`, locale)} class="block">
-                    {imageUrl ? (
-                      <img
-                        src={imageUrl}
-                        alt={post.mainImage?.alt || ''}
-                        width="760"
-                        height="500"
-                        loading="lazy"
-                        decoding="async"
-                        class="aspect-[1.52] w-full object-cover"
-                      />
-                    ) : (
-                      <div class="aspect-[1.52] w-full bg-muted" />
-                    )}
-                  </a>
-                  <CardHeader>
-                    <div class="flex flex-col gap-3">
-                      {post.publishedAt && (
-                        <Badge variant="secondary">{formatPostDate(post.publishedAt, locale)}</Badge>
-                      )}
-                      <CardTitle>
-                        <a href={localizePath(`/blog/${post.slug}/`, locale)} class="transition hover:text-primary">{post.title}</a>
-                      </CardTitle>
-                      {post.excerpt && <CardDescription>{post.excerpt}</CardDescription>}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <Separator className="mb-5" />
-                    <a href={localizePath(`/blog/${post.slug}/`, locale)} class={buttonVariants({ variant: 'ghost', className: 'px-0' })}>
-                      {copy.pages.blogIndex.readArticle}
-                    </a>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </Grid>
-        ) : (
+    {posts.length === 0 && (
+      <Section padding="lg">
+        <Container>
           <Card className="border border-dashed border-border text-center">
             <CardHeader>
               <CardTitle>{copy.pages.blogIndex.emptyTitle}</CardTitle>
               <CardDescription className="mx-auto max-w-2xl">{copy.pages.blogIndex.emptyDescription}</CardDescription>
             </CardHeader>
           </Card>
-        )
-      }
-      </Container>
-    </Section>
+        </Container>
+      </Section>
+    )}
+
+    {featured && (
+      <Section padding="lg">
+        <Container>
+
+          {/* Featured post */}
+          <a
+            href={localizePath(`/blog/${featured.slug}/`, locale)}
+            class="group mb-14 grid overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card shadow-sm transition hover:shadow-md md:grid-cols-2 block"
+            aria-label={featured.title}
+          >
+            {(() => {
+              const imageUrl = featured.mainImage
+                ? urlForImage(featured.mainImage)?.width(900).height(600).fit('crop').quality(84).auto('format').url()
+                : undefined;
+              return imageUrl ? (
+                <div class="overflow-hidden">
+                  <img
+                    src={imageUrl}
+                    alt={featured.mainImage?.alt || ''}
+                    width="900"
+                    height="600"
+                    loading="eager"
+                    decoding="async"
+                    class="h-full min-h-64 w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                    style={{ backgroundColor: featured.mainImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                  />
+                </div>
+              ) : (
+                <div class="min-h-64 w-full bg-muted" />
+              );
+            })()}
+            <div class="flex flex-col justify-between gap-6 p-8 md:p-10 lg:p-12">
+              <div class="flex flex-col gap-4">
+                {featured.publishedAt && (
+                  <span class="text-sm font-medium text-muted-foreground">{formatPostDate(featured.publishedAt, locale)}</span>
+                )}
+                <h2 class="font-heading font-semibold leading-tight text-foreground transition group-hover:text-primary" style="font-size: var(--heading-4)">
+                  {featured.title}
+                </h2>
+                {featured.excerpt && (
+                  <p class="leading-relaxed text-muted-foreground">{featured.excerpt}</p>
+                )}
+              </div>
+              <span class="flex items-center gap-2 text-sm font-semibold text-primary">
+                {copy.pages.blogIndex.readArticle}
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+            </div>
+          </a>
+
+          {/* Remaining posts grid */}
+          {rest.length > 0 && (
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {rest.map((post) => {
+                const imageUrl = post.mainImage
+                  ? urlForImage(post.mainImage)?.width(600).height(400).fit('crop').quality(82).auto('format').url()
+                  : undefined;
+
+                return (
+                  <article class="group flex flex-col overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card shadow-xs transition hover:shadow-md hover:-translate-y-0.5">
+                    <a href={localizePath(`/blog/${post.slug}/`, locale)} class="overflow-hidden" tabindex="-1" aria-hidden="true">
+                      {imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={post.mainImage?.alt || ''}
+                          width="600"
+                          height="400"
+                          loading="lazy"
+                          decoding="async"
+                          class="aspect-[3/2] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                          style={{ backgroundColor: post.mainImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                        />
+                      ) : (
+                        <div class="aspect-[3/2] w-full bg-muted" />
+                      )}
+                    </a>
+                    <div class="flex flex-1 flex-col gap-3 p-6">
+                      {post.publishedAt && (
+                        <span class="text-xs font-medium text-muted-foreground">{formatPostDate(post.publishedAt, locale)}</span>
+                      )}
+                      <h2 class="font-heading text-xl font-semibold leading-tight text-foreground">
+                        <a href={localizePath(`/blog/${post.slug}/`, locale)} class="transition hover:text-primary">
+                          {post.title}
+                        </a>
+                      </h2>
+                      {post.excerpt && (
+                        <p class="line-clamp-3 text-sm leading-relaxed text-muted-foreground">{post.excerpt}</p>
+                      )}
+                      <div class="mt-auto pt-4">
+                        <a
+                          href={localizePath(`/blog/${post.slug}/`, locale)}
+                          class="flex items-center gap-1.5 text-sm font-semibold text-primary transition hover:gap-2.5"
+                        >
+                          {copy.pages.blogIndex.readArticle}
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                            <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+
+        </Container>
+      </Section>
+    )}
+
   </main>
 </BaseLayout>

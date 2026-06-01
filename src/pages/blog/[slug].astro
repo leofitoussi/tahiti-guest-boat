@@ -2,9 +2,7 @@
 import BlogContent from '../../components/blog/BlogContent.astro';
 import Container from '../../components/layout/Container.astro';
 import Section from '../../components/layout/Section.astro';
-import { Badge } from '../../components/ui/badge';
 import { buttonVariants } from '../../components/ui/button';
-import { Separator } from '../../components/ui/separator';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatPostDate, getBlogPost, getBlogPosts, type BlogPost } from '../../lib/blog';
 import { defaultLocale, localizePath } from '../../lib/localization';
@@ -29,7 +27,7 @@ const post = (await getBlogPost(summary.slug, locale)) || summary;
 const title = post.seoTitle || `${post.title} | Tahiti Guest Boat`;
 const description = post.seoDescription || post.excerpt || copy.pages.blogPost.fallbackDescription;
 const mainImageUrl = post.mainImage
-  ? urlForImage(post.mainImage)?.width(1440).height(850).fit('crop').quality(84).auto('format').url()
+  ? urlForImage(post.mainImage)?.width(1440).height(810).fit('crop').quality(84).auto('format').url()
   : undefined;
 const secondaryCruises = post.secondaryCruises ?? [];
 ---
@@ -37,92 +35,168 @@ const secondaryCruises = post.secondaryCruises ?? [];
 <BaseLayout title={title} description={description} image={mainImageUrl} locale={locale}>
   <main class="bg-background">
     <article>
+
+      {/* Hero */}
       <Section padding="lg" class="border-b border-border/70 bg-muted/30">
-        <Container class="max-w-[1060px]">
-          <div class="flex flex-col gap-6">
-            <a href={localizePath('/blog', locale)} class={buttonVariants({ variant: 'ghost', className: 'w-fit px-0' })}>{copy.pages.blogPost.backToBlog}</a>
-            <div class="flex flex-col gap-4">
-              {post.publishedAt && <Badge variant="secondary">{formatPostDate(post.publishedAt, locale)}</Badge>}
-              <h1 class="font-heading font-semibold leading-tight text-foreground">{post.title}</h1>
-              {post.excerpt && <p class="max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">{post.excerpt}</p>}
-            </div>
+        <Container class="max-w-[860px]">
+          <a
+            href={localizePath('/blog', locale)}
+            class={buttonVariants({ variant: 'ghost', className: 'mb-6 w-fit px-0 text-muted-foreground hover:text-foreground' })}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="mr-1.5">
+              <path d="M13 8H3M7 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {copy.pages.blogPost.backToBlog}
+          </a>
+          <div class="flex flex-col gap-5">
+            {post.publishedAt && (
+              <time
+                datetime={post.publishedAt}
+                class="text-sm font-medium tracking-wide text-muted-foreground uppercase"
+              >
+                {formatPostDate(post.publishedAt, locale)}
+              </time>
+            )}
+            <h1
+              class="font-heading font-semibold leading-[--line-height-heading] text-foreground"
+              style="font-size: var(--heading-2)"
+            >
+              {post.title}
+            </h1>
+            {post.excerpt && (
+              <p class="max-w-2xl text-xl leading-relaxed text-muted-foreground">
+                {post.excerpt}
+              </p>
+            )}
           </div>
         </Container>
       </Section>
 
-      {
-        mainImageUrl && (
-          <Section padding="sm">
-            <Container>
-              <figure>
+      {/* Main image */}
+      {mainImageUrl && (
+        <div class="border-b border-border/70">
+          <Container class="px-0 sm:px-5 md:px-8">
+            <figure>
               <img
-                  src={mainImageUrl}
-                  alt={post.mainImage?.alt || ''}
-                  width="1440"
-                  height="850"
-                  loading="eager"
-                  decoding="async"
-                  fetchpriority="high"
-                  class="max-h-[680px] w-full rounded-[var(--radius-surface)] object-cover shadow-sm ring-1 ring-border/70"
-                  style={{ backgroundColor: post.mainImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
-                />
-                {post.mainImage?.caption && <figcaption class="px-1 py-3 text-sm text-muted-foreground">{post.mainImage.caption}</figcaption>}
-              </figure>
-            </Container>
-          </Section>
-        )
-      }
+                src={mainImageUrl}
+                alt={post.mainImage?.alt || ''}
+                width="1440"
+                height="810"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+                class="max-h-[600px] w-full object-cover sm:rounded-b-[var(--radius-surface)]"
+                style={{ backgroundColor: post.mainImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+              />
+              {post.mainImage?.caption && (
+                <figcaption class="px-5 py-3 text-sm text-muted-foreground sm:px-1">
+                  {post.mainImage.caption}
+                </figcaption>
+              )}
+            </figure>
+          </Container>
+        </div>
+      )}
 
-      <Section padding={mainImageUrl ? 'md' : 'lg'}>
-        <Container class="max-w-[820px]">
-          <Separator className="mb-10" />
+      {/* Body */}
+      <Section padding="lg">
+        <Container class="max-w-[740px]">
           <BlogContent value={post.body} />
         </Container>
       </Section>
 
-      {
-        (post.primaryCruise || secondaryCruises.length > 0) && (
-          <Section padding="lg" class="border-t border-border/70 bg-muted/30">
-            <Container class="max-w-[1060px]">
-              <div class="grid gap-6 lg:grid-cols-2">
-                {post.primaryCruise && (
-                  <article class="rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
-                    <Badge variant="secondary">{copy.pages.blogPost.primaryCruise}</Badge>
-                    <h2 class="mt-4 font-heading text-2xl font-semibold leading-tight text-foreground">
-                      {post.primaryCruise.heroTitle || post.primaryCruise.title}
-                    </h2>
-                    {post.primaryCruise.excerpt && (
-                      <p class="mt-4 text-sm leading-relaxed text-muted-foreground">{post.primaryCruise.excerpt}</p>
+      {/* Related cruises */}
+      {(post.primaryCruise || secondaryCruises.length > 0) && (
+        <Section padding="lg" class="border-t border-border/70 bg-muted/30">
+          <Container class="max-w-[860px]">
+            <p class="mb-8 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+              {copy.pages.blogPost.primaryCruise}
+            </p>
+            <div class="grid gap-5 sm:grid-cols-2">
+              {post.primaryCruise && (() => {
+                const cruiseImageUrl = post.primaryCruise.heroImage
+                  ? urlForImage(post.primaryCruise.heroImage)?.width(640).height(380).fit('crop').quality(82).auto('format').url()
+                  : undefined;
+                return (
+                  <article class="group overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card shadow-xs transition hover:shadow-md">
+                    {cruiseImageUrl && (
+                      <div class="overflow-hidden">
+                        <img
+                          src={cruiseImageUrl}
+                          alt={post.primaryCruise.heroImage?.alt || post.primaryCruise.heroTitle || ''}
+                          width="640"
+                          height="380"
+                          loading="lazy"
+                          decoding="async"
+                          class="aspect-[5/3] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                          style={{ backgroundColor: post.primaryCruise.heroImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                        />
+                      </div>
                     )}
-                    <a
-                      href={localizePath(`/nos-croisieres/${post.primaryCruise.slug}/`, locale)}
-                      class={buttonVariants({ variant: 'primary', className: 'mt-6 w-fit' })}
-                    >
-                      {copy.pages.blogPost.discoverCruise}
-                    </a>
+                    <div class="flex flex-col gap-4 p-6">
+                      <h2 class="font-heading text-2xl font-semibold leading-tight text-foreground">
+                        {post.primaryCruise.heroTitle || post.primaryCruise.title}
+                      </h2>
+                      {post.primaryCruise.excerpt && (
+                        <p class="text-sm leading-relaxed text-muted-foreground">{post.primaryCruise.excerpt}</p>
+                      )}
+                      <a
+                        href={localizePath(`/nos-croisieres/${post.primaryCruise.slug}/`, locale)}
+                        class={buttonVariants({ variant: 'primary', className: 'mt-2 w-fit' })}
+                      >
+                        {copy.pages.blogPost.discoverCruise}
+                      </a>
+                    </div>
                   </article>
-                )}
+                );
+              })()}
 
-                {secondaryCruises.length > 0 && (
-                  <article class="rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
-                    <Badge variant="secondary">{copy.pages.blogPost.secondaryCruises}</Badge>
-                    <ul class="mt-4 space-y-4">
-                      {secondaryCruises.map((cruise) => (
-                        <li class="border-t border-border/60 pt-4 first:border-t-0 first:pt-0">
-                          <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class="font-heading text-lg font-semibold text-foreground transition hover:text-primary">
+              {secondaryCruises.length > 0 && (
+                <div class="flex flex-col gap-4">
+                  {secondaryCruises.map((cruise) => {
+                    const cruiseImageUrl = cruise.heroImage
+                      ? urlForImage(cruise.heroImage)?.width(480).height(200).fit('crop').quality(80).auto('format').url()
+                      : undefined;
+                    return (
+                      <a
+                        href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)}
+                        class="group flex items-center gap-4 overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card p-4 shadow-xs transition hover:shadow-md hover:-translate-y-0.5"
+                      >
+                        {cruiseImageUrl && (
+                          <div class="shrink-0 overflow-hidden rounded-[var(--radius-control)]">
+                            <img
+                              src={cruiseImageUrl}
+                              alt={cruise.heroImage?.alt || cruise.heroTitle || ''}
+                              width="96"
+                              height="72"
+                              loading="lazy"
+                              decoding="async"
+                              class="h-18 w-24 object-cover transition duration-500 group-hover:scale-[1.04]"
+                              style={{ backgroundColor: cruise.heroImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                            />
+                          </div>
+                        )}
+                        <div class="min-w-0 flex-1">
+                          <h3 class="font-heading text-lg font-semibold leading-tight text-foreground transition group-hover:text-primary">
                             {cruise.heroTitle || cruise.title}
-                          </a>
-                          {cruise.excerpt && <p class="mt-2 text-sm leading-relaxed text-muted-foreground">{cruise.excerpt}</p>}
-                        </li>
-                      ))}
-                    </ul>
-                  </article>
-                )}
-              </div>
-            </Container>
-          </Section>
-        )
-      }
+                          </h3>
+                          {cruise.excerpt && (
+                            <p class="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{cruise.excerpt}</p>
+                          )}
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="shrink-0 text-muted-foreground transition group-hover:text-primary group-hover:translate-x-0.5">
+                          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </Container>
+        </Section>
+      )}
+
     </article>
   </main>
 </BaseLayout>

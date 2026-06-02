@@ -17,6 +17,7 @@ interface Props {
   alternatePaths?: Partial<Record<Locale, string>>;
   noindex?: boolean;
   structuredData?: Record<string, unknown>[];
+  heroPreload?: { srcset: string; sizes: string };
 }
 
 const {
@@ -28,6 +29,7 @@ const {
   alternatePaths = {},
   noindex = false,
   structuredData = [],
+  heroPreload,
 } = Astro.props;
 
 const copy = getSiteCopy(locale);
@@ -54,6 +56,16 @@ const metadata = buildLocalizedMetadata(Astro.url.pathname, {
     <meta name="description" content={description ?? copy.shell.defaultDescription} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
+    {heroPreload && (
+      <link
+        rel="preload"
+        as="image"
+        imagesrcset={heroPreload.srcset}
+        imagesizes={heroPreload.sizes}
+        fetchpriority="high"
+      />
+    )}
     <link rel="canonical" href={metadata.canonical} />
     {metadata.alternates.map((alternate) => (
       <link rel="alternate" hreflang={alternate.locale} href={alternate.path} />

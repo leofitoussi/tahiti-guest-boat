@@ -2,7 +2,7 @@
 import PageBuilder from '../components/blocks/PageBuilder.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../lib/cruises';
-import { isSanityConfigured } from '../lib/sanity';
+import { heroImageSources, isSanityConfigured } from '../lib/sanity';
 import { defaultLocale } from '../lib/localization';
 import { getSiteCopy } from '../lib/site-copy';
 import { buildLocalizedSingletonDocumentFilter, localizedDocumentFields } from '../lib/sanity-localization';
@@ -194,9 +194,17 @@ const copy = getSiteCopy(defaultLocale);
 
 const seoTitle = home?.seoTitle ?? copy.pages.home.title;
 const seoDescription = home?.seoDescription ?? copy.pages.home.description;
+
+// Preload de l'image hero (LCP) : mêmes sources que le <img> pour éviter un double téléchargement.
+const heroBlock = pageBuilder.find(
+  (block) => block._type === 'heroHeaderBlock' || block._type === 'homeHeroBlock'
+);
+const heroImage = heroBlock?.image as Parameters<typeof heroImageSources>[0] | undefined;
+const heroSources = heroImage ? heroImageSources(heroImage) : undefined;
+const heroPreload = heroSources ? { srcset: heroSources.srcset, sizes: heroSources.sizes } : undefined;
 ---
 
-<BaseLayout title={seoTitle} description={seoDescription} settings={settings} locale={defaultLocale}>
+<BaseLayout title={seoTitle} description={seoDescription} settings={settings} locale={defaultLocale} heroPreload={heroPreload}>
   <main class="bg-background">
     <PageBuilder blocks={pageBuilder} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} activities={activities} locale={defaultLocale} />
   </main>

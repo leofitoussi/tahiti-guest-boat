@@ -2,7 +2,7 @@
 import { buttonVariants } from '../ui/button';
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
-import { urlForImage } from '../../lib/sanity';
+import { heroImageSources } from '../../lib/sanity';
 import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
 
 interface Cta {
@@ -30,19 +30,19 @@ interface Props {
 
 const { title, body, primaryCta, secondaryCta, image, locale = defaultLocale } = Astro.props;
 
-const imageUrl = image
-  ? urlForImage(image)?.width(1680).height(1120).fit('crop').quality(84).auto('format').url()
-  : undefined;
+const hero = image ? heroImageSources(image) : undefined;
 ---
 
 {
-  imageUrl && (
+  hero && (
     <div class="h-[60vh] w-full overflow-hidden bg-muted">
       <img
-        src={imageUrl}
+        src={hero.src}
+        srcset={hero.srcset}
+        sizes={hero.sizes}
         alt={image?.alt || ''}
-        width="1680"
-        height="1120"
+        width={hero.width}
+        height={hero.height}
         loading="eager"
         decoding="async"
         fetchpriority="high"

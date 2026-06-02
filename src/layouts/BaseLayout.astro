@@ -16,6 +16,7 @@ interface Props {
   locale?: Locale;
   alternatePaths?: Partial<Record<Locale, string>>;
   noindex?: boolean;
+  structuredData?: Record<string, unknown>[];
 }
 
 const {
@@ -26,6 +27,7 @@ const {
   locale = defaultLocale,
   alternatePaths = {},
   noindex = false,
+  structuredData = [],
 } = Astro.props;
 
 const copy = getSiteCopy(locale);
@@ -63,6 +65,9 @@ const metadata = buildLocalizedMetadata(Astro.url.pathname, {
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description ?? copy.shell.defaultDescription} />
     {image && <meta name="twitter:image" content={image} />}
+    {structuredData.map((data) => (
+      <script type="application/ld+json" is:inline set:html={JSON.stringify(data)} />
+    ))}
   </head>
   <body>
     <Header

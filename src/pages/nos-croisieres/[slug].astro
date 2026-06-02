@@ -17,7 +17,8 @@ import {
   getSiteSettings,
   type CruisePage,
 } from '../../lib/cruises';
-import { defaultLocale } from '../../lib/localization';
+import { buildCruiseSeoImage, buildCruiseStructuredData } from '../../lib/cruise-seo';
+import { buildLocalizedMetadata, defaultLocale } from '../../lib/localization';
 import { getSiteCopy } from '../../lib/site-copy';
 
 const locale = defaultLocale;
@@ -47,9 +48,28 @@ const pitch = cruise.pitch || { accroche: description };
 const featuredImage = cruise.featuredImage || {};
 const boat = cruise.boat || {};
 const itinerary = cruise.itinerary || { title: copy.blocks.itineraryTitle, steps: [] };
+const metadata = buildLocalizedMetadata(Astro.url.pathname, {
+  locale,
+  siteUrl: Astro.site?.href,
+});
+const seoImage = buildCruiseSeoImage(cruise);
+const structuredData = [
+  buildCruiseStructuredData(cruise, {
+    canonicalUrl: metadata.canonical,
+    relatedCruises,
+    siteName: settings?.siteName,
+  }),
+];
 ---
 
-<BaseLayout title={title} description={description} settings={settings} locale={locale}>
+<BaseLayout
+  title={title}
+  description={description}
+  image={seoImage}
+  settings={settings}
+  locale={locale}
+  structuredData={structuredData}
+>
   <main class="bg-background">
     <HeroBlock block={hero} locale={locale} />
     <PitchBlock block={pitch} />

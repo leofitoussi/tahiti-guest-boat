@@ -1,6 +1,11 @@
-import type { SiteSettings } from './cruises';
+import type { CruisePageSummary, SiteSettings } from './cruises';
 import { defaultLocale, localizeHref, localizePath, type Locale } from './localization';
 import { getSiteCopy } from './site-copy';
+
+export interface LayoutLink {
+  label: string;
+  href: string;
+}
 
 export interface LayoutViewModel {
   brandName: string;
@@ -9,19 +14,18 @@ export interface LayoutViewModel {
   ctaHref: string;
   contactEmail?: string;
   contactPhone?: string;
-  footerLinks: {
-    label: string;
-    href: string;
-  }[];
+  cruiseLinks: LayoutLink[];
+  cruisesNavigationLabel: string;
+  footerLinks: LayoutLink[];
   footerText?: string;
   logoAlt: string;
   logoUrl?: string;
   mobileMenuLabel: string;
-  navItems: {
+  navItems: (LayoutLink & {
     label: string;
     href: string;
     hasDropdown: boolean;
-  }[];
+  })[];
   navigationLabel: string;
   footerNavigationLabel: string;
 }
@@ -29,9 +33,16 @@ export interface LayoutViewModel {
 export function buildLayoutViewModel(
   settings: SiteSettings | null | undefined,
   logoUrl?: string,
-  locale: Locale = defaultLocale
+  locale: Locale = defaultLocale,
+  cruises: CruisePageSummary[] = []
 ): LayoutViewModel {
   const copy = getSiteCopy(locale);
+  const cruiseLinks = cruises
+    .filter((cruise) => cruise.slug && (cruise.heroTitle || cruise.title))
+    .map((cruise) => ({
+      label: cruise.heroTitle || cruise.title,
+      href: localizePath(`/nos-croisieres/${cruise.slug}/`, locale),
+    }));
 
   return {
     brandName: settings?.siteName ?? 'Tahiti Guest Boat',
@@ -40,6 +51,8 @@ export function buildLayoutViewModel(
     ctaHref: settings?.reservationLink ? localizeHref(settings.reservationLink, locale) : localizePath('/reservation', locale),
     contactEmail: settings?.contactEmail,
     contactPhone: settings?.contactPhone,
+    cruiseLinks,
+    cruisesNavigationLabel: copy.pages.cruisesIndex.badge,
     footerLinks:
       settings?.footerLinks?.map((link) => ({
         label: link.label ?? '',

@@ -43,7 +43,7 @@ const ctaUrl = booking?.fallbackCtaUrl || '/contact';
               title={title}
               class="w-full"
             />
-            <script async src="https://tally.so/widgets/embed.js" />
+            <script is:inline defer src="https://tally.so/widgets/embed.js" />
           </div>
         ) : (
           <div class="rounded-[var(--radius-surface)] border p-8">

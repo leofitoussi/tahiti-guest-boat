@@ -10,12 +10,18 @@ interface NavItem {
   hasDropdown?: boolean;
 }
 
+interface CruiseLink {
+  label: string;
+  href: string;
+}
+
 interface Props {
   logoUrl?: string;
   logoAlt?: string;
   brandName?: string;
   homeHref?: string;
   navItems?: NavItem[];
+  cruiseLinks?: CruiseLink[];
   ctaLabel?: string;
   ctaHref?: string;
   mobileMenuLabel?: string;
@@ -28,6 +34,7 @@ const {
   brandName = 'Tahiti Guest Boat',
   homeHref = '/',
   navItems = [],
+  cruiseLinks = [],
   ctaLabel,
   ctaHref = '/contact',
 } = Astro.props;
@@ -48,16 +55,17 @@ const navigationLabel = Astro.props.navigationLabel ?? copy.shell.navigationLabe
       }
     </a>
 
-    <DesktopNavigation navItems={navItems} ctaLabel={ctaLabel} ctaHref={ctaHref} />
+    <DesktopNavigation navItems={navItems} cruiseLinks={cruiseLinks} ctaLabel={ctaLabel} ctaHref={ctaHref} />
 
     <div class="md:hidden">
       <MobileDrawer
         navItems={navItems}
+        cruiseLinks={cruiseLinks}
         ctaLabel={ctaLabel}
         ctaHref={ctaHref}
         menuLabel={mobileMenuLabel}
         navigationLabel={navigationLabel}
-        client:load
+        client:media="(max-width: 767px)"
       />
     </div>
   </div>

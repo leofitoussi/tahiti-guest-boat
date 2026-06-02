@@ -1,8 +1,12 @@
 ---
+import BateauRecommandeBlock from '../../components/cruises/BateauRecommandeBlock.astro';
 import BoatBlock from '../../components/cruises/BoatBlock.astro';
 import BookingBlock from '../../components/cruises/BookingBlock.astro';
+import CruiseTeaserBlock from '../../components/cruises/CruiseTeaserBlock.astro';
+import ExperienceCroisiereBlock from '../../components/cruises/ExperienceCroisiereBlock.astro';
 import FullWidthImageBlock from '../../components/cruises/FullWidthImageBlock.astro';
 import HeroBlock from '../../components/cruises/HeroBlock.astro';
+import IntroductionDestinationBlock from '../../components/cruises/IntroductionDestinationBlock.astro';
 import ItineraryBlock from '../../components/cruises/ItineraryBlock.astro';
 import PitchBlock from '../../components/cruises/PitchBlock.astro';
 import RelatedCruisesBlock from '../../components/cruises/RelatedCruisesBlock.astro';
@@ -72,8 +76,12 @@ const structuredData = [
 >
   <main class="bg-background">
     <HeroBlock block={hero} locale={locale} />
+    <CruiseTeaserBlock block={cruise.cruiseTeaser} />
     <PitchBlock block={pitch} />
     <FullWidthImageBlock block={featuredImage} />
+    <IntroductionDestinationBlock block={cruise.introductionDestination} />
+    <ExperienceCroisiereBlock block={cruise.experienceCroisiere} />
+    <BateauRecommandeBlock block={cruise.bateauRecommande} />
     <BoatBlock block={boat} locale={locale} />
     <ItineraryBlock block={itinerary} locale={locale} />
     <WhyUsBlock settings={settings} locale={locale} />

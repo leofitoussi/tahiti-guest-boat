@@ -1,0 +1,65 @@
+---
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import CruisePortableText from './CruisePortableText.astro';
+import type { IntroductionDestination } from '../../lib/cruises';
+import { urlForImage } from '../../lib/sanity';
+
+interface Props {
+  block?: IntroductionDestination;
+}
+
+const { block } = Astro.props;
+
+const hasContent = block && (block.heading || (block.body && block.body.length > 0) || (block.images && block.images.length > 0));
+if (!hasContent) return;
+
+const galleryImages = (block.images ?? []).slice(0, 3);
+---
+
+<Section padding="lg" class="bg-background">
+  <Container>
+    <div class="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-start">
+      <div class="flex flex-col gap-6">
+        {block.heading && <h2 class="intro-heading">{block.heading}</h2>}
+        {block.body && block.body.length > 0 && <CruisePortableText value={block.body} />}
+      </div>
+      {
+        galleryImages.length > 0 && (
+          <div class:list={['grid gap-4', galleryImages.length > 1 ? 'grid-rows-[auto_auto]' : '']}>
+            {galleryImages.map((image, index) => {
+              const w = index === 0 ? 980 : 760;
+              const h = index === 0 ? 720 : 500;
+              const imageUrl = urlForImage(image)?.width(w).height(h).fit('crop').quality(82).auto('format').url();
+              return imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={image.alt || ''}
+                  width={String(w)}
+                  height={String(h)}
+                  loading="lazy"
+                  decoding="async"
+                  class:list={[
+                    'w-full object-cover ring-1 ring-border',
+                    index === 0 ? 'aspect-[1.36]' : 'aspect-[1.52] md:ml-auto md:w-3/4',
+                  ]}
+                  style={{ backgroundColor: image.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                />
+              ) : null;
+            })}
+          </div>
+        )
+      }
+    </div>
+  </Container>
+</Section>
+
+<style>
+  .intro-heading {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-size: clamp(2rem, 3.5vw, 3.25rem);
+    line-height: 1.1;
+    color: var(--foreground);
+  }
+</style>

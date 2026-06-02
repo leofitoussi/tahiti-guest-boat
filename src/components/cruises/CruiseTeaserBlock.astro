@@ -1,0 +1,94 @@
+---
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import type { CruiseTeaser } from '../../lib/cruises';
+import { urlForImage } from '../../lib/sanity';
+
+interface Props {
+  block?: CruiseTeaser;
+}
+
+const { block } = Astro.props;
+
+const imageUrl = block?.image
+  ? urlForImage(block.image)?.width(1200).height(800).fit('crop').quality(84).auto('format').url()
+  : undefined;
+
+const hasContent = Boolean(block?.headline || imageUrl);
+
+// Icons are frontend-owned and consistent across all cruise pages
+const markers = [
+  {
+    label: 'Capacité',
+    value: block?.capacity,
+    // person-group icon
+    svgPath:
+      'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z',
+  },
+  {
+    label: 'Durée minimum',
+    value: block?.minimumDuration,
+    // clock icon
+    svgPath:
+      'M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z',
+  },
+  {
+    label: 'Tarif',
+    value: block?.pricing,
+    // price tag icon
+    svgPath:
+      'M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z',
+  },
+].filter((m): m is typeof m & { value: string } => Boolean(m.value));
+---
+
+{
+  hasContent && (
+    <Section padding="lg" class="bg-background">
+      <Container>
+        <div class="grid gap-12 lg:grid-cols-2 lg:items-center">
+          <div class="flex flex-col gap-8">
+            {block?.headline && (
+              <h2 class="font-heading text-3xl leading-snug text-foreground md:text-5xl">
+                {block.headline}
+              </h2>
+            )}
+            {markers.length > 0 && (
+              <dl class="flex flex-col divide-y divide-border/70">
+                {markers.map((marker) => (
+                  <div class="flex items-center gap-4 py-4">
+                    <span
+                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-soft text-brand-primary"
+                      aria-hidden="true"
+                    >
+                      <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current">
+                        <path d={marker.svgPath} />
+                      </svg>
+                    </span>
+                    <div>
+                      <dt class="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                        {marker.label}
+                      </dt>
+                      <dd class="mt-0.5 text-sm font-semibold text-foreground">{marker.value}</dd>
+                    </div>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </div>
+          {imageUrl && (
+            <img
+              src={imageUrl}
+              alt={block?.image?.alt || ''}
+              width="1200"
+              height="800"
+              loading="lazy"
+              decoding="async"
+              class="aspect-[3/2] w-full rounded-[var(--radius-surface)] object-cover shadow-sm ring-1 ring-border/70"
+            />
+          )}
+        </div>
+      </Container>
+    </Section>
+  )
+}

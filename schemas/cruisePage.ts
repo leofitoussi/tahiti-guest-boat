@@ -1,5 +1,6 @@
 import { defineField, defineType } from 'sanity';
 import { defineLocalizationFields } from './localization-fields';
+import { richText } from './portableText';
 
 export const cruisePage = defineType({
   name: 'cruisePage',
@@ -116,6 +117,68 @@ export const cruisePage = defineType({
       title: 'Itinerary',
       type: 'itineraryBlock',
       validation: (rule) => rule.required().warning('Ajoutez un itinéraire indicatif pour rendre la croisière concrète.'),
+    }),
+    defineField({
+      name: 'introductionDestination',
+      title: 'Introduction destination',
+      type: 'object',
+      fields: [
+        defineField({ name: 'heading', title: 'Titre', type: 'string' }),
+        defineField({ name: 'body', title: 'Texte', type: 'array', of: richText }),
+        defineField({
+          name: 'images',
+          title: 'Galerie',
+          type: 'array',
+          of: [
+            defineField({
+              name: 'image',
+              title: 'Image',
+              type: 'image',
+              options: { hotspot: true },
+              fields: [defineField({ name: 'alt', title: 'Texte alternatif', type: 'string', validation: (r) => r.required() })],
+            }),
+          ],
+        }),
+      ],
+    }),
+    defineField({
+      name: 'experienceCroisiere',
+      title: 'Expérience croisière',
+      type: 'object',
+      fields: [
+        defineField({ name: 'heading', title: 'Titre', type: 'string' }),
+        defineField({ name: 'body', title: 'Texte', type: 'array', of: richText }),
+        defineField({
+          name: 'image',
+          title: 'Image',
+          type: 'image',
+          options: { hotspot: true },
+          fields: [defineField({ name: 'alt', title: 'Texte alternatif', type: 'string', validation: (r) => r.required() })],
+        }),
+      ],
+    }),
+    defineField({
+      name: 'bateauRecommande',
+      title: 'Bateau recommandé',
+      type: 'object',
+      fields: [
+        defineField({ name: 'heading', title: 'Titre', type: 'string' }),
+        defineField({ name: 'body', title: 'Texte', type: 'array', of: richText }),
+        defineField({
+          name: 'image',
+          title: 'Image',
+          type: 'image',
+          options: { hotspot: true },
+          fields: [defineField({ name: 'alt', title: 'Texte alternatif', type: 'string', validation: (r) => r.required() })],
+        }),
+        defineField({ name: 'ctaLabel', title: 'Libellé CTA', type: 'string' }),
+        defineField({
+          name: 'ctaUrl',
+          title: 'Lien CTA',
+          type: 'url',
+          validation: (r) => r.uri({ allowRelative: true, scheme: ['http', 'https', 'mailto', 'tel'] }),
+        }),
+      ],
     }),
   ],
   preview: {

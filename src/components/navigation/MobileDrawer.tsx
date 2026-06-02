@@ -16,10 +16,17 @@ import { getSiteCopy } from "../../lib/site-copy"
 interface NavItem {
   label: string
   href: string
+  hasDropdown?: boolean
+}
+
+interface CruiseLink {
+  label: string
+  href: string
 }
 
 interface MobileDrawerProps {
   navItems: NavItem[]
+  cruiseLinks?: CruiseLink[]
   ctaLabel?: string
   ctaHref?: string
   menuLabel?: string
@@ -27,8 +34,17 @@ interface MobileDrawerProps {
   locale?: Locale
 }
 
+function shouldRenderCruiseLinks(item: NavItem, cruiseLinks: CruiseLink[]) {
+  const normalizedHref =
+    item.href.replace(/^\/en(?=\/|$)/, "").replace(/\/+$/, "") || "/"
+  const isCruiseNavItem = normalizedHref === "/nos-croisieres" || /croisi|cruise/i.test(item.label)
+
+  return cruiseLinks.length > 0 && isCruiseNavItem && (item.hasDropdown || normalizedHref === "/nos-croisieres")
+}
+
 export function MobileDrawer({
   navItems,
+  cruiseLinks = [],
   ctaLabel,
   ctaHref = "/contact",
   menuLabel,
@@ -57,20 +73,43 @@ export function MobileDrawer({
         </div>
 
         <nav className="flex flex-1 flex-col divide-y divide-border/50 px-5" aria-label={resolvedNavigationLabel}>
-          {navItems.map((item) => (
-            <SheetClose
-              key={item.href}
-              nativeButton={false}
-              render={
-                <a
-                  href={item.href}
-                  className="py-5 font-heading text-2xl text-foreground transition-colors hover:text-primary"
-                />
-              }
-            >
-              {item.label}
-            </SheetClose>
-          ))}
+          {navItems.map((item) => {
+            const hasCruiseLinks = shouldRenderCruiseLinks(item, cruiseLinks)
+
+            return (
+              <div key={item.href} className="flex flex-col py-1">
+                <SheetClose
+                  nativeButton={false}
+                  render={
+                    <a
+                      href={item.href}
+                      className="py-4 font-heading text-2xl text-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+                    />
+                  }
+                >
+                  {item.label}
+                </SheetClose>
+                {hasCruiseLinks ? (
+                  <div className="mb-3 flex flex-col gap-1 border-l border-border/70 pl-4">
+                    {cruiseLinks.map((cruise) => (
+                      <SheetClose
+                        key={cruise.href}
+                        nativeButton={false}
+                        render={
+                          <a
+                            href={cruise.href}
+                            className="flex min-h-11 items-center font-heading text-lg text-muted-foreground transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+                          />
+                        }
+                      >
+                        {cruise.label}
+                      </SheetClose>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            )
+          })}
         </nav>
 
         {ctaLabel ? (

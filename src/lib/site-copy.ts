@@ -80,7 +80,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
     shell: {
       mobileMenuLabel: 'Ouvrir le menu',
       navigationLabel: 'Navigation',
-      footerNavigationLabel: 'Navigation footer',
+      footerNavigationLabel: 'Explorer',
       defaultFooterText: 'Croisieres privees et experiences lagon en Polynesie francaise.',
       defaultDescription: 'Croisieres privees et experiences lagon en Polynesie francaise avec Tahiti Guest Boat.',
     },
@@ -158,7 +158,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
     shell: {
       mobileMenuLabel: 'Open menu',
       navigationLabel: 'Navigation',
-      footerNavigationLabel: 'Footer navigation',
+      footerNavigationLabel: 'Explore',
       defaultFooterText: 'Private cruises and lagoon experiences in French Polynesia.',
       defaultDescription: 'Private cruises and lagoon experiences in French Polynesia with Tahiti Guest Boat.',
     },

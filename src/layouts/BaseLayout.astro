@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import Header from '../components/navigation/Header.astro';
 import Footer from '../components/navigation/Footer.astro';
-import { getSiteSettings, type SiteSettings } from '../lib/cruises';
+import { getCruisePages, getSiteSettings, type SiteSettings } from '../lib/cruises';
 import { buildLayoutViewModel } from '../lib/site-settings';
 import { urlForImage } from '../lib/sanity';
 import { buildLocalizedMetadata, defaultLocale, type Locale } from '../lib/localization';
@@ -31,12 +31,15 @@ const {
 } = Astro.props;
 
 const copy = getSiteCopy(locale);
-const settings = providedSettings ?? (await getSiteSettings(locale));
+const [settings, cruisePages] = await Promise.all([
+  providedSettings ? Promise.resolve(providedSettings) : getSiteSettings(locale),
+  getCruisePages(locale),
+]);
 
 const logoUrl = settings?.logo
   ? urlForImage(settings.logo)?.width(360).auto('format').url()
   : undefined;
-const layoutViewModel = buildLayoutViewModel(settings, logoUrl, locale);
+const layoutViewModel = buildLayoutViewModel(settings, logoUrl, locale, cruisePages);
 const metadata = buildLocalizedMetadata(Astro.url.pathname, {
   locale,
   siteUrl: Astro.site?.href,
@@ -78,6 +81,7 @@ const metadata = buildLocalizedMetadata(Astro.url.pathname, {
       navItems={layoutViewModel.navItems}
       ctaLabel={layoutViewModel.ctaLabel}
       ctaHref={layoutViewModel.ctaHref}
+      cruiseLinks={layoutViewModel.cruiseLinks}
       mobileMenuLabel={layoutViewModel.mobileMenuLabel}
       navigationLabel={layoutViewModel.navigationLabel}
     />
@@ -85,7 +89,11 @@ const metadata = buildLocalizedMetadata(Astro.url.pathname, {
     <Footer
       brandName={layoutViewModel.brandName}
       homeHref={layoutViewModel.homeHref}
+      logoUrl={layoutViewModel.logoUrl}
+      logoAlt={layoutViewModel.logoAlt}
       footerLinks={layoutViewModel.footerLinks}
+      cruiseLinks={layoutViewModel.cruiseLinks}
+      cruisesNavigationLabel={layoutViewModel.cruisesNavigationLabel}
       footerText={layoutViewModel.footerText}
       contactEmail={layoutViewModel.contactEmail}
       contactPhone={layoutViewModel.contactPhone}

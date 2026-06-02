@@ -10,7 +10,11 @@ interface FooterLink {
 interface Props {
   brandName?: string;
   homeHref?: string;
+  logoUrl?: string;
+  logoAlt?: string;
   footerLinks?: FooterLink[];
+  cruiseLinks?: FooterLink[];
+  cruisesNavigationLabel?: string;
   footerText?: string;
   contactEmail?: string;
   contactPhone?: string;
@@ -20,8 +24,11 @@ interface Props {
 const {
   brandName = 'Tahiti Guest Boat',
   homeHref = '/',
+  logoUrl,
+  logoAlt = 'Logo Tahiti Guest Boat',
   footerLinks = [],
-  footerText,
+  cruiseLinks = [],
+  cruisesNavigationLabel = 'Croisières',
   contactEmail,
   contactPhone,
 } = Astro.props;
@@ -34,40 +41,81 @@ const phoneHref = contactPhone
   : undefined;
 ---
 
-<footer class="border-t border-border/70 bg-muted/40">
-  <div class="mx-auto grid max-w-site gap-8 px-5 py-12 md:grid-cols-[1.2fr_0.8fr] md:px-8">
-    <div class="flex flex-col gap-3">
-      <a href={homeHref} class="font-heading text-2xl font-semibold tracking-[0.16em] text-primary uppercase">{brandName}</a>
-      {footerText ? (
-        <p class="max-w-xl text-sm leading-relaxed text-muted-foreground">{footerText}</p>
-      ) : (
-        <p class="max-w-xl text-sm leading-relaxed text-muted-foreground">{copy.shell.defaultFooterText}</p>
-      )}
-      {(contactEmail || contactPhone) && (
-        <div class="mt-2 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-foreground">
-          {contactEmail && (
-            <a href={`mailto:${contactEmail}`} class="transition hover:text-primary">
-              {contactEmail}
-            </a>
-          )}
-          {contactPhone && (
-            <a href={phoneHref} class="transition hover:text-primary">
-              {contactPhone}
-            </a>
-          )}
+<footer class="bg-[var(--brand-secondary)] text-white">
+  <div class="border-t border-white/15">
+    <div class="mx-auto grid max-w-site gap-12 px-5 py-16 md:grid-cols-[1.15fr_0.55fr_0.65fr] md:px-8 lg:gap-16 lg:py-20">
+      <div class="flex flex-col items-start gap-8">
+        <a
+          href={homeHref}
+          class="inline-flex min-h-16 items-center transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+          aria-label={brandName}
+        >
+          {
+            logoUrl ? (
+              <img src={logoUrl} alt={logoAlt} class="h-14 w-auto object-contain brightness-0 invert" width="220" height="74" />
+            ) : (
+              <span class="font-heading text-2xl font-semibold tracking-[0.16em] text-white uppercase">{brandName}</span>
+            )
+          }
+        </a>
+        {(contactEmail || contactPhone) && (
+          <div class="flex flex-col gap-3 text-base font-medium text-white/82">
+            {contactEmail && (
+              <a
+                href={`mailto:${contactEmail}`}
+                class="inline-flex min-h-8 items-center transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+              >
+                {contactEmail}
+              </a>
+            )}
+            {contactPhone && (
+              <a
+                href={phoneHref}
+                class="inline-flex min-h-8 items-center transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+              >
+                {contactPhone}
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+
+      {footerLinks.length > 0 && (
+        <div class="flex flex-col gap-6">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-white/62">{navigationLabel}</p>
+          <nav class="flex flex-col gap-3 text-base font-medium" aria-label={navigationLabel}>
+            {footerLinks.map((item) => (
+              <a
+                href={item.href}
+                class="flex min-h-8 items-center text-white/84 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
         </div>
       )}
-      <p class="text-sm text-muted-foreground">© {year} {brandName}</p>
-    </div>
 
-    {footerLinks.length > 0 && (
-      <div class="flex flex-col gap-3 md:items-end">
-        <nav class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold uppercase tracking-[0.14em]" aria-label={navigationLabel}>
-          {footerLinks.map((item) => (
-            <a href={item.href} class="transition hover:text-primary">{item.label}</a>
-          ))}
-        </nav>
-      </div>
-    )}
+      {cruiseLinks.length > 0 && (
+        <div class="flex flex-col gap-6">
+          <p class="text-sm font-semibold uppercase tracking-[0.22em] text-white/62">{cruisesNavigationLabel}</p>
+          <nav class="flex flex-col gap-3 text-base font-medium" aria-label={cruisesNavigationLabel}>
+            {cruiseLinks.map((item) => (
+              <a
+                href={item.href}
+                class="flex min-h-8 items-center leading-snug text-white/84 transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        </div>
+      )}
+    </div>
+  </div>
+  <div class="border-t border-white/10">
+    <div class="mx-auto flex max-w-site px-5 py-6 text-sm text-white/64 md:px-8">
+      <p>© {year} {brandName}</p>
+    </div>
   </div>
 </footer>

@@ -112,6 +112,26 @@ export interface CruisePageSummary {
   _createdAt?: string;
 }
 
+export interface IntroductionDestination {
+  heading?: string;
+  body?: TypedObject[];
+  images?: SanityImage[];
+}
+
+export interface ExperienceCroisiere {
+  heading?: string;
+  body?: TypedObject[];
+  image?: SanityImage;
+}
+
+export interface BateauRecommande {
+  heading?: string;
+  body?: TypedObject[];
+  image?: SanityImage;
+  ctaLabel?: string;
+  ctaUrl?: string;
+}
+
 export interface CruisePage extends CruisePageSummary {
   locale?: Locale;
   translationGroup?: string;
@@ -121,6 +141,9 @@ export interface CruisePage extends CruisePageSummary {
   cruiseTeaser?: CruiseTeaser;
   pitch?: PitchBlock;
   featuredImage?: FullWidthImageBlock;
+  introductionDestination?: IntroductionDestination;
+  experienceCroisiere?: ExperienceCroisiere;
+  bateauRecommande?: BateauRecommande;
   boat?: BoatBlock;
   itinerary?: ItineraryBlock;
 }
@@ -223,6 +246,32 @@ const cruisePageFields = `
   featuredImage{
     ...,
     image${imageFields}
+  },
+  introductionDestination{
+    heading,
+    body,
+    images[]{
+      ...,
+      asset,
+      alt,
+      "metadata": asset->metadata {
+        dimensions,
+        lqip,
+        palette { dominant { background } }
+      }
+    }
+  },
+  experienceCroisiere{
+    heading,
+    body,
+    image${imageFields}
+  },
+  bateauRecommande{
+    heading,
+    body,
+    image${imageFields},
+    ctaLabel,
+    ctaUrl
   },
   boat{
     ...,

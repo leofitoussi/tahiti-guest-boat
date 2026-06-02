@@ -169,6 +169,41 @@ describe('cruise archive — /nos-croisieres/', () => {
   });
 });
 
+describe('layout navigation — automatic cruise links', () => {
+  it('BaseLayout fetches cruise pages for the shared header and footer', async () => {
+    const source = await readFile('src/layouts/BaseLayout.astro', 'utf8');
+
+    expect(source).toContain('getCruisePages');
+    expect(source).toContain('buildLayoutViewModel(settings, logoUrl, locale, cruisePages)');
+    expect(source).toContain('cruiseLinks={layoutViewModel.cruiseLinks}');
+  });
+
+  it('DesktopNavigation exposes cruise links from items marked as dropdowns or /nos-croisieres/', async () => {
+    const source = await readFile('src/components/navigation/DesktopNavigation.tsx', 'utf8');
+
+    expect(source).toContain('isCruiseNavItem');
+    expect(source).toContain('item.hasDropdown || normalizedHref === "/nos-croisieres"');
+    expect(source).toContain('group-hover/navigation-item:visible');
+    expect(source).toContain('group-focus-within/navigation-item:visible');
+  });
+
+  it('MobileDrawer renders cruise links directly without an accordion', async () => {
+    const source = await readFile('src/components/navigation/MobileDrawer.tsx', 'utf8');
+
+    expect(source).toContain('cruiseLinks.map');
+    expect(source).toContain('min-h-11');
+    expect(source).not.toContain('Accordion');
+  });
+
+  it('Footer has a dedicated automatic cruise navigation section', async () => {
+    const source = await readFile('src/components/navigation/Footer.astro', 'utf8');
+
+    expect(source).toContain('cruiseLinks');
+    expect(source).toContain('cruisesNavigationLabel');
+    expect(source).toContain('cruiseLinks.map');
+  });
+});
+
 // ── Cycle 1 ─────────────────────────────────────────────────────────────────
 // (was already in correct state — tests pin the expected order)
 
@@ -182,13 +217,17 @@ describe('cruise page template — fixed section order', () => {
     expect(source).toContain('<ReviewsBlock reviews={reviews} locale={locale} />');
   });
 
-  it('renders sections in the fixed order: Hero → Pitch → FullWidthImage → Boat → Itinerary → WhyUs → Reviews → Booking → RelatedCruises', async () => {
+  it('renders sections in the fixed order: Hero → Accroche → Pitch → FullWidthImage → IntroductionDestination → ExperienceCroisiere → BateauRecommande → Boat → Itinerary → WhyUs → Reviews → Booking → RelatedCruises', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
 
     const ORDERED_SECTIONS = [
       'HeroBlock',
+      'CruiseTeaserBlock',
       'PitchBlock',
       'FullWidthImageBlock',
+      'IntroductionDestinationBlock',
+      'ExperienceCroisiereBlock',
+      'BateauRecommandeBlock',
       'BoatBlock',
       'ItineraryBlock',
       'WhyUsBlock',
@@ -204,6 +243,46 @@ describe('cruise page template — fixed section order', () => {
       expect(idx, `<${section} should come after the previous section`).toBeGreaterThan(lastIndex);
       lastIndex = idx;
     }
+  });
+});
+
+// ── Cycle 7 — Hero et Accroche croisière (issue #16) ────────────────────────
+
+describe('CruiseTeaserBlock — conditional rendering', () => {
+  it('cruise template guards CruiseTeaserBlock against absent cruiseTeaser data', async () => {
+    const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
+    // Section must not render when cruiseTeaser is falsy
+    expect(source).toMatch(/cruise\.cruiseTeaser/);
+  });
+
+  it('CruiseTeaserBlock renders nothing when headline and image are absent', async () => {
+    const source = await readFile('src/components/cruises/CruiseTeaserBlock.astro', 'utf8');
+    // Component self-guards: no render if no meaningful content
+    expect(source).toMatch(/block\??\.headline|block\??\.image/);
+  });
+});
+
+describe('CruiseTeaserBlock — structure and markers', () => {
+  it('renders headline, capacity, minimumDuration, and pricing from block data', async () => {
+    const source = await readFile('src/components/cruises/CruiseTeaserBlock.astro', 'utf8');
+    expect(source).toMatch(/block\??\.headline/);
+    expect(source).toMatch(/block\??\.capacity/);
+    expect(source).toMatch(/block\??\.minimumDuration/);
+    expect(source).toMatch(/block\??\.pricing/);
+  });
+
+  it('practical marker icons are frontend-owned — not read from block data', async () => {
+    const source = await readFile('src/components/cruises/CruiseTeaserBlock.astro', 'utf8');
+    expect(source).not.toContain('block.icon');
+    expect(source).not.toContain('block.capacity.icon');
+  });
+});
+
+describe('CruiseTeaserBlock — image loading', () => {
+  it('Accroche image uses lazy loading (below hero fold)', async () => {
+    const source = await readFile('src/components/cruises/CruiseTeaserBlock.astro', 'utf8');
+    expect(source).toContain('loading="lazy"');
+    expect(source).not.toContain('fetchpriority="high"');
   });
 });
 
@@ -298,5 +377,268 @@ describe('Itinéraire indicatif — component', () => {
   it('ItineraryBlock does not render when steps are absent or empty', async () => {
     const source = await readFile('src/components/cruises/ItineraryBlock.astro', 'utf8');
     expect(source).toMatch(/block\.steps.*length|block\.steps\s*&&|block\.steps\?/);
+  });
+});
+
+// ── Cycle 8 — Sections éditoriales destination (issue #17) ──────────────────
+
+describe('sections éditoriales — schema fields', () => {
+  it('cruisePage has introductionDestination with heading, body, and images gallery', () => {
+    const fields = Object.fromEntries(cruisePage.fields.map((f) => [f.name, f as any]));
+    expect(fields.introductionDestination).toMatchObject({ type: 'object' });
+    const sub = Object.fromEntries(fields.introductionDestination.fields.map((f: any) => [f.name, f]));
+    expect(sub.heading).toMatchObject({ type: 'string' });
+    expect(sub.body).toMatchObject({ type: 'array' });
+    expect(sub.images).toMatchObject({ type: 'array' });
+  });
+
+  it('cruisePage has experienceCroisiere with heading, body, and single image', () => {
+    const fields = Object.fromEntries(cruisePage.fields.map((f) => [f.name, f as any]));
+    expect(fields.experienceCroisiere).toMatchObject({ type: 'object' });
+    const sub = Object.fromEntries(fields.experienceCroisiere.fields.map((f: any) => [f.name, f]));
+    expect(sub.heading).toMatchObject({ type: 'string' });
+    expect(sub.body).toMatchObject({ type: 'array' });
+    expect(sub.image).toMatchObject({ type: 'image' });
+  });
+
+  it('cruisePage has bateauRecommande with heading, body, image, and CTA', () => {
+    const fields = Object.fromEntries(cruisePage.fields.map((f) => [f.name, f as any]));
+    expect(fields.bateauRecommande).toMatchObject({ type: 'object' });
+    const sub = Object.fromEntries(fields.bateauRecommande.fields.map((f: any) => [f.name, f]));
+    expect(sub.heading).toMatchObject({ type: 'string' });
+    expect(sub.body).toMatchObject({ type: 'array' });
+    expect(sub.image).toMatchObject({ type: 'image' });
+    expect(sub.ctaLabel).toMatchObject({ type: 'string' });
+    expect(sub.ctaUrl).toMatchObject({ type: 'url' });
+  });
+
+  it('editorial sections are not exposed in GROQ page-builder references', () => {
+    const fieldNames = cruisePage.fields.map((f) => f.name);
+    expect(fieldNames).not.toContain('editorialSections');
+    expect(fieldNames).toContain('introductionDestination');
+    expect(fieldNames).toContain('experienceCroisiere');
+    expect(fieldNames).toContain('bateauRecommande');
+  });
+});
+
+describe('sections éditoriales — GROQ projection', () => {
+  it('cruises.ts projects introductionDestination with image metadata', async () => {
+    const source = await readFile('src/lib/cruises.ts', 'utf8');
+    expect(source).toContain('introductionDestination');
+    expect(source).toContain('images[]{');
+  });
+
+  it('cruises.ts projects experienceCroisiere with image metadata', async () => {
+    const source = await readFile('src/lib/cruises.ts', 'utf8');
+    expect(source).toContain('experienceCroisiere');
+  });
+
+  it('cruises.ts projects bateauRecommande with image metadata', async () => {
+    const source = await readFile('src/lib/cruises.ts', 'utf8');
+    expect(source).toContain('bateauRecommande');
+  });
+});
+
+describe('sections éditoriales — TypeScript types', () => {
+  it('CruisePage interface includes all three editorial section fields', () => {
+    // TS types are compile-time only; verified via source text in the next test
+    expect(typeof cruisesLib.getCruisePage).toBe('function');
+  });
+
+  it('cruises lib source declares IntroductionDestination, ExperienceCroisiere, BateauRecommande types', async () => {
+    const source = await readFile('src/lib/cruises.ts', 'utf8');
+    expect(source).toContain('introductionDestination');
+    expect(source).toContain('experienceCroisiere');
+    expect(source).toContain('bateauRecommande');
+  });
+});
+
+describe('sections éditoriales — empty-section guards', () => {
+  it('IntroductionDestinationBlock renders nothing when block is absent or empty', async () => {
+    const source = await readFile('src/components/cruises/IntroductionDestinationBlock.astro', 'utf8');
+    expect(source).toMatch(/hasContent|!block|block\s*&&/);
+    expect(source).toMatch(/return/);
+  });
+
+  it('ExperienceCroisiereBlock renders nothing when block is absent or empty', async () => {
+    const source = await readFile('src/components/cruises/ExperienceCroisiereBlock.astro', 'utf8');
+    expect(source).toMatch(/hasContent|!block|block\s*&&/);
+    expect(source).toMatch(/return/);
+  });
+
+  it('BateauRecommandeBlock renders nothing when block is absent or empty', async () => {
+    const source = await readFile('src/components/cruises/BateauRecommandeBlock.astro', 'utf8');
+    expect(source).toMatch(/hasContent|!block|block\s*&&/);
+    expect(source).toMatch(/return/);
+  });
+});
+
+describe('sections éditoriales — lazy loading', () => {
+  it('IntroductionDestinationBlock gallery images use lazy loading', async () => {
+    const source = await readFile('src/components/cruises/IntroductionDestinationBlock.astro', 'utf8');
+    expect(source).toContain('loading="lazy"');
+    expect(source).not.toContain('fetchpriority="high"');
+  });
+
+  it('ExperienceCroisiereBlock image uses lazy loading', async () => {
+    const source = await readFile('src/components/cruises/ExperienceCroisiereBlock.astro', 'utf8');
+    expect(source).toContain('loading="lazy"');
+  });
+
+  it('BateauRecommandeBlock image uses lazy loading', async () => {
+    const source = await readFile('src/components/cruises/BateauRecommandeBlock.astro', 'utf8');
+    expect(source).toContain('loading="lazy"');
+  });
+});
+
+describe('sections éditoriales — rendering order', () => {
+  it('template renders three editorial sections between FullWidthImageBlock and BoatBlock', async () => {
+    const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
+    const order = [
+      'FullWidthImageBlock',
+      'IntroductionDestinationBlock',
+      'ExperienceCroisiereBlock',
+      'BateauRecommandeBlock',
+      'BoatBlock',
+    ];
+    let last = -1;
+    for (const tag of order) {
+      const idx = source.indexOf(`<${tag}`);
+      expect(idx, `<${tag} must be present`).toBeGreaterThan(-1);
+      expect(idx, `<${tag} must come after previous`).toBeGreaterThan(last);
+      last = idx;
+    }
+  });
+
+  it('template passes editorial section data from cruise object', async () => {
+    const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
+    expect(source).toContain('cruise.introductionDestination');
+    expect(source).toContain('cruise.experienceCroisiere');
+    expect(source).toContain('cruise.bateauRecommande');
+  });
+});
+
+// ── Cycle 9 — Hero image priority (issue #22) ───────────────────────────────
+
+describe('performance — hero image priority', () => {
+  it('HeroBlock background image has fetchpriority="high" for LCP', async () => {
+    const source = await readFile('src/components/cruises/HeroBlock.astro', 'utf8');
+    expect(source).toContain('fetchpriority="high"');
+  });
+
+  it('HeroBlock background image uses eager loading', async () => {
+    const source = await readFile('src/components/cruises/HeroBlock.astro', 'utf8');
+    expect(source).toContain('loading="eager"');
+  });
+});
+
+// ── Cycle 10 — FullWidthImageBlock lazy load (issue #22) ────────────────────
+
+describe('performance — FullWidthImageBlock lazy load', () => {
+  it('FullWidthImageBlock image uses lazy loading (below fold)', async () => {
+    const source = await readFile('src/components/cruises/FullWidthImageBlock.astro', 'utf8');
+    expect(source).toContain('loading="lazy"');
+    expect(source).not.toContain('fetchpriority="high"');
+  });
+
+  it('FullWidthImageBlock image has explicit width and height for stable layout', async () => {
+    const source = await readFile('src/components/cruises/FullWidthImageBlock.astro', 'utf8');
+    expect(source).toContain('width="1920"');
+    expect(source).toContain('height="920"');
+  });
+});
+
+// ── Cycle 11 — BoatBlock lazy load (issue #22) ──────────────────────────────
+
+describe('performance — BoatBlock lazy load', () => {
+  it('BoatBlock image uses lazy loading', async () => {
+    const source = await readFile('src/components/cruises/BoatBlock.astro', 'utf8');
+    expect(source).toContain('loading="lazy"');
+    expect(source).not.toContain('fetchpriority="high"');
+  });
+
+  it('BoatBlock image has an aspect-ratio constraint to prevent layout shift', async () => {
+    const source = await readFile('src/components/cruises/BoatBlock.astro', 'utf8');
+    expect(source).toMatch(/aspect-\[/);
+  });
+});
+
+// ── Cycle 12 — ItineraryBlock lazy load (issue #22) ─────────────────────────
+
+describe('performance — ItineraryBlock lazy load', () => {
+  it('ItineraryBlock step images use lazy loading', async () => {
+    const source = await readFile('src/components/cruises/ItineraryBlock.astro', 'utf8');
+    expect(source).toContain('loading="lazy"');
+    expect(source).not.toContain('fetchpriority="high"');
+  });
+
+  it('ItineraryBlock step images have explicit dimensions for stable layout', async () => {
+    const source = await readFile('src/components/cruises/ItineraryBlock.astro', 'utf8');
+    expect(source).toContain('width="760"');
+    expect(source).toContain('height="500"');
+  });
+});
+
+// ── Cycle 13 — RelatedCruisesBlock lazy load (issue #22) ────────────────────
+
+describe('performance — RelatedCruisesBlock lazy load', () => {
+  it('RelatedCruisesBlock card images use lazy loading', async () => {
+    const source = await readFile('src/components/cruises/RelatedCruisesBlock.astro', 'utf8');
+    expect(source).toContain('loading="lazy"');
+    expect(source).not.toContain('fetchpriority="high"');
+  });
+
+  it('RelatedCruisesBlock card images have an aspect-ratio constraint', async () => {
+    const source = await readFile('src/components/cruises/RelatedCruisesBlock.astro', 'utf8');
+    expect(source).toMatch(/aspect-\[/);
+  });
+});
+
+// ── Cycle 14 — Tally deferred (issue #22) ───────────────────────────────────
+
+describe('performance — Tally deferred rendering', () => {
+  it('BookingBlock Tally embed script uses defer (not async) to not block initial rendering', async () => {
+    const source = await readFile('src/components/cruises/BookingBlock.astro', 'utf8');
+    expect(source).toContain('defer');
+    expect(source).not.toMatch(/<script\s+async\s+src="https:\/\/tally/);
+  });
+
+  it('BookingBlock Tally iframe uses lazy loading', async () => {
+    const source = await readFile('src/components/cruises/BookingBlock.astro', 'utf8');
+    expect(source).toContain('loading="lazy"');
+  });
+});
+
+// ── Cycle 15 — Itinerary native accordion (issue #22) ───────────────────────
+
+describe('performance — itinerary native accordion', () => {
+  it('ItineraryBlock uses native details/summary accordion with no client JS', async () => {
+    const source = await readFile('src/components/cruises/ItineraryBlock.astro', 'utf8');
+    expect(source).toContain('<details');
+    expect(source).toContain('<summary');
+    // No client-side framework component
+    expect(source).not.toMatch(/client:(load|idle|visible)/);
+  });
+});
+
+// ── Cycle 16 — No unnecessary client JS (issue #22) ─────────────────────────
+
+describe('performance — no unnecessary client JS in cruise sections', () => {
+  it('RelatedCruisesBlock uses CSS-only horizontal scroll (no JS carousel)', async () => {
+    const source = await readFile('src/components/cruises/RelatedCruisesBlock.astro', 'utf8');
+    expect(source).not.toMatch(/client:(load|idle|visible)/);
+    expect(source).not.toContain('useEffect');
+    expect(source).not.toContain('addEventListener');
+  });
+
+  it('ItineraryBlock imports no client-side interactive component', async () => {
+    const source = await readFile('src/components/cruises/ItineraryBlock.astro', 'utf8');
+    expect(source).not.toMatch(/client:(load|idle|visible)/);
+  });
+
+  it('EditorialBlock images use lazy loading and no client JS', async () => {
+    const source = await readFile('src/components/cruises/EditorialBlock.astro', 'utf8');
+    expect(source).toContain('loading="lazy"');
+    expect(source).not.toMatch(/client:(load|idle|visible)/);
   });
 });

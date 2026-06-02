@@ -28,6 +28,14 @@ export interface PitchBlock {
   }[];
 }
 
+export interface CruiseTeaser {
+  headline?: string;
+  capacity?: string;
+  minimumDuration?: string;
+  pricing?: string;
+  image?: SanityImage;
+}
+
 export interface FullWidthImageBlock {
   _type?: 'fullWidthImageBlock';
   _key?: string;
@@ -100,6 +108,8 @@ export interface CruisePageSummary {
   heroTitle?: string;
   heroImage?: SanityImage;
   excerpt?: string;
+  destinationLabel?: string;
+  editorialPriority?: number;
   _createdAt?: string;
 }
 
@@ -109,6 +119,7 @@ export interface CruisePage extends CruisePageSummary {
   seoTitle?: string;
   seoDescription?: string;
   hero?: CruiseHeroBlock;
+  cruiseTeaser?: CruiseTeaser;
   pitch?: PitchBlock;
   featuredImage?: FullWidthImageBlock;
   boat?: BoatBlock;
@@ -197,11 +208,17 @@ const imageFields = `{
 
 const cruisePageFields = `
   ${localizedDocumentFields},
+  destinationLabel,
+  editorialPriority,
   seoTitle,
   seoDescription,
   hero{
     ...,
     backgroundImage${imageFields}
+  },
+  cruiseTeaser{
+    ...,
+    image${imageFields}
   },
   pitch,
   featuredImage{
@@ -223,15 +240,17 @@ const cruisePageFields = `
 
 const cruisePageFilter = buildLocalizedSluggedDocumentFilter('cruisePage');
 
-const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter}] | order(_createdAt desc) {
+const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter}] | order(coalesce(editorialPriority, 0) desc, _createdAt desc) {
   _id,
   _createdAt,
   ${localizedDocumentFields},
   title,
+  destinationLabel,
+  editorialPriority,
   "slug": slug.current,
   "heroTitle": hero.title,
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": pitch.accroche
+  "excerpt": coalesce(cruiseTeaser.headline, pitch.accroche)
 }`;
 
 const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
@@ -239,10 +258,12 @@ const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
   _createdAt,
   ${localizedDocumentFields},
   title,
+  destinationLabel,
+  editorialPriority,
   "slug": slug.current,
   "heroTitle": hero.title,
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": pitch.accroche,
+  "excerpt": coalesce(cruiseTeaser.headline, pitch.accroche),
   ${cruisePageFields}
 }`;
 
@@ -307,15 +328,17 @@ const ACTIVITIES_QUERY = `*[
 const RELATED_CRUISES_QUERY = `*[
   ${cruisePageFilter} &&
   slug.current != $slug
-] | order(_createdAt desc)[0...$limit] {
+] | order(coalesce(editorialPriority, 0) desc, _createdAt desc)[0...$limit] {
   _id,
   _createdAt,
   ${localizedDocumentFields},
   title,
+  destinationLabel,
+  editorialPriority,
   "slug": slug.current,
   "heroTitle": hero.title,
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": pitch.accroche
+  "excerpt": coalesce(cruiseTeaser.headline, pitch.accroche)
 }`;
 
 export async function getCruisePages(locale: Locale = defaultLocale) {

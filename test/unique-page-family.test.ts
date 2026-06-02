@@ -6,22 +6,7 @@ import { boatPage } from '../schemas/boatPage';
 import { componentsTestPage } from '../schemas/componentsTestPage';
 import { contactPage } from '../schemas/contactPage';
 import { homePage } from '../schemas/homePage';
-
-const expectedPageBuilderTypes = [
-  'heroHeaderBlock',
-  'homeHeroBlock',
-  'pitchBlock',
-  'galleryBlock',
-  'marqueeGalleryBlock',
-  'editorialBlock',
-  'boatBlock',
-  'videoFeatureBlock',
-  'whyUsBlock',
-  'reviewsBlock',
-  'bookingBlock',
-  'relatedCruisesBlock',
-  'fullWidthImageBlock',
-];
+import { uniquePageBuilderBlockTypes } from '../schemas/pageBuilder';
 
 describe('unique page family schema', () => {
   it('registers the homepage, boat page, and contact page documents', () => {
@@ -37,8 +22,18 @@ describe('unique page family schema', () => {
       const pageBuilderField = page.fields.find((field) => field.name === 'pageBuilder');
 
       expect(pageBuilderField?.type).toBe('array');
-      expect((pageBuilderField as any)?.of?.map((member: any) => member.type)).toEqual(expectedPageBuilderTypes);
+      expect((pageBuilderField as any)?.of?.map((member: any) => member.type)).toEqual(uniquePageBuilderBlockTypes);
     }
+  });
+
+  it('keeps shared-block placeholders available for Page éditoriale page builders', async () => {
+    const pageBuilderSource = await readFile('src/components/blocks/PageBuilder.astro', 'utf8');
+    const querySource = await readFile('src/lib/page-builder.ts', 'utf8');
+
+    expect(uniquePageBuilderBlockTypes).toEqual(expect.arrayContaining(['whyUsBlock', 'reviewsBlock']));
+    expect(querySource).toContain('_type in ["whyUsBlock", "reviewsBlock"');
+    expect(pageBuilderSource).toContain('<WhyUsBlock settings={settings} locale={locale} />');
+    expect(pageBuilderSource).toContain('<ReviewsBlock reviews={reviews} locale={locale} />');
   });
 
   it('adds locale metadata fields to the unique page family documents', () => {

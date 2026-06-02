@@ -24,6 +24,20 @@ export const cruisePage = defineType({
     }),
     ...defineLocalizationFields(),
     defineField({
+      name: 'destinationLabel',
+      title: 'Libellé destination',
+      type: 'string',
+      description: 'Nom court de la destination utilisé dans les blocs partagés et les formulations sensibles à la grammaire.',
+      validation: (rule) => rule.required().warning('Ajoutez le libellé destination pour personnaliser les blocs partagés.'),
+    }),
+    defineField({
+      name: 'editorialPriority',
+      title: 'Priorité éditoriale',
+      type: 'number',
+      description: 'Priorité utilisée pour ordonner Autres croisières. Une valeur plus élevée remonte la page.',
+      initialValue: 0,
+    }),
+    defineField({
       name: 'seoTitle',
       title: 'SEO title',
       type: 'string',
@@ -38,33 +52,70 @@ export const cruisePage = defineType({
     }),
     defineField({
       name: 'hero',
-      title: 'Hero',
+      title: 'Hero croisière',
       type: 'heroBlock',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().warning('Ajoutez le Hero croisière pour présenter la page.'),
+    }),
+    defineField({
+      name: 'cruiseTeaser',
+      title: 'Accroche croisière',
+      type: 'object',
+      validation: (rule) => rule.required().warning("Ajoutez l'Accroche croisière pour qualifier l'expérience rapidement."),
+      fields: [
+        defineField({
+          name: 'headline',
+          title: 'Titre',
+          type: 'text',
+          rows: 3,
+        }),
+        defineField({
+          name: 'capacity',
+          title: 'Capacité',
+          type: 'string',
+        }),
+        defineField({
+          name: 'minimumDuration',
+          title: 'Durée minimum',
+          type: 'string',
+        }),
+        defineField({
+          name: 'pricing',
+          title: 'Tarif',
+          type: 'string',
+        }),
+        defineField({
+          name: 'image',
+          title: 'Image',
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+        }),
+      ],
     }),
     defineField({
       name: 'pitch',
       title: 'Pitch',
       type: 'pitchBlock',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().warning('Ajoutez le pitch existant tant que les contenus sont en migration.'),
     }),
     defineField({
       name: 'featuredImage',
       title: 'Featured image',
       type: 'fullWidthImageBlock',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().warning('Ajoutez une image éditoriale pour compléter la page.'),
     }),
     defineField({
       name: 'boat',
       title: 'Boat',
       type: 'boatBlock',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().warning('Ajoutez le bateau recommandé pour renforcer la conversion.'),
     }),
     defineField({
       name: 'itinerary',
       title: 'Itinerary',
       type: 'itineraryBlock',
-      validation: (rule) => rule.required(),
+      validation: (rule) => rule.required().warning('Ajoutez un itinéraire indicatif pour rendre la croisière concrète.'),
     }),
   ],
   preview: {

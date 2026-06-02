@@ -50,10 +50,16 @@ const components = {
     line-height: 1.6;
   }
 
-  .blog-content :global(ul),
+  .blog-content :global(ul) {
+    margin: 1.25rem 0;
+    padding-left: 1.5rem;
+    list-style-type: disc;
+  }
+
   .blog-content :global(ol) {
     margin: 1.25rem 0;
     padding-left: 1.5rem;
+    list-style-type: decimal;
   }
 
   .blog-content :global(li) {

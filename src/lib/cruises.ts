@@ -77,7 +77,6 @@ export interface ItineraryBlock {
   _key?: string;
   title?: string;
   route?: string;
-  disclaimer?: string;
   steps?: ItineraryStep[];
 }
 
@@ -328,7 +327,7 @@ const ACTIVITIES_QUERY = `*[
 const RELATED_CRUISES_QUERY = `*[
   ${cruisePageFilter} &&
   slug.current != $slug
-] | order(coalesce(editorialPriority, 0) desc, _createdAt desc)[0...$limit] {
+] | order(coalesce(editorialPriority, 0) desc, _createdAt desc) {
   _id,
   _createdAt,
   ${localizedDocumentFields},
@@ -381,10 +380,10 @@ export async function getActivities(locale: Locale = defaultLocale) {
   return sanityClient.fetch<Activity[]>(ACTIVITIES_QUERY, { locale }).catch(() => []);
 }
 
-export async function getRelatedCruises(slug: string, limit = 3, locale: Locale = defaultLocale) {
+export async function getRelatedCruises(slug: string, locale: Locale = defaultLocale) {
   if (!isSanityConfigured) {
     return [];
   }
 
-  return sanityClient.fetch<CruisePageSummary[]>(RELATED_CRUISES_QUERY, { slug, limit, locale }).catch(() => []);
+  return sanityClient.fetch<CruisePageSummary[]>(RELATED_CRUISES_QUERY, { slug, locale }).catch(() => []);
 }

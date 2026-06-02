@@ -18,12 +18,6 @@ export const itineraryBlock = defineType({
       description: 'Example: Hiva Oa > Tahuata > Fatu Hiva',
     }),
     defineField({
-      name: 'disclaimer',
-      title: 'Disclaimer',
-      type: 'text',
-      rows: 3,
-    }),
-    defineField({
       name: 'steps',
       title: 'Steps',
       type: 'array',

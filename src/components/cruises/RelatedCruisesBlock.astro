@@ -1,6 +1,5 @@
 ---
 import Container from '../layout/Container.astro';
-import Grid from '../layout/Grid.astro';
 import Section from '../layout/Section.astro';
 import type { CruisePageSummary } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
@@ -24,13 +23,13 @@ const copy = getSiteCopy(locale);
           <p class="text-sm font-bold uppercase tracking-[0.16em] text-primary">{copy.blocks.relatedCruisesEyebrow}</p>
           <h2 class="mt-3 font-heading font-semibold leading-tight text-foreground">{copy.blocks.relatedCruisesTitle}</h2>
         </div>
-        <Grid columns={3}>
+        <div class="flex overflow-x-auto gap-6 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {cruises.map((cruise) => {
             const imageUrl = cruise.heroImage ? urlForImage(cruise.heroImage)?.width(760).height(500).fit('crop').quality(82).auto('format').url() : undefined;
             const cruisePath = localizePath(`/nos-croisieres/${cruise.slug}/`, locale);
 
             return (
-              <article class="overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card shadow-xs transition hover:-translate-y-1 hover:shadow-md">
+              <article class="min-w-[320px] w-[320px] shrink-0 overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card shadow-xs transition hover:-translate-y-1 hover:shadow-md">
                 <a href={cruisePath} class="block">
                   {imageUrl ? (
                     <img src={imageUrl} alt={cruise.heroImage?.alt || ''} width="760" height="500" loading="lazy" decoding="async" class="aspect-[1.52] w-full object-cover" />
@@ -47,7 +46,7 @@ const copy = getSiteCopy(locale);
               </article>
             );
           })}
-        </Grid>
+        </div>
       </Container>
     </Section>
   )

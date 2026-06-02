@@ -37,7 +37,7 @@ const cruise = ((await getCruisePage(summary.slug, locale)) || summary) as Cruis
 const [settings, reviews, relatedCruises] = await Promise.all([
   getSiteSettings(locale),
   getReviews(3),
-  getRelatedCruises(cruise.slug, 3, locale),
+  getRelatedCruises(cruise.slug, locale),
 ]);
 
 const title = cruise.seoTitle || `${cruise.title} | Tahiti Guest Boat`;
@@ -58,7 +58,7 @@ const itinerary = cruise.itinerary || { title: copy.blocks.itineraryTitle, steps
     <ItineraryBlock block={itinerary} locale={locale} />
     <WhyUsBlock settings={settings} locale={locale} />
     <ReviewsBlock reviews={reviews} locale={locale} />
-    <BookingBlock settings={settings} locale={locale} />
+    <BookingBlock settings={settings} locale={locale} destinationLabel={cruise.destinationLabel} />
     <RelatedCruisesBlock cruises={relatedCruises} locale={locale} />
   </main>
 </BaseLayout>

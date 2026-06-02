@@ -9,12 +9,14 @@ import { getSiteCopy } from '../../lib/site-copy';
 interface Props {
   settings?: SiteSettings | null;
   locale?: Locale;
+  destinationLabel?: string | null;
 }
 
-const { settings, locale = defaultLocale } = Astro.props;
+const { settings, locale = defaultLocale, destinationLabel } = Astro.props;
 const copy = getSiteCopy(locale);
 const booking = settings?.bookingEmbed;
-const title = booking?.title || copy.blocks.bookingTitle;
+const baseTitle = booking?.title || copy.blocks.bookingTitle;
+const title = destinationLabel ? `${baseTitle} ${destinationLabel}` : baseTitle;
 const ctaLabel = booking?.fallbackCtaLabel || copy.blocks.bookingFallbackCta;
 const ctaUrl = booking?.fallbackCtaUrl || '/contact';
 ---

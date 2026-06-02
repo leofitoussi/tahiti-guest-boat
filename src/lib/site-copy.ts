@@ -55,6 +55,7 @@ export interface SiteCopy {
       relatedCruisesTitle: string;
       itineraryEyebrow: string;
       itineraryTitle: string;
+      itineraryDisclaimer: string;
       bookingEyebrow: string;
     bookingTitle: string;
     bookingProviderPrefix: string;
@@ -132,6 +133,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
       relatedCruisesTitle: 'Autres inspirations de croisière',
       itineraryEyebrow: 'Itinéraire indicatif',
       itineraryTitle: 'Itinéraire indicatif',
+      itineraryDisclaimer: "Cet itinéraire est donné à titre indicatif. Il s'adapte en fonction des conditions météorologiques, des marées et des préférences des passagers.",
       bookingEyebrow: 'Réservation',
       bookingTitle: 'Préparer votre croisière',
       bookingProviderPrefix: 'Module',
@@ -208,6 +210,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
       relatedCruisesTitle: 'More cruise inspiration',
       itineraryEyebrow: 'Indicative itinerary',
       itineraryTitle: 'Indicative itinerary',
+      itineraryDisclaimer: 'This itinerary is provided as a guide only. It adapts according to weather conditions, tides, and passenger preferences.',
       bookingEyebrow: 'Booking',
       bookingTitle: 'Plan your cruise',
       bookingProviderPrefix: 'Module',

@@ -16,24 +16,36 @@ const { block, locale = defaultLocale } = Astro.props;
 const copy = getSiteCopy(locale);
 ---
 
-<Section padding="lg" class="bg-background">
-  <Container>
-    <div class="mb-12 flex max-w-4xl flex-col gap-4">
-      <p class="text-sm font-bold uppercase tracking-[0.16em] text-primary">{copy.blocks.itineraryEyebrow}</p>
-      <h2 class="font-heading font-semibold leading-tight text-foreground">{block.title}</h2>
-      {block.route && <p class="text-lg font-semibold text-muted-foreground">{block.route}</p>}
-      {block.disclaimer && <p class="max-w-3xl text-sm leading-relaxed text-muted-foreground">{block.disclaimer}</p>}
-    </div>
-    {
-      block.steps && block.steps.length > 0 && (
-        <div class="grid gap-8">
-          {block.steps.map((step) => {
-            const imageUrl = step.image ? urlForImage(step.image)?.width(760).height(500).fit('crop').quality(82).auto('format').url() : undefined;
+{
+  block.steps && block.steps.length > 0 && (
+    <Section padding="lg" class="bg-background">
+      <Container>
+        <div class="mb-12 flex max-w-4xl flex-col gap-4">
+          <p class="text-sm font-bold uppercase tracking-[0.16em] text-primary">{copy.blocks.itineraryEyebrow}</p>
+          <h2 class="font-heading font-semibold leading-tight text-foreground">{block.title}</h2>
+          {block.route && <p class="text-lg font-semibold text-muted-foreground">{block.route}</p>}
+          <p class="max-w-3xl text-sm leading-relaxed text-muted-foreground">{copy.blocks.itineraryDisclaimer}</p>
+        </div>
+        <div class="flex flex-col divide-y divide-border">
+          {block.steps.map((step, index) => {
+            const imageUrl = step.image
+              ? urlForImage(step.image)?.width(760).height(500).fit('crop').quality(82).auto('format').url()
+              : undefined;
 
             return (
-              <article class="grid gap-6 border-t border-border pt-8 md:grid-cols-[0.8fr_1.2fr]">
-                <div>
-                  {step.dayLabel && <h3 class="font-heading font-semibold text-primary">{step.dayLabel}</h3>}
+              <details class="group py-8" open={index === 0}>
+                <summary class="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
+                  {step.dayLabel && (
+                    <h3 class="font-heading font-semibold text-primary">{step.dayLabel}</h3>
+                  )}
+                  <span
+                    class="ml-auto shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
+                    aria-hidden="true"
+                  >
+                    ↓
+                  </span>
+                </summary>
+                <div class="mt-6 grid gap-6 md:grid-cols-[0.8fr_1.2fr]">
                   {imageUrl && (
                     <img
                       src={imageUrl}
@@ -42,16 +54,16 @@ const copy = getSiteCopy(locale);
                       height="500"
                       loading="lazy"
                       decoding="async"
-                      class="mt-5 aspect-[1.52] w-full rounded-[var(--radius-surface)] object-cover ring-1 ring-border/70"
+                      class="aspect-[1.52] w-full rounded-[var(--radius-surface)] object-cover ring-1 ring-border/70"
                     />
                   )}
+                  <CruisePortableText value={step.description} />
                 </div>
-                <CruisePortableText value={step.description} />
-              </article>
+              </details>
             );
           })}
         </div>
-      )
-    }
-  </Container>
-</Section>
+      </Container>
+    </Section>
+  )
+}

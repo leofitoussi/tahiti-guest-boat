@@ -28,7 +28,9 @@ export default defineConfig({
     },
   },
   integrations: [
-    sitemap(),
+    sitemap({
+      filter: (page) => !page.includes('/composants'),
+    }),
     sanity({
       projectId,
       dataset,

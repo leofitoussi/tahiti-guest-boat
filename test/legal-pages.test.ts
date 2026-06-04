@@ -53,7 +53,7 @@ describe('legal page schema', () => {
 
     const memberTypes: string[] = bodyField.of.map((m: any) => m.type);
     const pageBuilderTypes = [
-      'heroHeaderBlock', 'homeHeroBlock', 'pitchBlock', 'galleryBlock',
+      'heroHeaderBlock', 'homeHeroBlock', 'galleryBlock',
       'editorialBlock', 'boatBlock', 'videoFeatureBlock', 'whyUsBlock',
       'reviewsBlock', 'bookingBlock', 'relatedCruisesBlock', 'fullWidthImageBlock',
     ];

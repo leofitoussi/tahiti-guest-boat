@@ -18,16 +18,6 @@ export interface CruiseHeroBlock {
   ctaUrl?: string;
 }
 
-export interface PitchBlock {
-  _type?: 'pitchBlock';
-  _key?: string;
-  accroche?: string;
-  badges?: {
-    icon?: string;
-    label?: string;
-  }[];
-}
-
 export interface CruiseTeaser {
   headline?: string;
   capacity?: string;
@@ -43,15 +33,14 @@ export interface FullWidthImageBlock {
 }
 
 export interface CruiseGallery {
-  title?: string;
+  title?: TypedObject[];
   text?: TypedObject[];
   images?: SanityImage[];
 }
 
 export interface CruiseIntro {
-  heading?: string;
+  heading?: TypedObject[];
   body?: TypedObject[];
-  highlight?: string;
   image?: SanityImage;
 }
 
@@ -154,7 +143,6 @@ export interface CruisePage extends CruisePageSummary {
   cruiseTeaser?: CruiseTeaser;
   gallery?: CruiseGallery;
   cruiseIntro?: CruiseIntro;
-  pitch?: PitchBlock;
   featuredImage?: FullWidthImageBlock;
   introductionDestination?: IntroductionDestination;
   experienceCroisiere?: ExperienceCroisiere;
@@ -265,10 +253,8 @@ const cruisePageFields = `
   cruiseIntro{
     heading,
     body,
-    highlight,
     image${imageFields}
   },
-  pitch,
   featuredImage{
     ...,
     image${imageFields}
@@ -324,7 +310,7 @@ const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter}] | order(coalesce(editorialP
   "slug": slug.current,
   "heroTitle": hero.title,
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": coalesce(cruiseTeaser.headline, pitch.accroche)
+  "excerpt": cruiseTeaser.headline
 }`;
 
 const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
@@ -337,7 +323,7 @@ const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
   "slug": slug.current,
   "heroTitle": hero.title,
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": coalesce(cruiseTeaser.headline, pitch.accroche),
+  "excerpt": cruiseTeaser.headline,
   ${cruisePageFields}
 }`;
 
@@ -412,7 +398,7 @@ const RELATED_CRUISES_QUERY = `*[
   "slug": slug.current,
   "heroTitle": hero.title,
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": coalesce(cruiseTeaser.headline, pitch.accroche)
+  "excerpt": cruiseTeaser.headline
 }`;
 
 export async function getCruisePages(locale: Locale = defaultLocale) {

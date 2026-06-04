@@ -74,10 +74,20 @@ const components = {
     line-height: 1.6;
   }
 
+  /* Tailwind's preflight resets list markers; restore them for editorial lists. */
   .cruise-content :global(ul),
   .cruise-content :global(ol) {
     margin: 1.25rem 0;
     padding-left: 1.5rem;
+    list-style-position: outside;
+  }
+
+  .cruise-content :global(ul) {
+    list-style-type: disc;
+  }
+
+  .cruise-content :global(ol) {
+    list-style-type: decimal;
   }
 
   .cruise-content :global(li) {

@@ -1,6 +1,8 @@
 ---
+import { PortableText } from 'astro-portabletext';
 import MarqueeGallery from '../blocks/MarqueeGallery.astro';
 import CruisePortableText from './CruisePortableText.astro';
+import GalleryHeading from './GalleryHeading.astro';
 import type { CruiseGallery } from '../../lib/cruises';
 
 interface Props {
@@ -9,13 +11,22 @@ interface Props {
 
 const { block } = Astro.props;
 const images = block?.images ?? [];
+const hasTitle = Array.isArray(block?.title) && block.title.length > 0;
 const hasText = Array.isArray(block?.text) && block.text.length > 0;
+
+// Render each title block as the section <h2>, keeping inline bold/italic marks.
+const titleComponents = { block: { normal: GalleryHeading } };
 ---
 
 {
   images.length > 0 && (
-    <MarqueeGallery title={block?.title} row1={images}>
-      {hasText && <CruisePortableText slot="description" value={block?.text} class="max-w-2xl" />}
+    <MarqueeGallery row1={images}>
+      {hasTitle && (
+        <Fragment slot="title">
+          <PortableText value={block?.title ?? []} components={titleComponents} />
+        </Fragment>
+      )}
+      {hasText && <CruisePortableText slot="description" value={block?.text} />}
     </MarqueeGallery>
   )
 }

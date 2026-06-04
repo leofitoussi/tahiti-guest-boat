@@ -1,0 +1,7 @@
+---
+// Portable Text block serializer for the gallery title.
+// Renders each block as the section <h2> while preserving inline marks
+// (bold / italic) emitted by astro-portabletext's default mark serializers.
+---
+
+<h2 class="font-heading font-semibold text-foreground"><slot /></h2>

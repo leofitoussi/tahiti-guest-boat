@@ -60,7 +60,7 @@ describe('Page croisière schema — fixed template base fields', () => {
   it('warns about important missing template sections without blocking publication', () => {
     const fields = Object.fromEntries(cruisePage.fields.map((field) => [field.name, field as any]));
 
-    for (const fieldName of ['hero', 'cruiseTeaser', 'pitch', 'featuredImage', 'boat', 'itinerary']) {
+    for (const fieldName of ['hero', 'cruiseTeaser', 'featuredImage', 'boat', 'itinerary']) {
       const rule = new ValidationProbe();
 
       fields[fieldName].validation(rule);
@@ -217,7 +217,7 @@ describe('cruise page template — fixed section order', () => {
     expect(source).toContain('<ReviewsBlock reviews={reviews} locale={locale} />');
   });
 
-  it('renders sections in the fixed order: Hero → Accroche → Gallery → CruiseIntro → Pitch → FullWidthImage → IntroductionDestination → ExperienceCroisiere → BateauRecommande → Boat → Itinerary → WhyUs → Reviews → Booking → RelatedCruises', async () => {
+  it('renders sections in the fixed order: Hero → Accroche → Gallery → CruiseIntro → FullWidthImage → IntroductionDestination → ExperienceCroisiere → BateauRecommande → Boat → Itinerary → WhyUs → Reviews → Booking → RelatedCruises', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
 
     const ORDERED_SECTIONS = [
@@ -225,7 +225,6 @@ describe('cruise page template — fixed section order', () => {
       'CruiseTeaserBlock',
       'CruiseGalleryBlock',
       'CruiseIntroBlock',
-      'PitchBlock',
       'FullWidthImageBlock',
       'IntroductionDestinationBlock',
       'ExperienceCroisiereBlock',
@@ -251,28 +250,28 @@ describe('cruise page template — fixed section order', () => {
 // ── Cycle 11 — Bloc intro croisière après galerie ──────────────────────────
 
 describe('CruiseIntroBlock — schema and data flow', () => {
-  it('cruisePage exposes editable cruiseIntro fields for heading, body, highlight, and image', () => {
+  it('cruisePage exposes editable cruiseIntro fields for stylable heading, body, and image', () => {
     const fields = Object.fromEntries(cruisePage.fields.map((f) => [f.name, f as any]));
     expect(fields.cruiseIntro).toMatchObject({ type: 'object' });
 
     const sub = Object.fromEntries(fields.cruiseIntro.fields.map((f: any) => [f.name, f]));
-    expect(sub.heading).toMatchObject({ type: 'string' });
+    expect(sub.heading).toMatchObject({ type: 'array' });
     expect(sub.body).toMatchObject({ type: 'array' });
-    expect(sub.highlight).toMatchObject({ type: 'text' });
+    expect(sub.highlight).toBeUndefined();
     expect(sub.image).toMatchObject({ type: 'image' });
   });
 
   it('cruises.ts projects cruiseIntro content and image metadata', async () => {
     const source = await readFile('src/lib/cruises.ts', 'utf8');
     expect(source).toContain('cruiseIntro{');
-    expect(source).toContain('highlight');
     expect(source).toContain('image');
     expect(source).toContain('export interface CruiseIntro');
+    expect(source).not.toContain('highlight?: string');
   });
 
   it('template renders CruiseIntroBlock immediately after CruiseGalleryBlock', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
-    const order = ['CruiseGalleryBlock', 'CruiseIntroBlock', 'PitchBlock'];
+    const order = ['CruiseGalleryBlock', 'CruiseIntroBlock', 'FullWidthImageBlock'];
 
     let last = -1;
     for (const tag of order) {

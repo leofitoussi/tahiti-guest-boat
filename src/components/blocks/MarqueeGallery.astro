@@ -42,6 +42,7 @@ interface Props {
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 const { eyebrow, title, row1 = [], row2 = [], row3 = [] } = Astro.props;
+const hasTitleSlot = Astro.slots.has('title');
 const hasDescription = Astro.slots.has('description');
 
 const SRCSET_WIDTHS = [400, 800, 1200];
@@ -82,13 +83,17 @@ const rows = [
 ---
 
 <Section class="bg-background overflow-hidden">
-  {(eyebrow || title || hasDescription) && (
+  {(eyebrow || title || hasTitleSlot || hasDescription) && (
     <Container>
       <div class="mb-10 flex flex-col gap-3">
         {eyebrow && (
           <p class="text-sm font-semibold uppercase tracking-[0.14em] text-primary">{eyebrow}</p>
         )}
-        {title && <h2 class="font-heading font-semibold text-foreground">{title}</h2>}
+        {hasTitleSlot ? (
+          <slot name="title" />
+        ) : (
+          title && <h2 class="font-heading font-semibold text-foreground">{title}</h2>
+        )}
         <slot name="description" />
       </div>
     </Container>

@@ -76,11 +76,6 @@ const pageBuilderFields = `pageBuilder[]{
     }
   },
 
-  _type == "pitchBlock" => {
-    accroche,
-    badges[]{ icon, label }
-  },
-
   _type == "editorialBlock" => {
     title,
     body,

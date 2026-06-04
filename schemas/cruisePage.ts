@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 import { defineLocalizationFields } from './localization-fields';
-import { activityDescriptionText, richText } from './portableText';
+import { activityDescriptionText, h2HeadingText, inlineText, richText } from './portableText';
 
 export const cruisePage = defineType({
   name: 'cruisePage',
@@ -100,7 +100,13 @@ export const cruisePage = defineType({
       type: 'object',
       description: 'Une rangée de photos qui défile sous l’accroche croisière.',
       fields: [
-        defineField({ name: 'title', title: 'Titre', type: 'string' }),
+        defineField({
+          name: 'title',
+          title: 'Titre',
+          type: 'array',
+          of: inlineText,
+          description: 'Titre de la section (gras / italique possibles).',
+        }),
         defineField({
           name: 'text',
           title: 'Texte libre',
@@ -142,19 +148,14 @@ export const cruisePage = defineType({
         defineField({
           name: 'heading',
           title: 'Titre',
-          type: 'string',
+          type: 'array',
+          of: h2HeadingText,
         }),
         defineField({
           name: 'body',
           title: 'Texte',
           type: 'array',
           of: richText,
-        }),
-        defineField({
-          name: 'highlight',
-          title: 'Phrase mise en avant',
-          type: 'text',
-          rows: 2,
         }),
         defineField({
           name: 'image',
@@ -171,12 +172,6 @@ export const cruisePage = defineType({
           ],
         }),
       ],
-    }),
-    defineField({
-      name: 'pitch',
-      title: 'Pitch',
-      type: 'pitchBlock',
-      validation: (rule) => rule.required().warning('Ajoutez le pitch existant tant que les contenus sont en migration.'),
     }),
     defineField({
       name: 'featuredImage',

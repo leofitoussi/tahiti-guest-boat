@@ -21,7 +21,6 @@ import { homeHeroBlock } from './homeHeroBlock';
 import { homePage } from './homePage';
 import { itineraryBlock } from './itineraryBlock';
 import { itineraryStep } from './itineraryStep';
-import { pitchBlock } from './pitchBlock';
 import { relatedCruisesBlock } from './relatedCruisesBlock';
 import { review } from './review';
 import { reviewsBlock } from './reviewsBlock';
@@ -55,7 +54,6 @@ export const schemaTypes = [
   heroBlock,
   galleryBlock,
   marqueeGalleryBlock,
-  pitchBlock,
   fullWidthImageBlock,
   editorialBlock,
   boatBlock,

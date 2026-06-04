@@ -11,7 +11,10 @@ interface Props {
 
 const { block } = Astro.props;
 
-const hasContent = block && (block.heading || (block.body && block.body.length > 0) || block.highlight || block.image);
+const headingValue = Array.isArray(block?.heading) ? block.heading : undefined;
+const legacyHeading = typeof block?.heading === 'string' ? block.heading : undefined;
+const hasHeading = Boolean((headingValue && headingValue.length > 0) || legacyHeading);
+const hasContent = block && (hasHeading || (block.body && block.body.length > 0) || block.image);
 if (!hasContent) return;
 
 const imageUrl = block.image
@@ -23,9 +26,9 @@ const imageUrl = block.image
   <Container>
     <div class="grid gap-12 lg:grid-cols-[0.92fr_1fr] lg:items-center xl:gap-16">
       <div class="flex flex-col gap-7">
-        {block.heading && <h2 class="font-heading text-4xl leading-tight text-primary md:text-6xl">{block.heading}</h2>}
-        {block.body && block.body.length > 0 && <CruisePortableText value={block.body} />}
-        {block.highlight && <p class="text-lg font-extrabold leading-relaxed text-foreground">{block.highlight}</p>}
+        {headingValue && headingValue.length > 0 && <CruisePortableText value={headingValue} class="cruise-intro-heading" />}
+        {legacyHeading && <h2 class="font-heading text-4xl leading-tight !text-primary md:text-6xl">{legacyHeading}</h2>}
+        {block.body && block.body.length > 0 && <CruisePortableText value={block.body} class="cruise-intro-body" />}
       </div>
       {
         imageUrl && (
@@ -44,3 +47,33 @@ const imageUrl = block.image
     </div>
   </Container>
 </Section>
+
+<style>
+  .cruise-intro-heading :global(h2) {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-size: 2.25rem;
+    line-height: 1.08;
+    color: var(--primary);
+  }
+
+  .cruise-intro-heading :global(strong) {
+    font-weight: 700;
+  }
+
+  .cruise-intro-heading :global(em) {
+    font-style: italic;
+  }
+
+  .cruise-intro-body :global(p) {
+    margin: 1.25rem 0;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+
+  @media (min-width: 768px) {
+    .cruise-intro-heading :global(h2) {
+      font-size: 3.75rem;
+    }
+  }
+</style>

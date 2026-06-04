@@ -4,7 +4,6 @@ export const uniquePageBuilderBlockTypes = [
   'heroHeaderBlock',
   'heroImageOverlayBlock',
   'homeHeroBlock',
-  'pitchBlock',
   'galleryBlock',
   'marqueeGalleryBlock',
   'editorialBlock',

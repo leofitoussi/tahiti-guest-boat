@@ -80,11 +80,6 @@ const HOME_QUERY = `*[_type == "homePage"] | order(_updatedAt desc)[0]{
       }
     },
 
-    _type == "pitchBlock" => {
-      accroche,
-      badges[]{ icon, label }
-    },
-
     _type == "editorialBlock" => {
       title,
       body,

@@ -12,6 +12,6 @@ const images = block?.images ?? [];
 
 {
   images.length > 0 && (
-    <MarqueeGallery eyebrow={block?.eyebrow} title={block?.title} row1={images} />
+    <MarqueeGallery title={block?.title} description={block?.text} row1={images} />
   )
 }

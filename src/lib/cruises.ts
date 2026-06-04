@@ -43,8 +43,8 @@ export interface FullWidthImageBlock {
 }
 
 export interface CruiseGallery {
-  eyebrow?: string;
   title?: string;
+  text?: string;
   images?: SanityImage[];
 }
 
@@ -250,8 +250,8 @@ const cruisePageFields = `
     image${imageFields}
   },
   gallery{
-    eyebrow,
     title,
+    text,
     images[]${imageFields}
   },
   pitch,

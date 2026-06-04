@@ -100,8 +100,14 @@ export const cruisePage = defineType({
       type: 'object',
       description: 'Une rangée de photos qui défile sous l’accroche croisière.',
       fields: [
-        defineField({ name: 'eyebrow', title: 'Surtitre', type: 'string' }),
         defineField({ name: 'title', title: 'Titre', type: 'string' }),
+        defineField({
+          name: 'text',
+          title: 'Texte libre',
+          type: 'text',
+          rows: 4,
+          description: 'Paragraphe d’introduction affiché sous le titre, avant les images.',
+        }),
         defineField({
           name: 'images',
           title: 'Images',

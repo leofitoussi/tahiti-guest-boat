@@ -42,6 +42,12 @@ export interface FullWidthImageBlock {
   image?: SanityImage;
 }
 
+export interface CruiseGallery {
+  eyebrow?: string;
+  title?: string;
+  images?: SanityImage[];
+}
+
 export interface EditorialBlock {
   _type: 'editorialBlock';
   _key?: string;
@@ -139,6 +145,7 @@ export interface CruisePage extends CruisePageSummary {
   seoDescription?: string;
   hero?: CruiseHeroBlock;
   cruiseTeaser?: CruiseTeaser;
+  gallery?: CruiseGallery;
   pitch?: PitchBlock;
   featuredImage?: FullWidthImageBlock;
   introductionDestination?: IntroductionDestination;
@@ -241,6 +248,11 @@ const cruisePageFields = `
   cruiseTeaser{
     ...,
     image${imageFields}
+  },
+  gallery{
+    eyebrow,
+    title,
+    images[]${imageFields}
   },
   pitch,
   featuredImage{

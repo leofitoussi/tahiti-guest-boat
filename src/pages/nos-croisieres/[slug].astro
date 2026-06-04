@@ -2,6 +2,7 @@
 import BateauRecommandeBlock from '../../components/cruises/BateauRecommandeBlock.astro';
 import BoatBlock from '../../components/cruises/BoatBlock.astro';
 import BookingBlock from '../../components/cruises/BookingBlock.astro';
+import CruiseGalleryBlock from '../../components/cruises/CruiseGalleryBlock.astro';
 import CruiseTeaserBlock from '../../components/cruises/CruiseTeaserBlock.astro';
 import ExperienceCroisiereBlock from '../../components/cruises/ExperienceCroisiereBlock.astro';
 import FullWidthImageBlock from '../../components/cruises/FullWidthImageBlock.astro';
@@ -77,6 +78,7 @@ const structuredData = [
   <main class="bg-background">
     <HeroBlock block={hero} locale={locale} />
     <CruiseTeaserBlock block={cruise.cruiseTeaser} />
+    <CruiseGalleryBlock block={cruise.gallery} />
     <PitchBlock block={pitch} />
     <FullWidthImageBlock block={featuredImage} />
     <IntroductionDestinationBlock block={cruise.introductionDestination} />

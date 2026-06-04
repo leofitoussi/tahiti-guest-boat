@@ -1,6 +1,5 @@
 ---
 import Container from '../layout/Container.astro';
-import Section from '../layout/Section.astro';
 import type { CruiseTeaser } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
 
@@ -11,7 +10,10 @@ interface Props {
 const { block } = Astro.props;
 
 const imageUrl = block?.image
-  ? urlForImage(block.image)?.width(1200).height(800).fit('crop').quality(84).auto('format').url()
+  ? urlForImage(block.image)?.width(1600).height(900).fit('crop').quality(84).auto('format').url()
+  : undefined;
+const placeholder = block?.image
+  ? urlForImage(block.image)?.width(40).height(23).fit('crop').blur(18).quality(35).auto('format').url()
   : undefined;
 
 const hasContent = Boolean(block?.headline || imageUrl);
@@ -21,74 +23,105 @@ const markers = [
   {
     label: 'Capacité',
     value: block?.capacity,
-    // person-group icon
-    svgPath:
-      'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z',
+    svgPaths: [
+      'M12 11.25a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z',
+      'M5.75 19.25c.74-3.1 3.04-5.05 6.25-5.05s5.51 1.95 6.25 5.05',
+      'M18.2 10.2a2.45 2.45 0 0 0 .2-4.78',
+      'M20.5 17.75a5.7 5.7 0 0 0-3-3.02',
+    ],
   },
   {
     label: 'Durée minimum',
     value: block?.minimumDuration,
-    // clock icon
-    svgPath:
-      'M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z',
+    svgPaths: [
+      'M6.75 3.75v2.5',
+      'M17.25 3.75v2.5',
+      'M5.25 6h13.5c.83 0 1.5.67 1.5 1.5v11c0 .83-.67 1.5-1.5 1.5H5.25c-.83 0-1.5-.67-1.5-1.5v-11c0-.83.67-1.5 1.5-1.5Z',
+      'M3.75 10h16.5',
+      'M12 13.25v3.25l2.25 1.25',
+    ],
   },
   {
     label: 'Tarif',
     value: block?.pricing,
-    // price tag icon
-    svgPath:
-      'M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58s1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41s-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z',
+    svgPaths: [
+      'M7.25 4.75h9.5c.83 0 1.5.67 1.5 1.5v13l-6.25-3-6.25 3v-13c0-.83.67-1.5 1.5-1.5Z',
+      'M9.5 9.25h5',
+      'M9.5 12.25h3.25',
+    ],
   },
 ].filter((m): m is typeof m & { value: string } => Boolean(m.value));
 ---
 
 {
   hasContent && (
-    <Section padding="lg" class="bg-background">
-      <Container>
-        <div class="grid gap-12 lg:grid-cols-2 lg:items-center">
-          <div class="flex flex-col gap-8">
+    <section class="overflow-hidden bg-background">
+      <div class="bg-brand-secondary pb-28 pt-14 text-white md:pb-44 md:pt-20">
+        <Container>
+          <div class="mx-auto flex max-w-5xl flex-col items-center text-center">
+            <img
+              src="/images/tahiti-guest-boat-catamaran-signature.svg"
+              alt="Tahiti Guest Boat catamaran"
+              width="124"
+              height="124"
+              loading="lazy"
+              decoding="async"
+              class="mb-8 size-24 object-contain md:mb-10 md:size-28"
+            />
             {block?.headline && (
-              <h2 class="font-heading text-3xl leading-snug text-foreground md:text-5xl">
+              <h2 class="max-w-5xl font-heading text-4xl leading-tight !text-white md:text-6xl">
                 {block.headline}
               </h2>
             )}
             {markers.length > 0 && (
-              <dl class="flex flex-col divide-y divide-border/70">
+              <dl class="mt-8 flex max-w-3xl flex-col items-center justify-center gap-5 text-base text-white/90 sm:flex-row sm:flex-wrap md:mt-10 md:gap-8 md:text-lg">
                 {markers.map((marker) => (
-                  <div class="flex items-center gap-4 py-4">
-                    <span
-                      class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-primary-soft text-brand-primary"
-                      aria-hidden="true"
-                    >
-                      <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current">
-                        <path d={marker.svgPath} />
+                  <div class="flex items-center gap-3">
+                    <dt class="sr-only">{marker.label}</dt>
+                    <dd class="flex items-center gap-3">
+                      <svg
+                        viewBox="0 0 24 24"
+                        class="size-6 shrink-0 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                      >
+                        {marker.svgPaths.map((path) => (
+                          <path d={path} />
+                        ))}
                       </svg>
-                    </span>
-                    <div>
-                      <dt class="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                        {marker.label}
-                      </dt>
-                      <dd class="mt-0.5 text-sm font-semibold text-foreground">{marker.value}</dd>
-                    </div>
+                      <span>{marker.value}</span>
+                    </dd>
                   </div>
                 ))}
               </dl>
             )}
           </div>
-          {imageUrl && (
+        </Container>
+      </div>
+      {imageUrl && (
+        <Container class="-mt-20 md:-mt-32">
             <img
               src={imageUrl}
               alt={block?.image?.alt || ''}
-              width="1200"
-              height="800"
+              width="1600"
+              height="900"
               loading="lazy"
               decoding="async"
-              class="aspect-[3/2] w-full rounded-[var(--radius-surface)] object-cover shadow-sm ring-1 ring-border/70"
+              class="mx-auto aspect-[16/9] w-full max-w-[92rem] rounded-[var(--radius-panel)] object-cover shadow-sm"
+              style={{
+                backgroundImage: placeholder ? `url(${placeholder})` : undefined,
+                backgroundColor: block?.image?.metadata?.palette?.dominant?.background || 'var(--muted)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
             />
-          )}
-        </div>
-      </Container>
-    </Section>
+        </Container>
+      )}
+      <div class="h-12 bg-background md:h-16" />
+    </section>
   )
 }

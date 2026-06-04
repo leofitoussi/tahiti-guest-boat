@@ -95,6 +95,39 @@ export const cruisePage = defineType({
       ],
     }),
     defineField({
+      name: 'gallery',
+      title: 'Galerie défilante',
+      type: 'object',
+      description: 'Une rangée de photos qui défile sous l’accroche croisière.',
+      fields: [
+        defineField({ name: 'eyebrow', title: 'Surtitre', type: 'string' }),
+        defineField({ name: 'title', title: 'Titre', type: 'string' }),
+        defineField({
+          name: 'images',
+          title: 'Images',
+          type: 'array',
+          of: [
+            defineField({
+              name: 'image',
+              title: 'Image',
+              type: 'image',
+              options: { hotspot: true },
+              fields: [
+                defineField({
+                  name: 'alt',
+                  title: 'Texte alternatif',
+                  type: 'string',
+                  validation: (rule) => rule.required(),
+                }),
+              ],
+            }),
+          ],
+          validation: (rule) =>
+            rule.min(5).warning('Recommandé : 5 images minimum pour un défilement fluide sans couture visible.'),
+        }),
+      ],
+    }),
+    defineField({
       name: 'pitch',
       title: 'Pitch',
       type: 'pitchBlock',

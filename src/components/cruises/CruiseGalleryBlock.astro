@@ -1,0 +1,17 @@
+---
+import MarqueeGallery from '../blocks/MarqueeGallery.astro';
+import type { CruiseGallery } from '../../lib/cruises';
+
+interface Props {
+  block?: CruiseGallery;
+}
+
+const { block } = Astro.props;
+const images = block?.images ?? [];
+---
+
+{
+  images.length > 0 && (
+    <MarqueeGallery eyebrow={block?.eyebrow} title={block?.title} row1={images} />
+  )
+}

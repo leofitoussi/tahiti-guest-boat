@@ -71,11 +71,13 @@ function resolveRow(images: RowImage[]): ResolvedItem[] {
 }
 
 // direction: 1 = right, -1 = left. speed in px/frame at 60fps (relative).
+// Empty rows are dropped so the marquee also supports single-row layouts
+// (e.g. the cruise template gallery) without rendering placeholder rows.
 const rows = [
   { images: resolveRow(row1), direction:  1, speed: 0.12 },
   { images: resolveRow(row2), direction: -1, speed: 0.165 },
   { images: resolveRow(row3), direction:  1, speed: 0.141 },
-];
+].filter((row) => row.images.length > 0);
 ---
 
 <Section class="bg-background overflow-hidden">
@@ -97,41 +99,27 @@ const rows = [
         data-direction={row.direction}
         data-speed={row.speed}
       >
-        {row.images.length > 0 ? (
-          <div class="marquee-track flex gap-3 will-change-transform">
-            {[...row.images, ...row.images].map((img, i) => (
-              <figure
-                class="marquee-item shrink-0 overflow-hidden"
-                style={`height: clamp(9rem, 18vw, 16rem); aspect-ratio: ${img.width} / ${img.height};`}
-                aria-hidden={i >= row.images.length ? 'true' : undefined}
-              >
-                <img
-                  src={img.src}
-                  srcset={img.srcset}
-                  sizes="(min-width: 768px) 30vw, 60vw"
-                  alt={i >= row.images.length ? '' : img.alt}
-                  width={img.width}
-                  height={img.height}
-                  class="h-full w-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
-              </figure>
-            ))}
-          </div>
-        ) : (
-          <div
-            class="flex gap-3"
-            style="height: clamp(9rem, 18vw, 16rem);"
-          >
-            {Array.from({ length: 5 }).map(() => (
-              <div
-                class="shrink-0 rounded-[var(--radius-surface)] bg-muted"
-                style="height: 100%; aspect-ratio: 4 / 3;"
+        <div class="marquee-track flex gap-3 will-change-transform">
+          {[...row.images, ...row.images].map((img, i) => (
+            <figure
+              class="marquee-item shrink-0 overflow-hidden"
+              style={`height: clamp(9rem, 18vw, 16rem); aspect-ratio: ${img.width} / ${img.height};`}
+              aria-hidden={i >= row.images.length ? 'true' : undefined}
+            >
+              <img
+                src={img.src}
+                srcset={img.srcset}
+                sizes="(min-width: 768px) 30vw, 60vw"
+                alt={i >= row.images.length ? '' : img.alt}
+                width={img.width}
+                height={img.height}
+                class="h-full w-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
-            ))}
-          </div>
-        )}
+            </figure>
+          ))}
+        </div>
       </div>
     ))}
   </div>

@@ -60,7 +60,7 @@ describe('Page croisière schema — fixed template base fields', () => {
   it('warns about important missing template sections without blocking publication', () => {
     const fields = Object.fromEntries(cruisePage.fields.map((field) => [field.name, field as any]));
 
-    for (const fieldName of ['hero', 'cruiseTeaser', 'featuredImage', 'boat', 'itinerary']) {
+    for (const fieldName of ['hero', 'cruiseTeaser', 'boat', 'itinerary']) {
       const rule = new ValidationProbe();
 
       fields[fieldName].validation(rule);
@@ -74,6 +74,11 @@ describe('Page croisière schema — fixed template base fields', () => {
     const fieldNames = cruisePage.fields.map((field) => field.name);
 
     expect(fieldNames).not.toEqual(expect.arrayContaining(['pageBuilder', 'whyUsBlock', 'reviewsBlock']));
+  });
+
+  it('no longer exposes the editorial featuredImage block', () => {
+    const fieldNames = cruisePage.fields.map((field) => field.name);
+    expect(fieldNames).not.toContain('featuredImage');
   });
 });
 
@@ -217,7 +222,7 @@ describe('cruise page template — fixed section order', () => {
     expect(source).toContain('<ReviewsBlock reviews={reviews} locale={locale} />');
   });
 
-  it('renders sections in the fixed order: Hero → Accroche → Gallery → CruiseIntro → FullWidthImage → IntroductionDestination → ExperienceCroisiere → BateauRecommande → Boat → Itinerary → WhyUs → Reviews → Booking → RelatedCruises', async () => {
+  it('renders sections in the fixed order: Hero → Accroche → Gallery → CruiseIntro → IntroductionDestination → ExperienceCroisiere → BateauRecommande → Boat → Itinerary → WhyUs → Reviews → Booking → RelatedCruises', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
 
     const ORDERED_SECTIONS = [
@@ -225,7 +230,6 @@ describe('cruise page template — fixed section order', () => {
       'CruiseTeaserBlock',
       'CruiseGalleryBlock',
       'CruiseIntroBlock',
-      'FullWidthImageBlock',
       'IntroductionDestinationBlock',
       'ExperienceCroisiereBlock',
       'BateauRecommandeBlock',
@@ -244,6 +248,12 @@ describe('cruise page template — fixed section order', () => {
       expect(idx, `<${section} should come after the previous section`).toBeGreaterThan(lastIndex);
       lastIndex = idx;
     }
+  });
+
+  it('no longer renders FullWidthImageBlock on the cruise page', async () => {
+    const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
+    expect(source).not.toContain('FullWidthImageBlock');
+    expect(source).not.toContain('featuredImage');
   });
 });
 
@@ -271,7 +281,7 @@ describe('CruiseIntroBlock — schema and data flow', () => {
 
   it('template renders CruiseIntroBlock immediately after CruiseGalleryBlock', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
-    const order = ['CruiseGalleryBlock', 'CruiseIntroBlock', 'FullWidthImageBlock'];
+    const order = ['CruiseGalleryBlock', 'CruiseIntroBlock', 'IntroductionDestinationBlock'];
 
     let last = -1;
     for (const tag of order) {
@@ -531,10 +541,10 @@ describe('sections éditoriales — lazy loading', () => {
 });
 
 describe('sections éditoriales — rendering order', () => {
-  it('template renders three editorial sections between FullWidthImageBlock and BoatBlock', async () => {
+  it('template renders three editorial sections between CruiseIntroBlock and BoatBlock', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
     const order = [
-      'FullWidthImageBlock',
+      'CruiseIntroBlock',
       'IntroductionDestinationBlock',
       'ExperienceCroisiereBlock',
       'BateauRecommandeBlock',

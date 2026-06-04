@@ -143,7 +143,6 @@ export interface CruisePage extends CruisePageSummary {
   cruiseTeaser?: CruiseTeaser;
   gallery?: CruiseGallery;
   cruiseIntro?: CruiseIntro;
-  featuredImage?: FullWidthImageBlock;
   introductionDestination?: IntroductionDestination;
   experienceCroisiere?: ExperienceCroisiere;
   bateauRecommande?: BateauRecommande;
@@ -253,10 +252,6 @@ const cruisePageFields = `
   cruiseIntro{
     heading,
     body,
-    image${imageFields}
-  },
-  featuredImage{
-    ...,
     image${imageFields}
   },
   introductionDestination{

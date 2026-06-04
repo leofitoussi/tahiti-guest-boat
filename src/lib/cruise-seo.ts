@@ -15,7 +15,7 @@ export function buildPrimaryCruiseKeyword(destinationLabel?: string, title?: str
 }
 
 export function buildCruiseSeoImage(cruise: CruisePage) {
-  const image = cruise.hero?.backgroundImage ?? cruise.cruiseTeaser?.image ?? cruise.featuredImage?.image;
+  const image = cruise.hero?.backgroundImage ?? cruise.cruiseTeaser?.image;
 
   return image ? urlForImage(image)?.width(1200).height(630).fit('crop').auto('format').url() : undefined;
 }

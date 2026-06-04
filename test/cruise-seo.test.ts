@@ -129,11 +129,10 @@ describe('buildCruiseSeoImage — image source priority', () => {
     expect(result).toBeUndefined();
   });
 
-  it('prefers hero.backgroundImage over teaser and featuredImage', () => {
+  it('prefers hero.backgroundImage over teaser', () => {
     const cruise = {
       hero: { backgroundImage: sanityRef('heroAAA') },
       cruiseTeaser: { image: sanityRef('teaserBBB') },
-      featuredImage: { image: sanityRef('featCCC') },
     } as any;
     const result = buildCruiseSeoImage(cruise);
     expect(typeof result).toBe('string');
@@ -144,19 +143,17 @@ describe('buildCruiseSeoImage — image source priority', () => {
     const cruise = {
       hero: {},
       cruiseTeaser: { image: sanityRef('teaserBBB') },
-      featuredImage: { image: sanityRef('featCCC') },
     } as any;
     const result = buildCruiseSeoImage(cruise);
     expect(typeof result).toBe('string');
     expect(result).toContain('teaserBBB');
   });
 
-  it('falls back to featuredImage.image when both hero and teaser images are absent', () => {
+  it('does not use featuredImage as an SEO image source', () => {
     const cruise = {
       featuredImage: { image: sanityRef('featCCC') },
     } as any;
     const result = buildCruiseSeoImage(cruise);
-    expect(typeof result).toBe('string');
-    expect(result).toContain('featCCC');
+    expect(result).toBeUndefined();
   });
 });

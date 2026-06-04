@@ -3,7 +3,6 @@ import HeroBlock from '../../components/cruises/HeroBlock.astro';
 import CruiseTeaserBlock from '../../components/cruises/CruiseTeaserBlock.astro';
 import CruiseGalleryBlock from '../../components/cruises/CruiseGalleryBlock.astro';
 import CruiseIntroBlock from '../../components/cruises/CruiseIntroBlock.astro';
-import FullWidthImageBlock from '../../components/cruises/FullWidthImageBlock.astro';
 import IntroductionDestinationBlock from '../../components/cruises/IntroductionDestinationBlock.astro';
 import ExperienceCroisiereBlock from '../../components/cruises/ExperienceCroisiereBlock.astro';
 import BateauRecommandeBlock from '../../components/cruises/BateauRecommandeBlock.astro';
@@ -49,7 +48,6 @@ const [settings, reviews, relatedCruises] = await Promise.all([
 const title = cruise.seoTitle || `${cruise.title} | Tahiti Guest Boat`;
 const description = cruise.seoDescription || cruise.excerpt || 'Croisière privée en catamaran avec Tahiti Guest Boat.';
 const hero = cruise.hero || { title: cruise.title };
-const featuredImage = cruise.featuredImage || {};
 const boat = cruise.boat || {};
 const itinerary = cruise.itinerary || { title: copy.blocks.itineraryTitle, steps: [] };
 const metadata = buildLocalizedMetadata(Astro.url.pathname, {
@@ -79,7 +77,6 @@ const structuredData = [
     <CruiseTeaserBlock block={cruise.cruiseTeaser} />
     <CruiseGalleryBlock block={cruise.gallery} />
     <CruiseIntroBlock block={cruise.cruiseIntro} />
-    <FullWidthImageBlock block={featuredImage} />
     <IntroductionDestinationBlock block={cruise.introductionDestination} />
     <ExperienceCroisiereBlock block={cruise.experienceCroisiere} />
     <BateauRecommandeBlock block={cruise.bateauRecommande} />

@@ -174,12 +174,6 @@ export const cruisePage = defineType({
       ],
     }),
     defineField({
-      name: 'featuredImage',
-      title: 'Featured image',
-      type: 'fullWidthImageBlock',
-      validation: (rule) => rule.required().warning('Ajoutez une image éditoriale pour compléter la page.'),
-    }),
-    defineField({
       name: 'boat',
       title: 'Boat',
       type: 'boatBlock',

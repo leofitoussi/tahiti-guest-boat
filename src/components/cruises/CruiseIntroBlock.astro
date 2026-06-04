@@ -1,0 +1,46 @@
+---
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import CruisePortableText from './CruisePortableText.astro';
+import type { CruiseIntro } from '../../lib/cruises';
+import { urlForImage } from '../../lib/sanity';
+
+interface Props {
+  block?: CruiseIntro;
+}
+
+const { block } = Astro.props;
+
+const hasContent = block && (block.heading || (block.body && block.body.length > 0) || block.highlight || block.image);
+if (!hasContent) return;
+
+const imageUrl = block.image
+  ? urlForImage(block.image)?.width(1100).height(900).fit('crop').quality(84).auto('format').url()
+  : undefined;
+---
+
+<Section padding="lg" class="bg-background">
+  <Container>
+    <div class="grid gap-12 lg:grid-cols-[0.92fr_1fr] lg:items-center xl:gap-16">
+      <div class="flex flex-col gap-7">
+        {block.heading && <h2 class="font-heading text-4xl leading-tight text-primary md:text-6xl">{block.heading}</h2>}
+        {block.body && block.body.length > 0 && <CruisePortableText value={block.body} />}
+        {block.highlight && <p class="text-lg font-extrabold leading-relaxed text-foreground">{block.highlight}</p>}
+      </div>
+      {
+        imageUrl && (
+          <img
+            src={imageUrl}
+            alt={block.image?.alt || ''}
+            width="1100"
+            height="900"
+            loading="lazy"
+            decoding="async"
+            class="aspect-[1.22] w-full rounded-[var(--radius-panel)] object-cover shadow-sm"
+            style={{ backgroundColor: block.image?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+          />
+        )
+      }
+    </div>
+  </Container>
+</Section>

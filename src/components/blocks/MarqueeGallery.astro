@@ -34,7 +34,6 @@ interface ResolvedItem {
 interface Props {
   eyebrow?: string;
   title?: string;
-  description?: string;
   row1?: RowImage[];
   row2?: RowImage[];
   row3?: RowImage[];
@@ -42,7 +41,8 @@ interface Props {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const { eyebrow, title, description, row1 = [], row2 = [], row3 = [] } = Astro.props;
+const { eyebrow, title, row1 = [], row2 = [], row3 = [] } = Astro.props;
+const hasDescription = Astro.slots.has('description');
 
 const SRCSET_WIDTHS = [400, 800, 1200];
 
@@ -82,18 +82,14 @@ const rows = [
 ---
 
 <Section class="bg-background overflow-hidden">
-  {(eyebrow || title || description) && (
+  {(eyebrow || title || hasDescription) && (
     <Container>
       <div class="mb-10 flex flex-col gap-3">
         {eyebrow && (
           <p class="text-sm font-semibold uppercase tracking-[0.14em] text-primary">{eyebrow}</p>
         )}
         {title && <h2 class="font-heading font-semibold text-foreground">{title}</h2>}
-        {description && (
-          <p class="max-w-2xl whitespace-pre-line text-base leading-relaxed text-muted-foreground md:text-lg">
-            {description}
-          </p>
-        )}
+        <slot name="description" />
       </div>
     </Container>
   )}

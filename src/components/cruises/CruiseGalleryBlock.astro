@@ -1,5 +1,6 @@
 ---
 import MarqueeGallery from '../blocks/MarqueeGallery.astro';
+import CruisePortableText from './CruisePortableText.astro';
 import type { CruiseGallery } from '../../lib/cruises';
 
 interface Props {
@@ -8,10 +9,13 @@ interface Props {
 
 const { block } = Astro.props;
 const images = block?.images ?? [];
+const hasText = Array.isArray(block?.text) && block.text.length > 0;
 ---
 
 {
   images.length > 0 && (
-    <MarqueeGallery title={block?.title} description={block?.text} row1={images} />
+    <MarqueeGallery title={block?.title} row1={images}>
+      {hasText && <CruisePortableText slot="description" value={block?.text} class="max-w-2xl" />}
+    </MarqueeGallery>
   )
 }

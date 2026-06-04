@@ -217,12 +217,14 @@ describe('cruise page template — fixed section order', () => {
     expect(source).toContain('<ReviewsBlock reviews={reviews} locale={locale} />');
   });
 
-  it('renders sections in the fixed order: Hero → Accroche → Pitch → FullWidthImage → IntroductionDestination → ExperienceCroisiere → BateauRecommande → Boat → Itinerary → WhyUs → Reviews → Booking → RelatedCruises', async () => {
+  it('renders sections in the fixed order: Hero → Accroche → Gallery → CruiseIntro → Pitch → FullWidthImage → IntroductionDestination → ExperienceCroisiere → BateauRecommande → Boat → Itinerary → WhyUs → Reviews → Booking → RelatedCruises', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
 
     const ORDERED_SECTIONS = [
       'HeroBlock',
       'CruiseTeaserBlock',
+      'CruiseGalleryBlock',
+      'CruiseIntroBlock',
       'PitchBlock',
       'FullWidthImageBlock',
       'IntroductionDestinationBlock',
@@ -243,6 +245,44 @@ describe('cruise page template — fixed section order', () => {
       expect(idx, `<${section} should come after the previous section`).toBeGreaterThan(lastIndex);
       lastIndex = idx;
     }
+  });
+});
+
+// ── Cycle 11 — Bloc intro croisière après galerie ──────────────────────────
+
+describe('CruiseIntroBlock — schema and data flow', () => {
+  it('cruisePage exposes editable cruiseIntro fields for heading, body, highlight, and image', () => {
+    const fields = Object.fromEntries(cruisePage.fields.map((f) => [f.name, f as any]));
+    expect(fields.cruiseIntro).toMatchObject({ type: 'object' });
+
+    const sub = Object.fromEntries(fields.cruiseIntro.fields.map((f: any) => [f.name, f]));
+    expect(sub.heading).toMatchObject({ type: 'string' });
+    expect(sub.body).toMatchObject({ type: 'array' });
+    expect(sub.highlight).toMatchObject({ type: 'text' });
+    expect(sub.image).toMatchObject({ type: 'image' });
+  });
+
+  it('cruises.ts projects cruiseIntro content and image metadata', async () => {
+    const source = await readFile('src/lib/cruises.ts', 'utf8');
+    expect(source).toContain('cruiseIntro{');
+    expect(source).toContain('highlight');
+    expect(source).toContain('image');
+    expect(source).toContain('export interface CruiseIntro');
+  });
+
+  it('template renders CruiseIntroBlock immediately after CruiseGalleryBlock', async () => {
+    const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
+    const order = ['CruiseGalleryBlock', 'CruiseIntroBlock', 'PitchBlock'];
+
+    let last = -1;
+    for (const tag of order) {
+      const idx = source.indexOf(`<${tag}`);
+      expect(idx, `<${tag} must be present`).toBeGreaterThan(-1);
+      expect(idx, `<${tag} must come after previous`).toBeGreaterThan(last);
+      last = idx;
+    }
+
+    expect(source).toContain('block={cruise.cruiseIntro}');
   });
 });
 

@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 import { defineLocalizationFields } from './localization-fields';
-import { richText } from './portableText';
+import { activityDescriptionText, richText } from './portableText';
 
 export const cruisePage = defineType({
   name: 'cruisePage',
@@ -104,9 +104,9 @@ export const cruisePage = defineType({
         defineField({
           name: 'text',
           title: 'Texte libre',
-          type: 'text',
-          rows: 4,
-          description: 'Paragraphe d’introduction affiché sous le titre, avant les images.',
+          type: 'array',
+          of: activityDescriptionText,
+          description: 'Texte d’introduction (gras, italique, liens, listes) affiché sous le titre, avant les images.',
         }),
         defineField({
           name: 'images',
@@ -130,6 +130,45 @@ export const cruisePage = defineType({
           ],
           validation: (rule) =>
             rule.min(5).warning('Recommandé : 5 images minimum pour un défilement fluide sans couture visible.'),
+        }),
+      ],
+    }),
+    defineField({
+      name: 'cruiseIntro',
+      title: 'Introduction croisière',
+      type: 'object',
+      description: 'Bloc éditorial affiché après la galerie pour expliquer pourquoi la croisière est adaptée à la destination.',
+      fields: [
+        defineField({
+          name: 'heading',
+          title: 'Titre',
+          type: 'string',
+        }),
+        defineField({
+          name: 'body',
+          title: 'Texte',
+          type: 'array',
+          of: richText,
+        }),
+        defineField({
+          name: 'highlight',
+          title: 'Phrase mise en avant',
+          type: 'text',
+          rows: 2,
+        }),
+        defineField({
+          name: 'image',
+          title: 'Image',
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            defineField({
+              name: 'alt',
+              title: 'Texte alternatif',
+              type: 'string',
+              validation: (rule) => rule.required(),
+            }),
+          ],
         }),
       ],
     }),

@@ -2,6 +2,7 @@
 import HeroBlock from '../../components/cruises/HeroBlock.astro';
 import CruiseTeaserBlock from '../../components/cruises/CruiseTeaserBlock.astro';
 import CruiseGalleryBlock from '../../components/cruises/CruiseGalleryBlock.astro';
+import CruiseIntroBlock from '../../components/cruises/CruiseIntroBlock.astro';
 import PitchBlock from '../../components/cruises/PitchBlock.astro';
 import FullWidthImageBlock from '../../components/cruises/FullWidthImageBlock.astro';
 import IntroductionDestinationBlock from '../../components/cruises/IntroductionDestinationBlock.astro';
@@ -79,6 +80,7 @@ const structuredData = [
     <HeroBlock block={hero} locale={locale} />
     <CruiseTeaserBlock block={cruise.cruiseTeaser} />
     <CruiseGalleryBlock block={cruise.gallery} />
+    <CruiseIntroBlock block={cruise.cruiseIntro} />
     <PitchBlock block={pitch} />
     <FullWidthImageBlock block={featuredImage} />
     <IntroductionDestinationBlock block={cruise.introductionDestination} />

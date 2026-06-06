@@ -4,7 +4,6 @@ import CruiseTeaserBlock from '../../components/cruises/CruiseTeaserBlock.astro'
 import CruiseGalleryBlock from '../../components/cruises/CruiseGalleryBlock.astro';
 import CruiseIntroBlock from '../../components/cruises/CruiseIntroBlock.astro';
 import IntroductionDestinationBlock from '../../components/cruises/IntroductionDestinationBlock.astro';
-import ExperienceCroisiereBlock from '../../components/cruises/ExperienceCroisiereBlock.astro';
 import BateauRecommandeBlock from '../../components/cruises/BateauRecommandeBlock.astro';
 import BoatBlock from '../../components/cruises/BoatBlock.astro';
 import ItineraryBlock from '../../components/cruises/ItineraryBlock.astro';
@@ -78,8 +77,7 @@ const structuredData = [
     <CruiseGalleryBlock block={cruise.gallery} />
     <CruiseIntroBlock block={cruise.cruiseIntro} />
     <IntroductionDestinationBlock block={cruise.introductionDestination} />
-    <ExperienceCroisiereBlock block={cruise.experienceCroisiere} />
-    <BateauRecommandeBlock block={cruise.bateauRecommande} />
+    <BateauRecommandeBlock block={cruise.bateauRecommande} locale={locale} />
     <BoatBlock block={boat} locale={locale} />
     <ItineraryBlock block={itinerary} locale={locale} />
     <WhyUsBlock settings={settings} locale={locale} />

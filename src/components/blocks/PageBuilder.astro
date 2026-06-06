@@ -15,6 +15,7 @@ import MarqueeGallery from './MarqueeGallery.astro';
 import BoatStoryVideoBlock from './BoatStoryVideoBlock.astro';
 import VideoFeature from './VideoFeature.astro';
 import FullWidthImageBlock from '../cruises/FullWidthImageBlock.astro';
+import BoatBlock from '../cruises/BoatBlock.astro';
 import BookingBlock from '../cruises/BookingBlock.astro';
 import RelatedCruisesBlock from '../cruises/RelatedCruisesBlock.astro';
 import BoatArgumentsBlock from './BoatArgumentsBlock.astro';
@@ -151,6 +152,9 @@ const { blocks = [], settings = null, reviews = [], cruises = [], activities = [
 
       case 'fullWidthImageBlock':
         return <FullWidthImageBlock block={block} />;
+
+      case 'boatBlock':
+        return <BoatBlock block={block} locale={locale} />;
 
       case 'practicalInfoBlock':
         return (

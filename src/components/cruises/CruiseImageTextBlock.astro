@@ -1,0 +1,78 @@
+---
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import { buttonVariants } from '../ui/button';
+import CruisePortableText from './CruisePortableText.astro';
+import { urlForImage } from '../../lib/sanity';
+import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
+import type { SanityImage } from '../../lib/blog';
+import type { TypedObject } from 'astro-portabletext/types';
+
+interface Props {
+  heading?: string;
+  body?: TypedObject[];
+  image?: SanityImage;
+  ctaLabel?: string;
+  ctaUrl?: string;
+  desktopLayout?: 'image-text' | 'text-image';
+  locale?: Locale;
+}
+
+const {
+  heading,
+  body,
+  image,
+  ctaLabel,
+  ctaUrl,
+  desktopLayout = 'image-text',
+  locale = defaultLocale,
+} = Astro.props;
+
+const hasContent = heading || (body && body.length > 0) || image;
+if (!hasContent) return;
+
+const imageUrl = image ? urlForImage(image)?.width(1200).height(760).fit('crop').quality(84).auto('format').url() : undefined;
+const imageFirst = desktopLayout === 'image-text';
+---
+
+<Section padding="lg" class="bg-background">
+  <Container>
+    <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+      <div class:list={['flex flex-col gap-6', imageFirst && 'lg:order-2']}>
+        {heading && <h2 class="image-text-heading">{heading}</h2>}
+        {body && body.length > 0 && <CruisePortableText value={body} />}
+        {
+          ctaLabel && ctaUrl && (
+            <a href={localizeHref(ctaUrl, locale)} class={buttonVariants({ className: 'w-fit' })}>
+              {ctaLabel}
+            </a>
+          )
+        }
+      </div>
+      {
+        imageUrl && (
+          <img
+            src={imageUrl}
+            alt={image?.alt || ''}
+            width="1200"
+            height="760"
+            loading="lazy"
+            decoding="async"
+            class:list={['aspect-[1.58] w-full object-cover shadow-sm ring-1 ring-border/70', imageFirst && 'lg:order-1']}
+            style={{ backgroundColor: image?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+          />
+        )
+      }
+    </div>
+  </Container>
+</Section>
+
+<style>
+  .image-text-heading {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-size: clamp(2rem, 3.5vw, 3.25rem);
+    line-height: 1.1;
+    color: var(--foreground);
+  }
+</style>

@@ -21,32 +21,37 @@ const placeholder = block.backgroundImage
   : undefined;
 ---
 
-<section class="relative isolate min-h-[76vh] overflow-hidden bg-brand-secondary text-white">
-  {
-    imageUrl ? (
-      <img
-        src={imageUrl}
-        alt={block.backgroundImage?.alt || ''}
-        width="1800"
-        height="980"
-        loading="eager"
-        decoding="async"
-        fetchpriority="high"
-        class="absolute inset-0 h-full w-full object-cover"
-        style={{
-          backgroundImage: placeholder ? `url(${placeholder})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      />
-    ) : (
-      <div class="absolute inset-0 bg-brand-secondary" />
-    )
-  }
-  <div class="absolute inset-0 bg-brand-secondary/45" />
+<section class="relative isolate min-h-[76vh] bg-brand-secondary text-white">
+  <div
+    class="absolute inset-0 overflow-hidden"
+    style="border-bottom-left-radius: 50% 4rem; border-bottom-right-radius: 50% 4rem;"
+  >
+    {
+      imageUrl ? (
+        <img
+          src={imageUrl}
+          alt={block.backgroundImage?.alt || ''}
+          width="1800"
+          height="980"
+          loading="eager"
+          decoding="async"
+          fetchpriority="high"
+          class="absolute inset-0 h-full w-full object-cover"
+          style={{
+            backgroundImage: placeholder ? `url(${placeholder})` : undefined,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+          }}
+        />
+      ) : (
+        <div class="absolute inset-0 bg-brand-secondary" />
+      )
+    }
+    <div class="absolute inset-0 bg-gradient-to-t from-brand-secondary/90 via-brand-secondary/30 to-transparent" />
+  </div>
   <Container class="relative flex min-h-[76vh] items-center justify-center text-center pt-24">
     <div class="max-w-4xl">
-      <h1 class="font-heading font-semibold leading-tight">{block.title}</h1>
+      <h1 class="font-heading font-semibold leading-tight text-white!">{block.title}</h1>
       {
         block.ctaLabel && block.ctaUrl && (
           <a

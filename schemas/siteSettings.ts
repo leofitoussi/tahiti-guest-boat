@@ -1,5 +1,6 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { defineLocalizationFields } from './localization-fields';
+import { h2HeadingText } from './portableText';
 
 export const siteSettings = defineType({
   name: 'siteSettings',
@@ -128,19 +129,17 @@ export const siteSettings = defineType({
     defineField({
       name: 'whyUsTitle',
       title: 'Why us — titre principal',
-      type: 'string',
-    }),
-    defineField({
-      name: 'whyUsDescription',
-      title: 'Why us — description intro',
-      type: 'text',
-      rows: 3,
-      description: "Phrase d'accroche affichée sous le titre principal dans la mise en page deux colonnes.",
+      type: 'array',
+      of: h2HeadingText,
+      description: 'Titre éditorial en h2 avec gras/italique.',
+      validation: (rule) => rule.max(1),
     }),
     defineField({
       name: 'whyUsArguments',
       title: 'Why us — arguments',
       type: 'array',
+      description: 'Trois colonnes : icône étoile + titre + texte.',
+      validation: (rule) => rule.max(3),
       of: [
         defineArrayMember({
           name: 'whyUsArgument',
@@ -151,13 +150,8 @@ export const siteSettings = defineType({
               name: 'heading',
               title: "Titre de l'argument",
               type: 'string',
-              description: 'Titre court affiché en h3. Laissez vide pour afficher uniquement le corps.',
-            }),
-            defineField({
-              name: 'icon',
-              title: 'Icône (emoji)',
-              type: 'string',
-              description: 'Affiché uniquement dans la mise en page icônes (sans titre).',
+              description: 'Titre court affiché en h3.',
+              validation: (rule) => rule.required(),
             }),
             defineField({
               name: 'body',

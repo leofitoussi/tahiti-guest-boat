@@ -1,5 +1,5 @@
 import { defineField, defineType } from 'sanity';
-import { headingText, richText } from './portableText';
+import { richText } from './portableText';
 
 export const boatBlock = defineType({
   name: 'boatBlock',
@@ -7,80 +7,67 @@ export const boatBlock = defineType({
   type: 'object',
   fields: [
     defineField({
-      name: 'title',
-      title: 'Title',
-      type: 'array',
-      of: headingText,
+      name: 'heading',
+      title: 'Titre',
+      type: 'string',
     }),
     defineField({
       name: 'body',
-      title: 'Body',
+      title: 'Texte',
       type: 'array',
       of: richText,
     }),
     defineField({
-      name: 'arguments',
-      title: 'Arguments',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            defineField({
-              name: 'icon',
-              title: 'Icon',
-              type: 'string',
-              description: 'Emoji or short icon label.',
-            }),
-            defineField({
-              name: 'label',
-              title: 'Label',
-              type: 'string',
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: 'body',
-              title: 'Body',
-              type: 'text',
-              rows: 2,
-            }),
-          ],
-          preview: {
-            select: {
-              title: 'label',
-              subtitle: 'body',
-            },
-          },
-        },
-      ],
-    }),
-    defineField({
-      name: 'boatImage',
-      title: 'Boat image',
+      name: 'image',
+      title: 'Image',
       type: 'image',
       options: {
         hotspot: true,
       },
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Texte alternatif',
+          type: 'string',
+          validation: (rule) => rule.required(),
+        }),
+      ],
     }),
     defineField({
       name: 'ctaLabel',
-      title: 'CTA label',
+      title: 'Libellé CTA',
       type: 'string',
     }),
     defineField({
       name: 'ctaUrl',
-      title: 'CTA URL',
+      title: 'Lien CTA',
+      type: 'url',
+      validation: (rule) => rule.uri({ allowRelative: true, scheme: ['http', 'https', 'mailto', 'tel'] }),
+    }),
+    defineField({
+      name: 'desktopLayout',
+      title: 'Ordre des colonnes sur desktop',
       type: 'string',
+      initialValue: 'text-image',
+      options: {
+        layout: 'radio',
+        list: [
+          { title: 'Texte puis image', value: 'text-image' },
+          { title: 'Image puis texte', value: 'image-text' },
+        ],
+      },
+      validation: (rule) => rule.required(),
     }),
   ],
   preview: {
     select: {
-      media: 'boatImage',
+      title: 'heading',
+      media: 'image',
     },
-    prepare({ media }) {
+    prepare({ title, media }) {
       return {
-        title: 'Boat block',
-        subtitle: 'Boat presentation',
+        title: title || 'Boat block',
+        subtitle: 'Présentation bateau',
         media,
       };
     },

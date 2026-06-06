@@ -1,61 +1,22 @@
 ---
-import Container from '../layout/Container.astro';
-import Section from '../layout/Section.astro';
-import { buttonVariants } from '../ui/button';
-import CruisePortableText from './CruisePortableText.astro';
+import CruiseImageTextBlock from './CruiseImageTextBlock.astro';
 import type { BateauRecommande } from '../../lib/cruises';
-import { urlForImage } from '../../lib/sanity';
+import { defaultLocale, type Locale } from '../../lib/localization';
 
 interface Props {
   block?: BateauRecommande;
+  locale?: Locale;
 }
 
-const { block } = Astro.props;
-
-const hasContent = block && (block.heading || (block.body && block.body.length > 0) || block.image);
-if (!hasContent) return;
-
-const imageUrl = block.image ? urlForImage(block.image)?.width(1200).height(760).fit('crop').quality(84).auto('format').url() : undefined;
+const { block, locale = defaultLocale } = Astro.props;
 ---
 
-<Section padding="lg" class="bg-background">
-  <Container>
-    <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-      {
-        imageUrl && (
-          <img
-            src={imageUrl}
-            alt={block.image?.alt || ''}
-            width="1200"
-            height="760"
-            loading="lazy"
-            decoding="async"
-            class="aspect-[1.58] w-full rounded-[var(--radius-surface)] object-cover shadow-sm ring-1 ring-border/70"
-            style={{ backgroundColor: block.image?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
-          />
-        )
-      }
-      <div class="flex flex-col gap-6">
-        {block.heading && <h2 class="bateau-heading">{block.heading}</h2>}
-        {block.body && block.body.length > 0 && <CruisePortableText value={block.body} />}
-        {
-          block.ctaLabel && block.ctaUrl && (
-            <a href={block.ctaUrl} class={buttonVariants({ className: 'w-fit' })}>
-              {block.ctaLabel}
-            </a>
-          )
-        }
-      </div>
-    </div>
-  </Container>
-</Section>
-
-<style>
-  .bateau-heading {
-    margin: 0;
-    font-family: var(--font-family-heading);
-    font-size: clamp(2rem, 3.5vw, 3.25rem);
-    line-height: 1.1;
-    color: var(--foreground);
-  }
-</style>
+<CruiseImageTextBlock
+  heading={block?.heading}
+  body={block?.body}
+  image={block?.image}
+  ctaLabel={block?.ctaLabel}
+  ctaUrl={block?.ctaUrl}
+  desktopLayout="image-text"
+  locale={locale}
+/>

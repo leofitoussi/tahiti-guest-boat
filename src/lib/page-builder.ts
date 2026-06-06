@@ -99,15 +99,21 @@ const pageBuilderFields = `pageBuilder[]{
   },
 
   _type == "boatBlock" => {
-    title,
+    heading,
     body,
-    ctaLabel,
-    ctaUrl,
-    boatImage{
+    image{
       ...,
       asset,
-      "metadata": asset->metadata { dimensions, lqip }
-    }
+      alt,
+      "metadata": asset->metadata {
+        dimensions,
+        lqip,
+        palette { dominant { background } }
+      }
+    },
+    ctaLabel,
+    ctaUrl,
+    desktopLayout
   },
 
   _type == "boatStoryVideoBlock" => {

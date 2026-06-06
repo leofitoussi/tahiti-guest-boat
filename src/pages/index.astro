@@ -102,15 +102,12 @@ const HOME_QUERY = `*[_type == "homePage"] | order(_updatedAt desc)[0]{
     },
 
       _type == "boatBlock" => {
-        title,
+        heading,
         body,
+        image{ ..., asset, alt, "metadata": asset->metadata { dimensions, lqip, palette { dominant { background } } } },
         ctaLabel,
         ctaUrl,
-        boatImage{
-          ...,
-          asset,
-          "metadata": asset->metadata { dimensions, lqip }
-        }
+        desktopLayout
       },
 
       _type == "videoFeatureBlock" => {

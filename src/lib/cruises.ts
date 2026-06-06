@@ -56,16 +56,12 @@ export interface EditorialBlock {
 export interface BoatBlock {
   _type?: 'boatBlock';
   _key?: string;
-  title?: TypedObject[];
+  heading?: string;
   body?: TypedObject[];
-  arguments?: {
-    icon?: string;
-    label?: string;
-    body?: string;
-  }[];
-  boatImage?: SanityImage;
+  image?: SanityImage;
   ctaLabel?: string;
   ctaUrl?: string;
+  desktopLayout?: 'image-text' | 'text-image';
 }
 
 export interface ItineraryStep {
@@ -120,12 +116,6 @@ export interface IntroductionDestination {
   images?: SanityImage[];
 }
 
-export interface ExperienceCroisiere {
-  heading?: string;
-  body?: TypedObject[];
-  image?: SanityImage;
-}
-
 export interface BateauRecommande {
   heading?: string;
   body?: TypedObject[];
@@ -144,7 +134,6 @@ export interface CruisePage extends CruisePageSummary {
   gallery?: CruiseGallery;
   cruiseIntro?: CruiseIntro;
   introductionDestination?: IntroductionDestination;
-  experienceCroisiere?: ExperienceCroisiere;
   bateauRecommande?: BateauRecommande;
   boat?: BoatBlock;
   itinerary?: ItineraryBlock;
@@ -170,11 +159,9 @@ export interface SiteSettings {
   footerText?: string;
   contactEmail?: string;
   contactPhone?: string;
-  whyUsTitle?: string;
-  whyUsDescription?: string;
+  whyUsTitle?: TypedObject[];
   whyUsArguments?: {
     heading?: string;
-    icon?: string;
     body?: string;
   }[];
   bookingEmbed?: {
@@ -268,11 +255,6 @@ const cruisePageFields = `
       }
     }
   },
-  experienceCroisiere{
-    heading,
-    body,
-    image${imageFields}
-  },
   bateauRecommande{
     heading,
     body,
@@ -281,8 +263,12 @@ const cruisePageFields = `
     ctaUrl
   },
   boat{
-    ...,
-    boatImage${imageFields}
+    heading,
+    body,
+    image${imageFields},
+    ctaLabel,
+    ctaUrl,
+    desktopLayout
   },
   itinerary{
     ...,
@@ -335,8 +321,7 @@ const SITE_SETTINGS_QUERY = `*[${buildLocalizedSingletonDocumentFilter('siteSett
   contactEmail,
   contactPhone,
   whyUsTitle,
-  whyUsDescription,
-  whyUsArguments[]{heading, icon, body},
+  whyUsArguments[]{heading, body},
   bookingEmbed{
     title,
     providerName,

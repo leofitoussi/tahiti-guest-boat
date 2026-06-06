@@ -45,7 +45,8 @@ const copy = getSiteCopy(locale);
                     ↓
                   </span>
                 </summary>
-                <div class="mt-6 grid gap-6 md:grid-cols-[0.8fr_1.2fr]">
+                <div class="mt-6 grid gap-6 md:grid-cols-[1.2fr_0.8fr]">
+                  <CruisePortableText value={step.description} />
                   {imageUrl && (
                     <img
                       src={imageUrl}
@@ -57,7 +58,6 @@ const copy = getSiteCopy(locale);
                       class="aspect-[1.52] w-full rounded-[var(--radius-surface)] object-cover ring-1 ring-border/70"
                     />
                   )}
-                  <CruisePortableText value={step.description} />
                 </div>
               </details>
             );

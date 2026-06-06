@@ -43,14 +43,16 @@ const placeholder = block.backgroundImage
       <div class="absolute inset-0 bg-brand-secondary" />
     )
   }
-  <div class="absolute inset-0 bg-gradient-to-t from-brand-secondary/85 via-brand-secondary/35 to-brand-secondary/35" />
-  <Container class="relative flex min-h-[76vh] items-end pb-16 pt-36 md:pb-24">
+  <div class="absolute inset-0 bg-brand-secondary/45" />
+  <Container class="relative flex min-h-[76vh] items-center justify-center text-center pt-24">
     <div class="max-w-4xl">
-      <p class="mb-5 text-sm font-bold uppercase tracking-[0.18em] text-brand-accent">{copy.blocks.heroEyebrow}</p>
       <h1 class="font-heading font-semibold leading-tight">{block.title}</h1>
       {
         block.ctaLabel && block.ctaUrl && (
-          <a href={localizeHref(block.ctaUrl, locale)} class={buttonVariants({ className: 'mt-8' })}>
+          <a
+            href={localizeHref(block.ctaUrl, locale)}
+            class="mt-8 inline-flex items-center justify-center bg-brand-accent px-8 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-brand-secondary underline underline-offset-4 transition-opacity hover:opacity-90"
+          >
             {block.ctaLabel}
           </a>
         )

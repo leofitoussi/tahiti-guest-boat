@@ -138,7 +138,7 @@ export const siteSettings = defineType({
       name: 'whyUsArguments',
       title: 'Why us — arguments',
       type: 'array',
-      description: 'Trois colonnes : icône étoile + titre + texte.',
+      description: 'Trois colonnes : icône étoile + texte.',
       validation: (rule) => rule.max(3),
       of: [
         defineArrayMember({
@@ -147,15 +147,8 @@ export const siteSettings = defineType({
           type: 'object',
           fields: [
             defineField({
-              name: 'heading',
-              title: "Titre de l'argument",
-              type: 'string',
-              description: 'Titre court affiché en h3.',
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
               name: 'body',
-              title: 'Corps',
+              title: 'Texte',
               type: 'text',
               rows: 3,
               validation: (rule) => rule.required(),
@@ -163,11 +156,10 @@ export const siteSettings = defineType({
           ],
           preview: {
             select: {
-              title: 'heading',
               subtitle: 'body',
             },
-            prepare({ title, subtitle }) {
-              return { title: title || subtitle, subtitle: title ? subtitle : undefined };
+            prepare({ subtitle }) {
+              return { title: subtitle };
             },
           },
         }),

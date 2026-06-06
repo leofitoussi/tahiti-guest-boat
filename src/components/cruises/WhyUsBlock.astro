@@ -22,18 +22,9 @@ const titleFallback = copy.blocks.whyUsTitle;
 const argumentsList = settings?.whyUsArguments?.length
   ? settings.whyUsArguments
   : [
-      {
-        heading: 'Croisière sur mesure',
-        body: 'Une croisière privée pensée autour de votre rythme, de vos envies et de la météo.',
-      },
-      {
-        heading: 'Expérience conviviale',
-        body: 'Une expérience simple et attentive, loin des programmes standardisés.',
-      },
-      {
-        heading: 'Connaissance des lagons',
-        body: 'Une connaissance sensible des lagons, des mouillages et de la vie à bord.',
-      },
+      { body: 'Une croisière privée pensée autour de votre rythme, de vos envies et de la météo.' },
+      { body: 'Une expérience simple et attentive, loin des programmes standardisés.' },
+      { body: 'Une connaissance sensible des lagons, des mouillages et de la vie à bord.' },
     ];
 ---
 
@@ -58,11 +49,6 @@ const argumentsList = settings?.whyUsArguments?.length
           >
             <path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.4l-5.8 3.05 1.11-6.46-4.7-4.58 6.49-.94L12 2.5z" />
           </svg>
-          {item.heading && (
-            <h3 class="font-heading text-xl font-semibold leading-snug text-foreground">
-              {item.heading}
-            </h3>
-          )}
           <p class="text-base leading-relaxed text-muted-foreground">{item.body}</p>
         </div>
       ))}

@@ -92,7 +92,7 @@ const postFields = `{
     _id,
     title,
     "slug": slug.current,
-    "heroTitle": hero.title,
+    "heroTitle": pt::text(hero.title),
     "heroImage": hero.backgroundImage${imageFields},
     "excerpt": pitch.accroche
   },
@@ -100,7 +100,7 @@ const postFields = `{
     _id,
     title,
     "slug": slug.current,
-    "heroTitle": hero.title,
+    "heroTitle": pt::text(hero.title),
     "heroImage": hero.backgroundImage${imageFields},
     "excerpt": pitch.accroche
   }
@@ -149,7 +149,7 @@ const postDetailFields = `{
     _id,
     title,
     "slug": slug.current,
-    "heroTitle": hero.title,
+    "heroTitle": pt::text(hero.title),
     "heroImage": hero.backgroundImage${imageFields},
     "excerpt": pitch.accroche
   },
@@ -157,7 +157,7 @@ const postDetailFields = `{
     _id,
     title,
     "slug": slug.current,
-    "heroTitle": hero.title,
+    "heroTitle": pt::text(hero.title),
     "heroImage": hero.backgroundImage${imageFields},
     "excerpt": pitch.accroche
   },

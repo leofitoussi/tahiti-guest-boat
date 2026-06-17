@@ -273,6 +273,7 @@ const cruisePageFields = `
     ...,
     steps[]{
       ...,
+      "dayLabel": pt::text(dayLabel),
       image${imageFields}
     }
   }
@@ -288,7 +289,7 @@ const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter}] | order(coalesce(editorialP
   destinationLabel,
   editorialPriority,
   "slug": slug.current,
-  "heroTitle": hero.title,
+  "heroTitle": pt::text(hero.title),
   "heroImage": hero.backgroundImage${imageFields},
   "excerpt": cruiseTeaser.headline
 }`;
@@ -301,7 +302,7 @@ const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
   destinationLabel,
   editorialPriority,
   "slug": slug.current,
-  "heroTitle": hero.title,
+  "heroTitle": pt::text(hero.title),
   "heroImage": hero.backgroundImage${imageFields},
   "excerpt": cruiseTeaser.headline,
   ${cruisePageFields}
@@ -375,7 +376,7 @@ const RELATED_CRUISES_QUERY = `*[
   destinationLabel,
   editorialPriority,
   "slug": slug.current,
-  "heroTitle": hero.title,
+  "heroTitle": pt::text(hero.title),
   "heroImage": hero.backgroundImage${imageFields},
   "excerpt": cruiseTeaser.headline
 }`;

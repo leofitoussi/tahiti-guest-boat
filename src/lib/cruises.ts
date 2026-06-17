@@ -161,7 +161,6 @@ export interface SiteSettings {
   contactPhone?: string;
   whyUsTitle?: TypedObject[];
   whyUsArguments?: {
-    heading?: string;
     body?: string;
   }[];
   bookingEmbed?: {
@@ -321,7 +320,7 @@ const SITE_SETTINGS_QUERY = `*[${buildLocalizedSingletonDocumentFilter('siteSett
   contactEmail,
   contactPhone,
   whyUsTitle,
-  whyUsArguments[]{heading, body},
+  whyUsArguments[]{body},
   bookingEmbed{
     title,
     providerName,

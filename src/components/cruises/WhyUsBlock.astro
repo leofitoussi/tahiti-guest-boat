@@ -22,22 +22,13 @@ const titleFallback = copy.blocks.whyUsTitle;
 const argumentsList = settings?.whyUsArguments?.length
   ? settings.whyUsArguments
   : [
-      {
-        heading: 'Croisière sur mesure',
-        body: 'Une croisière privée pensée autour de votre rythme, de vos envies et de la météo.',
-      },
-      {
-        heading: 'Expérience conviviale',
-        body: 'Une expérience simple et attentive, loin des programmes standardisés.',
-      },
-      {
-        heading: 'Connaissance des lagons',
-        body: 'Une connaissance sensible des lagons, des mouillages et de la vie à bord.',
-      },
+      { body: 'Une croisière privée pensée autour de votre rythme, de vos envies et de la météo.' },
+      { body: 'Une expérience simple et attentive, loin des programmes standardisés.' },
+      { body: 'Une connaissance sensible des lagons, des mouillages et de la vie à bord.' },
     ];
 ---
 
-<Section padding="lg" class="bg-muted/30">
+<Section padding="lg" class="bg-primary text-primary-foreground">
   <Container>
     <div class="why-us-title mx-auto mb-12 max-w-3xl text-center md:mb-16">
       {isRichTitle ? (
@@ -51,19 +42,14 @@ const argumentsList = settings?.whyUsArguments?.length
       {argumentsList.map((item) => (
         <div class="flex flex-col items-center gap-4 text-center">
           <svg
-            class="h-8 w-8 text-[var(--primary)]"
+            class="h-8 w-8 text-primary-foreground"
             viewBox="0 0 24 24"
             fill="currentColor"
             aria-hidden="true"
           >
             <path d="M12 2.5l2.9 5.88 6.49.94-4.7 4.58 1.11 6.46L12 17.4l-5.8 3.05 1.11-6.46-4.7-4.58 6.49-.94L12 2.5z" />
           </svg>
-          {item.heading && (
-            <h3 class="font-heading text-xl font-semibold leading-snug text-foreground">
-              {item.heading}
-            </h3>
-          )}
-          <p class="text-base leading-relaxed text-muted-foreground">{item.body}</p>
+          <p class="text-base leading-relaxed text-primary-foreground/90">{item.body}</p>
         </div>
       ))}
     </div>
@@ -77,7 +63,7 @@ const argumentsList = settings?.whyUsArguments?.length
     font-size: clamp(1.875rem, 3.6vw, 2.5rem);
     font-weight: 600;
     line-height: 1.16;
-    color: var(--foreground);
+    color: var(--primary-foreground);
   }
 
   .why-us-title :global(strong) {

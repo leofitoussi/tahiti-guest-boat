@@ -1,4 +1,0 @@
-interface:
-  display_name: "Tahiti Component Builder"
-  short_description: "Build coherent Astro/Sanity components with live Sanity validation."
-  default_prompt: "Use $tahiti-component-builder to create or refactor a coherent Tahiti Guest Boat component with design-system, Sanity, SEO, performance, and /composants validation rules."

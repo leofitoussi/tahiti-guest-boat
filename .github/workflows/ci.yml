@@ -27,3 +27,20 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  # Trigger a Netlify production build only after a green build on main.
+  # Netlify clones the repo and runs `npm run build`, publishing `dist`.
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Netlify build & deploy
+        run: |
+          status=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -X POST -d '{}' "${{ secrets.NETLIFY_BUILD_HOOK_URL }}")
+          echo "Netlify build hook responded with HTTP $status"
+          if [ "$status" != "200" ] && [ "$status" != "201" ]; then
+            echo "::error::Netlify build hook failed (HTTP $status)"
+            exit 1
+          fi

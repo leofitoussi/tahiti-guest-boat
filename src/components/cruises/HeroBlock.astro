@@ -1,10 +1,8 @@
 ---
-import { buttonVariants } from '../ui/button';
 import Container from '../layout/Container.astro';
 import type { CruiseHeroBlock } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
 import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
-import { getSiteCopy } from '../../lib/site-copy';
 
 interface Props {
   block: CruiseHeroBlock;
@@ -12,7 +10,6 @@ interface Props {
 }
 
 const { block, locale = defaultLocale } = Astro.props;
-const copy = getSiteCopy(locale);
 const imageUrl = block.backgroundImage
   ? urlForImage(block.backgroundImage)?.width(1800).height(980).fit('crop').quality(84).auto('format').url()
   : undefined;

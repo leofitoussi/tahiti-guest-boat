@@ -8,6 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
+    "test": "vitest run",
     "sanity:deploy": "sanity deploy",
     "sanity:dataset": "sanity dataset list"
   },

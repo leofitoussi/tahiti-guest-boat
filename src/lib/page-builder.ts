@@ -11,7 +11,7 @@ export interface UniquePageDocument {
   pageBuilder?: Record<string, unknown>[];
 }
 
-const pageBuilderFields = `pageBuilder[]{
+export const pageBuilderFields = `pageBuilder[]{
   _type,
   _key,
 

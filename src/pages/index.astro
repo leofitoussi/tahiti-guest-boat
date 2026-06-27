@@ -6,6 +6,7 @@ import { heroImageSources, isSanityConfigured } from '../lib/sanity';
 import { defaultLocale } from '../lib/localization';
 import { getSiteCopy } from '../lib/site-copy';
 import { localizedDocumentFields } from '../lib/sanity-localization';
+import { pageBuilderFields } from '../lib/page-builder';
 import { sanityClient } from 'sanity:client';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -27,143 +28,7 @@ const HOME_QUERY = `*[_id == $homeId && !(_id in path("drafts.**"))][0]{
   ${localizedDocumentFields},
   seoTitle,
   seoDescription,
-    pageBuilder[]{
-      _type,
-      _key,
-
-    _type == "heroHeaderBlock" => {
-      keywords,
-      title,
-      body,
-      primaryCtaLabel,
-      primaryCtaLink,
-      secondaryCtaLabel,
-      secondaryCtaLink,
-      image{ ..., asset, alt, "metadata": asset->metadata { dimensions } }
-    },
-
-    _type == "homeHeroBlock" => {
-      keywords,
-      title,
-      body,
-      primaryCtaLabel,
-      primaryCtaLink,
-      secondaryCtaLabel,
-      secondaryCtaLink,
-      image{ ..., asset, alt, "metadata": asset->metadata { dimensions } }
-    },
-
-    _type == "marqueeGalleryBlock" => {
-      eyebrow,
-      title,
-      "row1": row1[]{
-        ..., asset, alt,
-        "metadata": asset->metadata { dimensions, lqip }
-      },
-      "row2": row2[]{
-        ..., asset, alt,
-        "metadata": asset->metadata { dimensions, lqip }
-      },
-      "row3": row3[]{
-        ..., asset, alt,
-        "metadata": asset->metadata { dimensions, lqip }
-      }
-    },
-
-    _type == "galleryBlock" => {
-      eyebrow,
-      title,
-      layout,
-      columns,
-      gap,
-      images[]{
-        ...,
-        asset,
-        alt,
-        caption,
-        "metadata": asset->metadata { dimensions, lqip }
-      }
-    },
-
-    _type == "editorialBlock" => {
-      title,
-      body,
-      image{
-        ...,
-        asset,
-        alt,
-        "metadata": asset->metadata {
-          dimensions,
-          lqip,
-          palette { dominant { background } }
-        }
-      },
-      desktopLayout,
-      mobileLayout,
-      primaryCtaLabel,
-      primaryCtaLink,
-      secondaryCtaLabel,
-      secondaryCtaLink
-    },
-
-      _type == "boatBlock" => {
-        heading,
-        body,
-        image{ ..., asset, alt, "metadata": asset->metadata { dimensions, lqip, palette { dominant { background } } } },
-        ctaLabel,
-        ctaUrl,
-        desktopLayout
-      },
-
-      _type == "videoFeatureBlock" => {
-        iconImage{
-          ...,
-          asset,
-          alt,
-          "metadata": asset->metadata {
-            dimensions,
-            lqip,
-            palette { dominant { background } }
-          }
-        },
-        title,
-        body,
-        ctaLabel,
-        ctaUrl,
-        youtubeUrl,
-        posterImage{
-          ...,
-          asset,
-          alt,
-          "metadata": asset->metadata {
-            dimensions,
-            lqip,
-            palette { dominant { background } }
-          }
-        }
-      },
-
-      _type in ["whyUsBlock", "reviewsBlock", "bookingBlock", "relatedCruisesBlock", "fullWidthImageBlock"] => {
-        ...
-      },
-
-      _type == "activitiesBlock" => {
-        anchorId,
-        title,
-        intro,
-        groups[]{
-          _key,
-          heading,
-          description,
-          tagFilters[]->{
-            _id,
-            ${localizedDocumentFields},
-            title,
-            "slug": slug.current
-          }
-        }
-      }
-  }
+  ${pageBuilderFields}
 }`;
 
 // ─── Fetch ────────────────────────────────────────────────────────────────────

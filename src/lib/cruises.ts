@@ -223,11 +223,16 @@ const cruisePageFields = `
   seoTitle,
   seoDescription,
   hero{
-    ...,
+    "title": pt::text(title),
+    ctaLabel,
+    ctaUrl,
     backgroundImage${imageFields}
   },
   cruiseTeaser{
-    ...,
+    "headline": pt::text(headline),
+    capacity,
+    minimumDuration,
+    pricing,
     image${imageFields}
   },
   gallery{
@@ -291,7 +296,7 @@ const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter}] | order(coalesce(editorialP
   "slug": slug.current,
   "heroTitle": pt::text(hero.title),
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": cruiseTeaser.headline
+  "excerpt": pt::text(cruiseTeaser.headline)
 }`;
 
 const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
@@ -304,7 +309,7 @@ const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
   "slug": slug.current,
   "heroTitle": pt::text(hero.title),
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": cruiseTeaser.headline,
+  "excerpt": pt::text(cruiseTeaser.headline),
   ${cruisePageFields}
 }`;
 

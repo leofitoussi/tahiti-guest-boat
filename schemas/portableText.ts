@@ -1,5 +1,25 @@
 import { defineArrayMember } from 'sanity';
 
+/**
+ * Extracts plain text from a Portable Text value (or returns a string as-is).
+ * Used in Studio `preview.prepare` where titles are Portable Text arrays and
+ * cannot be displayed directly.
+ */
+export function plainText(value?: unknown): string {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) {
+    return value
+      .map((block: any) =>
+        block?._type === 'block' && Array.isArray(block.children)
+          ? block.children.map((child: any) => child?.text ?? '').join('')
+          : '',
+      )
+      .join(' ')
+      .trim();
+  }
+  return '';
+}
+
 export const inlineText = [
   defineArrayMember({
     type: 'block',

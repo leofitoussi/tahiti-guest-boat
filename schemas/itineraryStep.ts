@@ -1,16 +1,17 @@
 import { defineField, defineType } from 'sanity';
-import { richText } from './portableText';
+import { inlineText, plainText, richText } from './portableText';
 
 export const itineraryStep = defineType({
   name: 'itineraryStep',
-  title: 'Itinerary step',
+  title: 'Étape d’itinéraire',
   type: 'object',
   fields: [
     defineField({
       name: 'dayLabel',
-      title: 'Day label',
-      type: 'string',
-      description: 'Example: Jour 1 à 3',
+      title: 'Libellé du jour',
+      type: 'array',
+      of: inlineText,
+      description: 'Exemple : Jour 1 à 3 (gras / italique possibles).',
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -30,7 +31,7 @@ export const itineraryStep = defineType({
       fields: [
         defineField({
           name: 'alt',
-          title: 'Alternative text',
+          title: 'Texte alternatif',
           type: 'string',
         }),
       ],
@@ -43,8 +44,8 @@ export const itineraryStep = defineType({
     },
     prepare({ title, media }) {
       return {
-        title: title || 'Itinerary step',
-        subtitle: 'Itinerary',
+        title: plainText(title) || 'Étape d’itinéraire',
+        subtitle: 'Itinéraire',
         media,
       };
     },

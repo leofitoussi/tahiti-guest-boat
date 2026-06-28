@@ -344,9 +344,9 @@ describe('Itinéraire indicatif — schema shape', () => {
     expect(fieldNames).toContain('steps');
   });
 
-  it('itineraryStep has dayLabel, rich-text description, and optional image', () => {
+  it('itineraryStep has dayLabel (Portable Text), rich-text description, and optional image', () => {
     const fields = Object.fromEntries(itineraryStep.fields.map((f) => [f.name, f]));
-    expect(fields.dayLabel).toMatchObject({ type: 'string' });
+    expect(fields.dayLabel).toMatchObject({ type: 'array' });
     expect(fields.description).toMatchObject({ type: 'array' });
     expect(fields.image).toMatchObject({ type: 'image' });
   });
@@ -416,7 +416,7 @@ describe('sections éditoriales — schema fields', () => {
     const fields = Object.fromEntries(cruisePage.fields.map((f) => [f.name, f as any]));
     expect(fields.introductionDestination).toMatchObject({ type: 'object' });
     const sub = Object.fromEntries(fields.introductionDestination.fields.map((f: any) => [f.name, f]));
-    expect(sub.heading).toMatchObject({ type: 'string' });
+    expect(sub.heading).toMatchObject({ type: 'array' });
     expect(sub.body).toMatchObject({ type: 'array' });
     expect(sub.images).toMatchObject({ type: 'array' });
   });

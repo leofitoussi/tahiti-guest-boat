@@ -1,25 +1,28 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { inlineText, plainText } from './portableText';
 
 export const itineraryBlock = defineType({
   name: 'itineraryBlock',
-  title: 'Itinerary block',
+  title: 'Itinéraire',
   type: 'object',
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
-      type: 'string',
+      title: 'Titre',
+      type: 'array',
+      of: inlineText,
+      description: 'Titre de la section (gras / italique possibles).',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'route',
-      title: 'Route',
+      title: 'Parcours',
       type: 'string',
-      description: 'Example: Hiva Oa > Tahuata > Fatu Hiva',
+      description: 'Exemple : Hiva Oa > Tahuata > Fatu Hiva',
     }),
     defineField({
       name: 'steps',
-      title: 'Steps',
+      title: 'Étapes',
       type: 'array',
       of: [
         defineArrayMember({
@@ -36,8 +39,8 @@ export const itineraryBlock = defineType({
     },
     prepare({ title, subtitle }) {
       return {
-        title: title || 'Itinerary block',
-        subtitle: subtitle || 'Itinerary',
+        title: plainText(title) || 'Itinéraire',
+        subtitle: subtitle || 'Itinéraire',
       };
     },
   },

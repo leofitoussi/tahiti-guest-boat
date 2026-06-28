@@ -1,19 +1,22 @@
 import { defineField, defineType } from 'sanity';
+import { inlineText, plainText } from './portableText';
 
 export const heroBlock = defineType({
   name: 'heroBlock',
-  title: 'Hero block',
+  title: 'Hero',
   type: 'object',
   fields: [
     defineField({
       name: 'title',
-      title: 'Title',
-      type: 'string',
+      title: 'Titre',
+      type: 'array',
+      of: inlineText,
+      description: 'Titre principal (gras / italique possibles).',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'backgroundImage',
-      title: 'Background image',
+      title: 'Image de fond',
       type: 'image',
       options: {
         hotspot: true,
@@ -21,12 +24,12 @@ export const heroBlock = defineType({
     }),
     defineField({
       name: 'ctaLabel',
-      title: 'CTA label',
+      title: 'Libellé du bouton',
       type: 'string',
     }),
     defineField({
       name: 'ctaUrl',
-      title: 'CTA URL',
+      title: 'Lien du bouton',
       type: 'string',
     }),
   ],
@@ -37,7 +40,7 @@ export const heroBlock = defineType({
     },
     prepare({ title, media }) {
       return {
-        title: title || 'Hero block',
+        title: plainText(title) || 'Hero',
         subtitle: 'Hero',
         media,
       };

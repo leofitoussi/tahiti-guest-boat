@@ -1,0 +1,43 @@
+---
+import type { TypedObject } from 'astro-portabletext/types';
+
+interface Props {
+  /** Portable Text inline value (blocks with strong/em marks) or a plain string (legacy). */
+  value?: TypedObject[] | string;
+  /** Heading tag to render. */
+  as?: 'h1' | 'h2' | 'h3' | 'h4';
+  class?: string;
+}
+
+const { value, as: Tag = 'h2', class: className } = Astro.props;
+
+const blocks = Array.isArray(value) ? (value as any[]) : [];
+const legacyString = typeof value === 'string' ? value : '';
+const hasContent = legacyString.length > 0 || blocks.length > 0;
+---
+
+{
+  hasContent && (
+    <Tag class={className}>
+      {legacyString
+        ? legacyString
+        : blocks.map((block) =>
+            (block?.children ?? []).map((span: any) => {
+              const marks: string[] = span?.marks ?? [];
+              const strong = marks.includes('strong');
+              const em = marks.includes('em');
+              const text = span?.text ?? '';
+              if (strong && em)
+                return (
+                  <strong>
+                    <em>{text}</em>
+                  </strong>
+                );
+              if (strong) return <strong>{text}</strong>;
+              if (em) return <em>{text}</em>;
+              return text;
+            }),
+          )}
+    </Tag>
+  )
+}

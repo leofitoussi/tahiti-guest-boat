@@ -1,6 +1,7 @@
 ---
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
+import CruiseHeading from './CruiseHeading.astro';
 import CruisePortableText from './CruisePortableText.astro';
 import type { ItineraryBlock } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
@@ -22,7 +23,7 @@ const copy = getSiteCopy(locale);
       <Container>
         <div class="mb-12 flex max-w-4xl flex-col gap-4">
           <p class="text-sm font-bold uppercase tracking-[0.16em] text-primary">{copy.blocks.itineraryEyebrow}</p>
-          <h2 class="font-heading font-semibold leading-tight text-foreground">{block.title}</h2>
+          <CruiseHeading as="h2" value={block.title} class="font-heading font-semibold leading-tight text-foreground" />
           {block.route && <p class="text-lg font-semibold text-muted-foreground">{block.route}</p>}
           <p class="max-w-3xl text-sm leading-relaxed text-muted-foreground">{copy.blocks.itineraryDisclaimer}</p>
         </div>
@@ -35,9 +36,7 @@ const copy = getSiteCopy(locale);
             return (
               <details class="group py-8" open={index === 0}>
                 <summary class="flex cursor-pointer list-none items-center justify-between gap-4 [&::-webkit-details-marker]:hidden">
-                  {step.dayLabel && (
-                    <h3 class="font-heading font-semibold text-primary">{step.dayLabel}</h3>
-                  )}
+                  <CruiseHeading as="h3" value={step.dayLabel} class="font-heading font-semibold text-primary" />
                   <span
                     class="ml-auto shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
                     aria-hidden="true"

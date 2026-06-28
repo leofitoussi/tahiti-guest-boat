@@ -1,6 +1,7 @@
 ---
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
+import CruiseHeading from './CruiseHeading.astro';
 import CruisePortableText from './CruisePortableText.astro';
 import type { IntroductionDestination } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
@@ -11,7 +12,8 @@ interface Props {
 
 const { block } = Astro.props;
 
-const hasContent = block && (block.heading || (block.body && block.body.length > 0) || (block.images && block.images.length > 0));
+const hasHeading = Array.isArray(block?.heading) ? block.heading.length > 0 : Boolean(block?.heading);
+const hasContent = block && (hasHeading || (block.body && block.body.length > 0) || (block.images && block.images.length > 0));
 if (!hasContent) return;
 
 const galleryImages = (block.images ?? []).slice(0, 3);
@@ -21,7 +23,11 @@ const galleryImages = (block.images ?? []).slice(0, 3);
   <Container>
     <div class="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-start">
       <div class="flex flex-col gap-6">
-        {block.heading && <h2 class="intro-heading">{block.heading}</h2>}
+        <CruiseHeading
+          as="h2"
+          value={block.heading}
+          class="font-heading text-[clamp(2rem,3.5vw,3.25rem)] leading-[1.1] text-foreground"
+        />
         {block.body && block.body.length > 0 && <CruisePortableText value={block.body} />}
       </div>
       {
@@ -53,13 +59,3 @@ const galleryImages = (block.images ?? []).slice(0, 3);
     </div>
   </Container>
 </Section>
-
-<style>
-  .intro-heading {
-    margin: 0;
-    font-family: var(--font-family-heading);
-    font-size: clamp(2rem, 3.5vw, 3.25rem);
-    line-height: 1.1;
-    color: var(--foreground);
-  }
-</style>

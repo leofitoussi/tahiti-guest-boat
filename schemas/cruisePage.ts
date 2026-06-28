@@ -66,8 +66,9 @@ export const cruisePage = defineType({
         defineField({
           name: 'headline',
           title: 'Titre',
-          type: 'text',
-          rows: 3,
+          type: 'array',
+          of: inlineText,
+          description: 'Titre de l’accroche (gras / italique possibles).',
         }),
         defineField({
           name: 'capacity',
@@ -145,7 +146,13 @@ export const cruisePage = defineType({
       type: 'object',
       description: 'Bloc éditorial affiché après la galerie pour expliquer pourquoi la croisière est adaptée à la destination.',
       fields: [
-        defineField({ name: 'heading', title: 'Titre', type: 'string' }),
+        defineField({
+          name: 'heading',
+          title: 'Titre',
+          type: 'array',
+          of: inlineText,
+          description: 'Titre du bloc (gras / italique possibles).',
+        }),
         defineField({ name: 'body', title: 'Texte', type: 'array', of: richText }),
         defineField({
           name: 'images',

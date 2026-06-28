@@ -1,15 +1,17 @@
 import { defineField, defineType } from 'sanity';
-import { richText } from './portableText';
+import { inlineText, plainText, richText } from './portableText';
 
 export const boatBlock = defineType({
   name: 'boatBlock',
-  title: 'Boat block',
+  title: 'Bloc bateau',
   type: 'object',
   fields: [
     defineField({
       name: 'heading',
       title: 'Titre',
-      type: 'string',
+      type: 'array',
+      of: inlineText,
+      description: 'Titre du bloc (gras / italique possibles).',
     }),
     defineField({
       name: 'body',
@@ -66,7 +68,7 @@ export const boatBlock = defineType({
     },
     prepare({ title, media }) {
       return {
-        title: title || 'Boat block',
+        title: plainText(title) || 'Bloc bateau',
         subtitle: 'Présentation bateau',
         media,
       };

@@ -20,10 +20,8 @@ import {
 } from '../../lib/cruises';
 import { buildCruiseSeoImage, buildCruiseStructuredData } from '../../lib/cruise-seo';
 import { buildLocalizedMetadata, defaultLocale } from '../../lib/localization';
-import { getSiteCopy } from '../../lib/site-copy';
 
 const locale = defaultLocale;
-const copy = getSiteCopy(locale);
 
 export async function getStaticPaths() {
   const cruises = await getCruisePages(defaultLocale);
@@ -44,9 +42,9 @@ const [settings, reviews, relatedCruises] = await Promise.all([
 
 const title = cruise.seoTitle || `${cruise.title} | Tahiti Guest Boat`;
 const description = cruise.seoDescription || cruise.excerpt || 'Croisière privée en catamaran avec Tahiti Guest Boat.';
-const hero = cruise.hero || { title: cruise.title };
-const boat = cruise.boat || {};
-const itinerary = cruise.itinerary || { title: copy.blocks.itineraryTitle, steps: [] };
+const hero = cruise.hero ?? {};
+const boat = cruise.boat ?? {};
+const itinerary = cruise.itinerary ?? { steps: [] };
 const metadata = buildLocalizedMetadata(Astro.url.pathname, {
   locale,
   siteUrl: Astro.site?.href,

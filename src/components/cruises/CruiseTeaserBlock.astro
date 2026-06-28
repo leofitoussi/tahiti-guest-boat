@@ -1,5 +1,6 @@
 ---
 import Container from '../layout/Container.astro';
+import CruiseHeading from './CruiseHeading.astro';
 import type { CruiseTeaser } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
 
@@ -16,7 +17,8 @@ const placeholder = block?.image
   ? urlForImage(block.image)?.width(40).height(23).fit('crop').blur(18).quality(35).auto('format').url()
   : undefined;
 
-const hasContent = Boolean(block?.headline || imageUrl);
+const hasHeadline = Array.isArray(block?.headline) ? block.headline.length > 0 : Boolean(block?.headline);
+const hasContent = hasHeadline || Boolean(imageUrl);
 
 // Icons are frontend-owned and consistent across all cruise pages
 const markers = [
@@ -68,11 +70,11 @@ const markers = [
               decoding="async"
               class="mb-8 size-24 object-contain md:mb-10 md:size-28"
             />
-            {block?.headline && (
-              <h2 class="max-w-5xl font-heading text-4xl leading-tight !text-white md:text-6xl">
-                {block.headline}
-              </h2>
-            )}
+            <CruiseHeading
+              as="h2"
+              value={block?.headline}
+              class="max-w-5xl font-heading text-4xl leading-tight !text-white md:text-6xl"
+            />
             {markers.length > 0 && (
               <dl class="mt-8 flex max-w-3xl flex-col items-center justify-center gap-5 text-base text-white/90 sm:flex-row sm:flex-wrap md:mt-10 md:gap-8 md:text-lg">
                 {markers.map((marker) => (

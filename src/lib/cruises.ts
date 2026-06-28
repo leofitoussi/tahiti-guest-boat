@@ -12,14 +12,14 @@ import type { SanityImage } from './blog';
 export interface CruiseHeroBlock {
   _type?: 'heroBlock';
   _key?: string;
-  title?: string;
+  title?: TypedObject[];
   backgroundImage?: SanityImage;
   ctaLabel?: string;
   ctaUrl?: string;
 }
 
 export interface CruiseTeaser {
-  headline?: string;
+  headline?: TypedObject[];
   capacity?: string;
   minimumDuration?: string;
   pricing?: string;
@@ -50,7 +50,7 @@ export interface EditorialBlock {
 export interface BoatBlock {
   _type?: 'boatBlock';
   _key?: string;
-  heading?: string;
+  heading?: TypedObject[];
   body?: TypedObject[];
   image?: SanityImage;
   ctaLabel?: string;
@@ -59,7 +59,7 @@ export interface BoatBlock {
 }
 
 export interface ItineraryStep {
-  dayLabel?: string;
+  dayLabel?: TypedObject[];
   description?: TypedObject[];
   image?: SanityImage;
 }
@@ -67,7 +67,7 @@ export interface ItineraryStep {
 export interface ItineraryBlock {
   _type?: 'itineraryBlock';
   _key?: string;
-  title?: string;
+  title?: TypedObject[];
   route?: string;
   steps?: ItineraryStep[];
 }
@@ -105,7 +105,7 @@ export interface CruisePageSummary {
 }
 
 export interface IntroductionDestination {
-  heading?: string;
+  heading?: TypedObject[];
   body?: TypedObject[];
   images?: SanityImage[];
 }
@@ -267,9 +267,9 @@ const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter}] | order(coalesce(editorialP
   destinationLabel,
   editorialPriority,
   "slug": slug.current,
-  "heroTitle": hero.title,
+  "heroTitle": pt::text(hero.title),
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": cruiseTeaser.headline
+  "excerpt": pt::text(cruiseTeaser.headline)
 }`;
 
 const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
@@ -280,9 +280,9 @@ const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
   destinationLabel,
   editorialPriority,
   "slug": slug.current,
-  "heroTitle": hero.title,
+  "heroTitle": pt::text(hero.title),
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": cruiseTeaser.headline,
+  "excerpt": pt::text(cruiseTeaser.headline),
   ${cruisePageFields}
 }`;
 
@@ -354,9 +354,9 @@ const RELATED_CRUISES_QUERY = `*[
   destinationLabel,
   editorialPriority,
   "slug": slug.current,
-  "heroTitle": hero.title,
+  "heroTitle": pt::text(hero.title),
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": cruiseTeaser.headline
+  "excerpt": pt::text(cruiseTeaser.headline)
 }`;
 
 export async function getCruisePages(locale: Locale = defaultLocale) {

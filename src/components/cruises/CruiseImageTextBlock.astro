@@ -2,6 +2,7 @@
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
 import { buttonVariants } from '../ui/button';
+import CruiseHeading from './CruiseHeading.astro';
 import CruisePortableText from './CruisePortableText.astro';
 import { urlForImage } from '../../lib/sanity';
 import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
@@ -9,7 +10,7 @@ import type { SanityImage } from '../../lib/blog';
 import type { TypedObject } from 'astro-portabletext/types';
 
 interface Props {
-  heading?: string;
+  heading?: TypedObject[] | string;
   body?: TypedObject[];
   image?: SanityImage;
   ctaLabel?: string;
@@ -28,7 +29,8 @@ const {
   locale = defaultLocale,
 } = Astro.props;
 
-const hasContent = heading || (body && body.length > 0) || image;
+const hasHeading = Array.isArray(heading) ? heading.length > 0 : Boolean(heading);
+const hasContent = hasHeading || (body && body.length > 0) || image;
 if (!hasContent) return;
 
 const imageUrl = image ? urlForImage(image)?.width(1200).height(760).fit('crop').quality(84).auto('format').url() : undefined;
@@ -39,7 +41,11 @@ const imageFirst = desktopLayout === 'image-text';
   <Container>
     <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
       <div class:list={['flex flex-col gap-6', imageFirst && 'lg:order-2']}>
-        {heading && <h2 class="image-text-heading">{heading}</h2>}
+        <CruiseHeading
+          as="h2"
+          value={heading}
+          class="font-heading text-[clamp(2rem,3.5vw,3.25rem)] leading-[1.1] text-foreground"
+        />
         {body && body.length > 0 && <CruisePortableText value={body} />}
         {
           ctaLabel && ctaUrl && (
@@ -66,13 +72,3 @@ const imageFirst = desktopLayout === 'image-text';
     </div>
   </Container>
 </Section>
-
-<style>
-  .image-text-heading {
-    margin: 0;
-    font-family: var(--font-family-heading);
-    font-size: clamp(2rem, 3.5vw, 3.25rem);
-    line-height: 1.1;
-    color: var(--foreground);
-  }
-</style>

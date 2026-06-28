@@ -69,7 +69,7 @@ function buildSubTrips(cruise: CruisePage) {
     cruise.itinerary?.steps
       ?.map((step) => {
         const description = portableTextToPlainText(step.description);
-        const name = step.dayLabel?.trim();
+        const name = portableTextToPlainText(step.dayLabel);
 
         if (!name || !description) {
           return null;
@@ -111,7 +111,10 @@ function buildRelatedCruisesItemList(relatedCruises: CruisePageSummary[], canoni
   };
 }
 
-function portableTextToPlainText(blocks?: TypedObject[]) {
+function portableTextToPlainText(blocks?: TypedObject[] | string) {
+  if (typeof blocks === 'string') {
+    return blocks.replace(/\s+/g, ' ').trim();
+  }
   return (
     blocks
       ?.map((block) => {

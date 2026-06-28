@@ -246,7 +246,7 @@ const cruisePageFields = `
     image${imageFields}
   },
   introductionDestination{
-    heading,
+    "heading": pt::text(heading),
     body,
     images[]{
       ...,
@@ -275,7 +275,8 @@ const cruisePageFields = `
     desktopLayout
   },
   itinerary{
-    ...,
+    "title": pt::text(title),
+    route,
     steps[]{
       ...,
       "dayLabel": pt::text(dayLabel),

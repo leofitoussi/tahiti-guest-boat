@@ -207,13 +207,13 @@ const cruisePageFields = `
   seoTitle,
   seoDescription,
   hero{
-    "title": pt::text(title),
+    title,
     ctaLabel,
     ctaUrl,
     backgroundImage${imageFields}
   },
   cruiseTeaser{
-    "headline": pt::text(headline),
+    headline,
     capacity,
     minimumDuration,
     pricing,
@@ -225,7 +225,7 @@ const cruisePageFields = `
     images[]${imageFields}
   },
   introductionDestination{
-    "heading": pt::text(heading),
+    heading,
     body,
     images[]{
       ...,
@@ -238,7 +238,7 @@ const cruisePageFields = `
       }
     }
   },
-boat{
+  boat{
     heading,
     body,
     image${imageFields},
@@ -247,11 +247,11 @@ boat{
     desktopLayout
   },
   itinerary{
-    "title": pt::text(title),
+    title,
     route,
     steps[]{
       ...,
-      "dayLabel": pt::text(dayLabel),
+      dayLabel,
       image${imageFields}
     }
   }
@@ -267,9 +267,9 @@ const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter}] | order(coalesce(editorialP
   destinationLabel,
   editorialPriority,
   "slug": slug.current,
-  "heroTitle": pt::text(hero.title),
+  "heroTitle": hero.title,
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": pt::text(cruiseTeaser.headline)
+  "excerpt": cruiseTeaser.headline
 }`;
 
 const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
@@ -280,9 +280,9 @@ const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
   destinationLabel,
   editorialPriority,
   "slug": slug.current,
-  "heroTitle": pt::text(hero.title),
+  "heroTitle": hero.title,
   "heroImage": hero.backgroundImage${imageFields},
-  "excerpt": pt::text(cruiseTeaser.headline),
+  "excerpt": cruiseTeaser.headline,
   ${cruisePageFields}
 }`;
 
@@ -354,7 +354,7 @@ const RELATED_CRUISES_QUERY = `*[
   destinationLabel,
   editorialPriority,
   "slug": slug.current,
-  "heroTitle": pt::text(hero.title),
+  "heroTitle": hero.title,
   "heroImage": hero.backgroundImage${imageFields},
   "excerpt": cruiseTeaser.headline
 }`;

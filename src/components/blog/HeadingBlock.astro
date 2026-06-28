@@ -5,7 +5,7 @@ import { headingId } from '../../lib/portable-text-headings';
 type Props = PortableTextProps<Block>;
 
 const { node, ...attrs } = Astro.props;
-const Tag = node.style === 'h3' ? 'h3' : 'h2';
+const Tag = node.style === 'h4' ? 'h4' : node.style === 'h3' ? 'h3' : 'h2';
 ---
 
 <Tag id={headingId(node)} {...attrs}><slot /></Tag>

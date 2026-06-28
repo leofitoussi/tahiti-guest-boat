@@ -46,6 +46,17 @@ describe('blog lib — exports and GROQ cruise dereferencing', () => {
 
 // ── Cycle 2 ─────────────────────────────────────────────────────────────────
 describe('blogPost schema — cruise relationships', () => {
+  it('allows Heading 4 in the Blog Article body styles', () => {
+    const field = blogPost.fields.find((f) => f.name === 'body') as any;
+    expect(field).toBeDefined();
+    expect(field.type).toBe('array');
+
+    const blockMember = field.of.find((member: any) => member.type === 'block');
+    const styleValues = blockMember.styles.map((style: any) => style.value);
+
+    expect(styleValues).toContain('h4');
+  });
+
   it('has a primaryCruise field referencing cruisePage', () => {
     const field = blogPost.fields.find((f) => f.name === 'primaryCruise') as any;
     expect(field).toBeDefined();
@@ -78,6 +89,11 @@ describe('blog article template — table of contents & reading width', () => {
   it('imports TableOfContents', async () => {
     const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
     expect(source).toContain('TableOfContents');
+  });
+
+  it('uses the primary page heading token for the Article title', async () => {
+    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    expect(source).toContain('font-size: var(--heading-1)');
   });
 
   it('renders TableOfContents with mobile and desktop variants', async () => {
@@ -131,10 +147,38 @@ describe('BlogContent — heading block overrides', () => {
     expect(source).toContain('HeadingBlock');
   });
 
+  it('maps h4 blocks to HeadingBlock', async () => {
+    const source = await readFile('src/components/blog/BlogContent.astro', 'utf8');
+    expect(source).toContain('h4: HeadingBlock');
+  });
+
   it('maps h2 and h3 blocks to HeadingBlock', async () => {
     const source = await readFile('src/components/blog/BlogContent.astro', 'utf8');
     expect(source).toContain('h2: HeadingBlock');
     expect(source).toContain('h3: HeadingBlock');
+  });
+
+  it('uses design system body and heading scale tokens for Blog editorial content', async () => {
+    const source = await readFile('src/components/blog/BlogContent.astro', 'utf8');
+    expect(source).toContain('font-size: var(--font-size-base);');
+    expect(source).toContain('font-size: var(--heading-2);');
+    expect(source).toContain('font-size: var(--heading-3);');
+    expect(source).toContain('font-size: var(--heading-4);');
+  });
+
+  it('uses tokenized spacing and agreed color hierarchy for Blog body headings', async () => {
+    const source = await readFile('src/components/blog/BlogContent.astro', 'utf8');
+    expect(source).toContain('margin: var(--space-10) 0 var(--space-4);');
+    expect(source).toContain('margin: var(--space-8) 0 var(--space-3);');
+    expect(source).toContain('margin: var(--space-6) 0 var(--space-3);');
+    expect(source).toContain('color: var(--primary);');
+    expect(source).toMatch(/:global\(h3\)[\s\S]*color:\s*var\(--foreground\)/);
+    expect(source).toMatch(/:global\(h4\)[\s\S]*color:\s*var\(--foreground\)/);
+  });
+
+  it('gives h4 headings the same scroll offset used for deep-linked Blog headings', async () => {
+    const source = await readFile('src/components/blog/BlogContent.astro', 'utf8');
+    expect(source).toMatch(/:global\(h4\)[\s\S]*scroll-margin-top:\s*6rem/);
   });
 });
 
@@ -143,6 +187,11 @@ describe('HeadingBlock — heading id anchor', () => {
     const source = await readFile('src/components/blog/HeadingBlock.astro', 'utf8');
     expect(source).toContain('headingId');
     expect(source).toContain('id={headingId(node)}');
+  });
+
+  it('supports h4 as a rendered Blog heading level', async () => {
+    const source = await readFile('src/components/blog/HeadingBlock.astro', 'utf8');
+    expect(source).toContain("node.style === 'h4'");
   });
 });
 

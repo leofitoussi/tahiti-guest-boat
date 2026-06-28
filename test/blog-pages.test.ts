@@ -102,6 +102,29 @@ describe('blog article template — table of contents & reading width', () => {
   });
 });
 
+describe('TableOfContents — desktop sticky behavior', () => {
+  it('keeps the desktop variant scrollable with a runtime max-height variable', async () => {
+    const source = await readFile('src/components/blog/TableOfContents.astro', 'utf8');
+    expect(source).toContain('data-desktop-toc-scroll');
+    expect(source).toContain('max-height: var(--toc-max-height');
+    expect(source).toContain('lg:overflow-y-auto');
+  });
+
+  it('measures the desktop TOC to compute a sticky offset', async () => {
+    const source = await readFile('src/components/blog/TableOfContents.astro', 'utf8');
+    expect(source).toContain('data-desktop-toc');
+    expect(source).toContain('ResizeObserver');
+    expect(source).toContain("--toc-sticky-top");
+    expect(source).toContain("--toc-max-height");
+  });
+
+  it('applies sticky positioning with a CSS variable on the desktop sidebar grid item', async () => {
+    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    expect(source).toContain('lg:sticky');
+    expect(source).toContain('top: var(--toc-sticky-top, 6rem);');
+  });
+});
+
 describe('BlogContent — heading block overrides', () => {
   it('imports HeadingBlock', async () => {
     const source = await readFile('src/components/blog/BlogContent.astro', 'utf8');
@@ -127,8 +150,10 @@ describe('extractHeadings — unit', () => {
   it('extracts h2 and h3 blocks with correct id and level', async () => {
     const { extractHeadings } = await import('../src/lib/portable-text-headings');
     const body = [
+      { _type: 'block', _key: 'h1', style: 'h1', children: [{ _type: 'span', text: 'Titre principal' }] },
       { _type: 'block', _key: 'abc', style: 'h2', children: [{ _type: 'span', text: 'Section un' }] },
       { _type: 'block', _key: 'def', style: 'h3', children: [{ _type: 'span', text: 'Sous-section' }] },
+      { _type: 'block', _key: 'h4', style: 'h4', children: [{ _type: 'span', text: 'Section ignorée' }] },
       { _type: 'block', _key: 'ghi', style: 'normal', children: [{ _type: 'span', text: 'Paragraphe' }] },
     ];
     const headings = extractHeadings(body as any);
@@ -143,6 +168,16 @@ describe('extractHeadings — unit', () => {
       { _type: 'block', _key: 'xyz', style: 'h2', children: [{ _type: 'span', text: '' }] },
     ];
     expect(extractHeadings(body as any)).toHaveLength(0);
+  });
+
+  it('does not include h1 or h4 blocks in the extracted headings', async () => {
+    const { extractHeadings } = await import('../src/lib/portable-text-headings');
+    const body = [
+      { _type: 'block', _key: 'a', style: 'h1', children: [{ _type: 'span', text: 'Titre principal' }] },
+      { _type: 'block', _key: 'b', style: 'h4', children: [{ _type: 'span', text: 'Titre secondaire' }] },
+    ];
+
+    expect(extractHeadings(body as any)).toEqual([]);
   });
 });
 

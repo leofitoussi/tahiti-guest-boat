@@ -33,8 +33,12 @@ const { headings, label, variant } = Astro.props;
 )}
 
 {headings.length >= 2 && variant === 'desktop' && (
-  <aside aria-label={label}>
-    <div class="sticky top-24">
+  <aside aria-label={label} class="lg:self-start" data-desktop-toc>
+    <div
+      class="lg:overflow-y-auto lg:pr-2"
+      data-desktop-toc-scroll
+      style="max-height: var(--toc-max-height, calc(100vh - 6rem - 1.5rem));"
+    >
       <p class="mb-3 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
         {label}
       </p>
@@ -55,3 +59,55 @@ const { headings, label, variant } = Astro.props;
     </div>
   </aside>
 )}
+
+<script is:inline>
+  (() => {
+    const cleanupKey = '__tgbDesktopTocCleanup';
+    window[cleanupKey]?.();
+
+    const setup = () => {
+      const toc = document.querySelector('[data-desktop-toc]');
+      const scrollContainer = document.querySelector('[data-desktop-toc-scroll]');
+      if (!(toc instanceof HTMLElement) || !(scrollContainer instanceof HTMLElement)) return () => {};
+
+      const headerOffset = 96;
+      const bottomGap = 24;
+
+      const update = () => {
+        if (window.innerWidth < 1024) {
+          toc.style.removeProperty('--toc-sticky-top');
+          toc.style.removeProperty('--toc-max-height');
+          return;
+        }
+
+        const tocHeight = toc.offsetHeight;
+        const stickyTop = Math.max(headerOffset, window.innerHeight - tocHeight - bottomGap);
+        const maxHeight = Math.max(160, window.innerHeight - stickyTop - bottomGap);
+
+        toc.style.setProperty('--toc-sticky-top', `${stickyTop}px`);
+        toc.style.setProperty('--toc-max-height', `${maxHeight}px`);
+      };
+
+      const resizeObserver = new ResizeObserver(update);
+      resizeObserver.observe(toc);
+      update();
+
+      window.addEventListener('resize', update);
+
+      return () => {
+        resizeObserver.disconnect();
+        window.removeEventListener('resize', update);
+      };
+    };
+
+    const mount = () => {
+      window[cleanupKey] = setup();
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', mount, { once: true });
+    } else {
+      mount();
+    }
+  })();
+</script>

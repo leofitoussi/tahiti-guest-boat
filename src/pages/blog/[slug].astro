@@ -101,118 +101,118 @@ const secondaryCruises = post.secondaryCruises ?? [];
         </div>
       )}
 
-      {/* Body */}
-      <Section padding="lg">
-        <Container class="max-w-[960px]">
-          {/* TOC mobile — replié en tête, masqué sur desktop */}
-          <div class="lg:hidden">
-            <TableOfContents headings={headings} label={copy.pages.blogPost.tableOfContents} variant="mobile" />
-          </div>
+      <div class="mx-auto w-full max-w-[960px] px-5 md:px-8 lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-12 lg:items-start">
+        <div>
+          {/* Body */}
+          <Section padding="lg" class="lg:py-20">
+            {/* TOC mobile — replié en tête, masqué sur desktop */}
+            <div class="lg:hidden">
+              <TableOfContents headings={headings} label={copy.pages.blogPost.tableOfContents} variant="mobile" />
+            </div>
 
-          {/* Grille 2 colonnes sur desktop : contenu | sommaire */}
-          <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-12 lg:items-start">
             <div class="max-w-[68ch]">
               <BlogContent value={post.body} />
             </div>
-            {/* TOC desktop — sidebar sticky */}
-            <div class="hidden lg:block">
-              <TableOfContents headings={headings} label={copy.pages.blogPost.tableOfContents} variant="desktop" />
-            </div>
-          </div>
-        </Container>
-      </Section>
+          </Section>
 
-      {/* Related cruises */}
-      {(post.primaryCruise || secondaryCruises.length > 0) && (
-        <Section padding="lg" class="border-t border-border/70 bg-muted/30">
-          <Container class="max-w-[860px]">
-            <p class="mb-8 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-              {copy.pages.blogPost.primaryCruise}
-            </p>
-            <div class="grid gap-5 sm:grid-cols-2">
-              {post.primaryCruise && (() => {
-                const cruiseImageUrl = post.primaryCruise.heroImage
-                  ? urlForImage(post.primaryCruise.heroImage)?.width(640).height(380).fit('crop').quality(82).auto('format').url()
-                  : undefined;
-                return (
-                  <article class="group overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card shadow-xs transition hover:shadow-md">
-                    {cruiseImageUrl && (
-                      <div class="overflow-hidden">
-                        <img
-                          src={cruiseImageUrl}
-                          alt={post.primaryCruise.heroImage?.alt || post.primaryCruise.heroTitle || ''}
-                          width="640"
-                          height="380"
-                          loading="lazy"
-                          decoding="async"
-                          class="aspect-[5/3] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
-                          style={{ backgroundColor: post.primaryCruise.heroImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
-                        />
-                      </div>
-                    )}
-                    <div class="flex flex-col gap-4 p-6">
-                      <h2 class="font-heading text-2xl font-semibold leading-tight text-foreground">
-                        {post.primaryCruise.heroTitle || post.primaryCruise.title}
-                      </h2>
-                      {post.primaryCruise.excerpt && (
-                        <p class="text-sm leading-relaxed text-muted-foreground">{post.primaryCruise.excerpt}</p>
-                      )}
-                      <a
-                        href={localizePath(`/nos-croisieres/${post.primaryCruise.slug}/`, locale)}
-                        class={buttonVariants({ variant: 'primary', className: 'mt-2 w-fit' })}
-                      >
-                        {copy.pages.blogPost.discoverCruise}
-                      </a>
-                    </div>
-                  </article>
-                );
-              })()}
-
-              {secondaryCruises.length > 0 && (
-                <div class="flex flex-col gap-4">
-                  {secondaryCruises.map((cruise) => {
-                    const cruiseImageUrl = cruise.heroImage
-                      ? urlForImage(cruise.heroImage)?.width(480).height(200).fit('crop').quality(80).auto('format').url()
+          {/* Related cruises */}
+          {(post.primaryCruise || secondaryCruises.length > 0) && (
+            <Section padding="lg" class="border-t border-border/70 bg-muted/30 lg:py-20">
+              <div class="max-w-[860px]">
+                <p class="mb-8 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
+                  {copy.pages.blogPost.primaryCruise}
+                </p>
+                <div class="grid gap-5 sm:grid-cols-2">
+                  {post.primaryCruise && (() => {
+                    const cruiseImageUrl = post.primaryCruise.heroImage
+                      ? urlForImage(post.primaryCruise.heroImage)?.width(640).height(380).fit('crop').quality(82).auto('format').url()
                       : undefined;
                     return (
-                      <a
-                        href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)}
-                        class="group flex items-center gap-4 overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card p-4 shadow-xs transition hover:shadow-md hover:-translate-y-0.5"
-                      >
+                      <article class="group overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card shadow-xs transition hover:shadow-md">
                         {cruiseImageUrl && (
-                          <div class="shrink-0 overflow-hidden rounded-[var(--radius-control)]">
+                          <div class="overflow-hidden">
                             <img
                               src={cruiseImageUrl}
-                              alt={cruise.heroImage?.alt || cruise.heroTitle || ''}
-                              width="96"
-                              height="72"
+                              alt={post.primaryCruise.heroImage?.alt || post.primaryCruise.heroTitle || ''}
+                              width="640"
+                              height="380"
                               loading="lazy"
                               decoding="async"
-                              class="h-18 w-24 object-cover transition duration-500 group-hover:scale-[1.04]"
-                              style={{ backgroundColor: cruise.heroImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                              class="aspect-[5/3] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                              style={{ backgroundColor: post.primaryCruise.heroImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
                             />
                           </div>
                         )}
-                        <div class="min-w-0 flex-1">
-                          <h3 class="font-heading text-lg font-semibold leading-tight text-foreground transition group-hover:text-primary">
-                            {cruise.heroTitle || cruise.title}
-                          </h3>
-                          {cruise.excerpt && (
-                            <p class="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{cruise.excerpt}</p>
+                        <div class="flex flex-col gap-4 p-6">
+                          <h2 class="font-heading text-2xl font-semibold leading-tight text-foreground">
+                            {post.primaryCruise.heroTitle || post.primaryCruise.title}
+                          </h2>
+                          {post.primaryCruise.excerpt && (
+                            <p class="text-sm leading-relaxed text-muted-foreground">{post.primaryCruise.excerpt}</p>
                           )}
+                          <a
+                            href={localizePath(`/nos-croisieres/${post.primaryCruise.slug}/`, locale)}
+                            class={buttonVariants({ variant: 'primary', className: 'mt-2 w-fit' })}
+                          >
+                            {copy.pages.blogPost.discoverCruise}
+                          </a>
                         </div>
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="shrink-0 text-muted-foreground transition group-hover:text-primary group-hover:translate-x-0.5">
-                          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                      </a>
+                      </article>
                     );
-                  })}
+                  })()}
+
+                  {secondaryCruises.length > 0 && (
+                    <div class="flex flex-col gap-4">
+                      {secondaryCruises.map((cruise) => {
+                        const cruiseImageUrl = cruise.heroImage
+                          ? urlForImage(cruise.heroImage)?.width(480).height(200).fit('crop').quality(80).auto('format').url()
+                          : undefined;
+                        return (
+                          <a
+                            href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)}
+                            class="group flex items-center gap-4 overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card p-4 shadow-xs transition hover:shadow-md hover:-translate-y-0.5"
+                          >
+                            {cruiseImageUrl && (
+                              <div class="shrink-0 overflow-hidden rounded-[var(--radius-control)]">
+                                <img
+                                  src={cruiseImageUrl}
+                                  alt={cruise.heroImage?.alt || cruise.heroTitle || ''}
+                                  width="96"
+                                  height="72"
+                                  loading="lazy"
+                                  decoding="async"
+                                  class="h-18 w-24 object-cover transition duration-500 group-hover:scale-[1.04]"
+                                  style={{ backgroundColor: cruise.heroImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                                />
+                              </div>
+                            )}
+                            <div class="min-w-0 flex-1">
+                              <h3 class="font-heading text-lg font-semibold leading-tight text-foreground transition group-hover:text-primary">
+                                {cruise.heroTitle || cruise.title}
+                              </h3>
+                              {cruise.excerpt && (
+                                <p class="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{cruise.excerpt}</p>
+                              )}
+                            </div>
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="shrink-0 text-muted-foreground transition group-hover:text-primary group-hover:translate-x-0.5">
+                              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </a>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </Container>
-        </Section>
-      )}
+              </div>
+            </Section>
+          )}
+        </div>
+
+        {/* TOC desktop — sidebar sticky */}
+        <div class="hidden lg:block lg:sticky lg:self-start lg:pt-6" style="top: var(--toc-sticky-top, 6rem);">
+          <TableOfContents headings={headings} label={copy.pages.blogPost.tableOfContents} variant="desktop" />
+        </div>
+      </div>
 
     </article>
   </main>

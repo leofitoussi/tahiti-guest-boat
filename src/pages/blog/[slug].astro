@@ -1,11 +1,13 @@
 ---
 import BlogContent from '../../components/blog/BlogContent.astro';
+import TableOfContents from '../../components/blog/TableOfContents.astro';
 import Container from '../../components/layout/Container.astro';
 import Section from '../../components/layout/Section.astro';
 import { buttonVariants } from '../../components/ui/button';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { formatPostDate, getBlogPost, getBlogPosts, type BlogPost } from '../../lib/blog';
+import { formatPostDate, getAllBlogSlugs, getBlogPost, type BlogPost } from '../../lib/blog';
 import { defaultLocale, localizePath } from '../../lib/localization';
+import { extractHeadings } from '../../lib/portable-text-headings';
 import { getSiteCopy } from '../../lib/site-copy';
 import { urlForImage } from '../../lib/sanity';
 
@@ -13,16 +15,17 @@ const locale = defaultLocale;
 const copy = getSiteCopy(locale);
 
 export async function getStaticPaths() {
-  const posts = await getBlogPosts(defaultLocale);
+  const slugs = await getAllBlogSlugs(defaultLocale);
 
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
+  return slugs.map(({ slug }) => ({
+    params: { slug },
+    props: { post: { slug } },
   }));
 }
 
 const summary = Astro.props.post as BlogPost;
 const post = (await getBlogPost(summary.slug, locale)) || summary;
+const headings = extractHeadings(post.body);
 
 const title = post.seoTitle || `${post.title} | Tahiti Guest Boat`;
 const description = post.seoDescription || post.excerpt || copy.pages.blogPost.fallbackDescription;
@@ -32,13 +35,13 @@ const mainImageUrl = post.mainImage
 const secondaryCruises = post.secondaryCruises ?? [];
 ---
 
-<BaseLayout title={title} description={description} image={mainImageUrl} locale={locale}>
+<BaseLayout title={title} description={description} image={mainImageUrl} locale={locale} noindex={!post.seo?.indexable}>
   <main class="bg-background">
     <article>
 
       {/* Hero */}
       <Section padding="lg" class="border-b border-border/70 bg-muted/30">
-        <Container class="max-w-[860px]">
+        <Container class="max-w-[960px]">
           <a
             href={localizePath('/blog', locale)}
             class={buttonVariants({ variant: 'ghost', className: 'mb-6 w-fit px-0 text-muted-foreground hover:text-foreground' })}
@@ -100,8 +103,22 @@ const secondaryCruises = post.secondaryCruises ?? [];
 
       {/* Body */}
       <Section padding="lg">
-        <Container class="max-w-[740px]">
-          <BlogContent value={post.body} />
+        <Container class="max-w-[960px]">
+          {/* TOC mobile — replié en tête, masqué sur desktop */}
+          <div class="lg:hidden">
+            <TableOfContents headings={headings} label={copy.pages.blogPost.tableOfContents} variant="mobile" />
+          </div>
+
+          {/* Grille 2 colonnes sur desktop : contenu | sommaire */}
+          <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-12 lg:items-start">
+            <div class="max-w-[68ch]">
+              <BlogContent value={post.body} />
+            </div>
+            {/* TOC desktop — sidebar sticky */}
+            <div class="hidden lg:block">
+              <TableOfContents headings={headings} label={copy.pages.blogPost.tableOfContents} variant="desktop" />
+            </div>
+          </div>
         </Container>
       </Section>
 

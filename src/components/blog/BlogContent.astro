@@ -1,6 +1,7 @@
 ---
 import { PortableText } from 'astro-portabletext';
 import type { TypedObject } from 'astro-portabletext/types';
+import HeadingBlock from './HeadingBlock.astro';
 import PortableImage from './PortableImage.astro';
 
 interface Props {
@@ -11,6 +12,10 @@ const { value = [] } = Astro.props;
 const components = {
   type: {
     image: PortableImage,
+  },
+  block: {
+    h2: HeadingBlock,
+    h3: HeadingBlock,
   },
 };
 ---
@@ -23,7 +28,7 @@ const components = {
   .blog-content {
     color: var(--foreground);
     font-size: var(--font-size-lg);
-    line-height: var(--line-height-relaxed);
+    line-height: var(--line-height-body);
   }
 
   .blog-content :global(p) {
@@ -32,12 +37,18 @@ const components = {
 
   .blog-content :global(h2) {
     margin: 2.5rem 0 1rem;
+    font-size: var(--font-size-3xl);
+    line-height: var(--line-height-heading);
     color: var(--primary);
+    scroll-margin-top: 6rem;
   }
 
   .blog-content :global(h3) {
     margin: 2rem 0 0.75rem;
+    font-size: var(--font-size-xl);
+    line-height: var(--line-height-heading);
     color: var(--foreground);
+    scroll-margin-top: 6rem;
   }
 
   .blog-content :global(blockquote) {

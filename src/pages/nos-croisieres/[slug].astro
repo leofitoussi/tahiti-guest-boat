@@ -2,7 +2,6 @@
 import HeroBlock from '../../components/cruises/HeroBlock.astro';
 import CruiseTeaserBlock from '../../components/cruises/CruiseTeaserBlock.astro';
 import CruiseGalleryBlock from '../../components/cruises/CruiseGalleryBlock.astro';
-import CruiseIntroBlock from '../../components/cruises/CruiseIntroBlock.astro';
 import IntroductionDestinationBlock from '../../components/cruises/IntroductionDestinationBlock.astro';
 import BoatBlock from '../../components/cruises/BoatBlock.astro';
 import ItineraryBlock from '../../components/cruises/ItineraryBlock.astro';
@@ -74,9 +73,8 @@ const structuredData = [
     <HeroBlock block={hero} locale={locale} />
     <CruiseTeaserBlock block={cruise.cruiseTeaser} />
     <CruiseGalleryBlock block={cruise.gallery} />
-    <CruiseIntroBlock block={cruise.cruiseIntro} />
     <IntroductionDestinationBlock block={cruise.introductionDestination} />
-<BoatBlock block={boat} locale={locale} />
+    <BoatBlock block={boat} locale={locale} />
     <ItineraryBlock block={itinerary} locale={locale} />
     <WhyUsBlock settings={settings} locale={locale} />
     <ReviewsBlock reviews={reviews} locale={locale} />

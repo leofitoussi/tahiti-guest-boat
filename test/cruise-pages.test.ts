@@ -222,16 +222,14 @@ describe('cruise page template — fixed section order', () => {
     expect(source).toContain('<ReviewsBlock reviews={reviews} locale={locale} />');
   });
 
-  it('renders sections in the fixed order: Hero → Accroche → Gallery → CruiseIntro → IntroductionDestination → BateauRecommande → Boat → Itinerary → WhyUs → Reviews → Booking → RelatedCruises', async () => {
+  it('renders sections in the fixed order: Hero → Accroche → Gallery → IntroductionDestination → Boat → Itinerary → WhyUs → Reviews → Booking → RelatedCruises', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
 
     const ORDERED_SECTIONS = [
       'HeroBlock',
       'CruiseTeaserBlock',
       'CruiseGalleryBlock',
-      'CruiseIntroBlock',
       'IntroductionDestinationBlock',
-      'BateauRecommandeBlock',
       'BoatBlock',
       'ItineraryBlock',
       'WhyUsBlock',
@@ -256,41 +254,24 @@ describe('cruise page template — fixed section order', () => {
   });
 });
 
-// ── Cycle 11 — Bloc intro croisière après galerie ──────────────────────────
+// ── Cycle 11 — Bloc intro croisière supprimé (remplacé par Introduction destination) ──
 
-describe('CruiseIntroBlock — schema and data flow', () => {
-  it('cruisePage exposes editable cruiseIntro fields for stylable heading, body, and image', () => {
-    const fields = Object.fromEntries(cruisePage.fields.map((f) => [f.name, f as any]));
-    expect(fields.cruiseIntro).toMatchObject({ type: 'object' });
-
-    const sub = Object.fromEntries(fields.cruiseIntro.fields.map((f: any) => [f.name, f]));
-    expect(sub.heading).toMatchObject({ type: 'array' });
-    expect(sub.body).toMatchObject({ type: 'array' });
-    expect(sub.highlight).toBeUndefined();
-    expect(sub.image).toMatchObject({ type: 'image' });
+describe('cruiseIntro — removed in favour of introductionDestination', () => {
+  it('cruisePage no longer exposes a cruiseIntro field', () => {
+    const fieldNames = cruisePage.fields.map((f) => f.name);
+    expect(fieldNames).not.toContain('cruiseIntro');
   });
 
-  it('cruises.ts projects cruiseIntro content and image metadata', async () => {
+  it('cruises.ts no longer projects or declares cruiseIntro', async () => {
     const source = await readFile('src/lib/cruises.ts', 'utf8');
-    expect(source).toContain('cruiseIntro{');
-    expect(source).toContain('image');
-    expect(source).toContain('export interface CruiseIntro');
-    expect(source).not.toContain('highlight?: string');
+    expect(source).not.toContain('cruiseIntro');
+    expect(source).not.toContain('CruiseIntro');
   });
 
-  it('template renders CruiseIntroBlock immediately after CruiseGalleryBlock', async () => {
+  it('template no longer renders CruiseIntroBlock', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
-    const order = ['CruiseGalleryBlock', 'CruiseIntroBlock', 'IntroductionDestinationBlock'];
-
-    let last = -1;
-    for (const tag of order) {
-      const idx = source.indexOf(`<${tag}`);
-      expect(idx, `<${tag} must be present`).toBeGreaterThan(-1);
-      expect(idx, `<${tag} must come after previous`).toBeGreaterThan(last);
-      last = idx;
-    }
-
-    expect(source).toContain('block={cruise.cruiseIntro}');
+    expect(source).not.toContain('CruiseIntroBlock');
+    expect(source).not.toContain('cruise.cruiseIntro');
   });
 });
 
@@ -440,15 +421,25 @@ describe('sections éditoriales — schema fields', () => {
     expect(sub.images).toMatchObject({ type: 'array' });
   });
 
-  it('cruisePage has bateauRecommande with heading, body, image, and CTA', () => {
+  it('cruisePage has a boat block (Na Maka) with heading, body, image, and CTA', () => {
     const fields = Object.fromEntries(cruisePage.fields.map((f) => [f.name, f as any]));
-    expect(fields.bateauRecommande).toMatchObject({ type: 'object' });
-    const sub = Object.fromEntries(fields.bateauRecommande.fields.map((f: any) => [f.name, f]));
-    expect(sub.heading).toMatchObject({ type: 'string' });
-    expect(sub.body).toMatchObject({ type: 'array' });
-    expect(sub.image).toMatchObject({ type: 'image' });
-    expect(sub.ctaLabel).toMatchObject({ type: 'string' });
-    expect(sub.ctaUrl).toMatchObject({ type: 'url' });
+    expect(fields.boat).toMatchObject({ type: 'boatBlock' });
+    expect(fields.boat.title).toMatch(/Na Maka/);
+  });
+
+  it('bateauRecommande is removed (consolidated into boat)', () => {
+    const fieldNames = cruisePage.fields.map((f) => f.name);
+    expect(fieldNames).not.toContain('bateauRecommande');
+  });
+
+  it('schema field order is introductionDestination → boat → itinerary', () => {
+    const fieldNames = cruisePage.fields.map((f) => f.name);
+    const intro = fieldNames.indexOf('introductionDestination');
+    const boat = fieldNames.indexOf('boat');
+    const itinerary = fieldNames.indexOf('itinerary');
+    expect(intro).toBeGreaterThan(-1);
+    expect(boat).toBeGreaterThan(intro);
+    expect(itinerary).toBeGreaterThan(boat);
   });
 
   it('editorial sections are not exposed in GROQ page-builder references', () => {
@@ -456,7 +447,6 @@ describe('sections éditoriales — schema fields', () => {
     expect(fieldNames).not.toContain('editorialSections');
     expect(fieldNames).toContain('introductionDestination');
     expect(fieldNames).not.toContain('experienceCroisiere');
-    expect(fieldNames).toContain('bateauRecommande');
   });
 });
 
@@ -467,22 +457,23 @@ describe('sections éditoriales — GROQ projection', () => {
     expect(source).toContain('images[]{');
   });
 
-  it('cruises.ts projects bateauRecommande with image metadata', async () => {
+  it('cruises.ts projects the boat block with image metadata', async () => {
     const source = await readFile('src/lib/cruises.ts', 'utf8');
-    expect(source).toContain('bateauRecommande');
+    expect(source).toContain('boat{');
   });
 });
 
 describe('sections éditoriales — TypeScript types', () => {
-  it('CruisePage interface includes all three editorial section fields', () => {
+  it('CruisePage interface exposes the editorial section fields', () => {
     // TS types are compile-time only; verified via source text in the next test
     expect(typeof cruisesLib.getCruisePage).toBe('function');
   });
 
-  it('cruises lib source declares IntroductionDestination and BateauRecommande types', async () => {
+  it('cruises lib source declares IntroductionDestination type and no longer BateauRecommande', async () => {
     const source = await readFile('src/lib/cruises.ts', 'utf8');
     expect(source).toContain('introductionDestination');
-    expect(source).toContain('bateauRecommande');
+    expect(source).not.toContain('bateauRecommande');
+    expect(source).not.toContain('BateauRecommande');
   });
 });
 
@@ -493,7 +484,7 @@ describe('sections éditoriales — empty-section guards', () => {
     expect(source).toMatch(/return/);
   });
 
-  it('BateauRecommandeBlock renders nothing when block is absent or empty', async () => {
+  it('BoatBlock content guard renders nothing when block is absent or empty', async () => {
     const source = await readFile('src/components/cruises/CruiseImageTextBlock.astro', 'utf8');
     expect(source).toMatch(/hasContent|!block|block\s*&&/);
     expect(source).toMatch(/return/);
@@ -507,20 +498,20 @@ describe('sections éditoriales — lazy loading', () => {
     expect(source).not.toContain('fetchpriority="high"');
   });
 
-  it('BateauRecommandeBlock image uses lazy loading', async () => {
+  it('BoatBlock image uses lazy loading', async () => {
     const source = await readFile('src/components/cruises/CruiseImageTextBlock.astro', 'utf8');
     expect(source).toContain('loading="lazy"');
   });
 });
 
 describe('sections éditoriales — rendering order', () => {
-  it('template renders editorial destination sections between CruiseIntroBlock and BoatBlock', async () => {
+  it('template renders IntroductionDestination → Boat → Itinerary in order', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
     const order = [
-      'CruiseIntroBlock',
+      'CruiseGalleryBlock',
       'IntroductionDestinationBlock',
-      'BateauRecommandeBlock',
       'BoatBlock',
+      'ItineraryBlock',
     ];
     let last = -1;
     for (const tag of order) {
@@ -534,7 +525,7 @@ describe('sections éditoriales — rendering order', () => {
   it('template passes editorial section data from cruise object', async () => {
     const source = await readFile('src/pages/nos-croisieres/[slug].astro', 'utf8');
     expect(source).toContain('cruise.introductionDestination');
-    expect(source).toContain('cruise.bateauRecommande');
+    expect(source).not.toContain('cruise.bateauRecommande');
   });
 });
 

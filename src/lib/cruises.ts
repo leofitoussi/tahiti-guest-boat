@@ -38,12 +38,6 @@ export interface CruiseGallery {
   images?: SanityImage[];
 }
 
-export interface CruiseIntro {
-  heading?: TypedObject[];
-  body?: TypedObject[];
-  image?: SanityImage;
-}
-
 export interface EditorialBlock {
   _type: 'editorialBlock';
   _key?: string;
@@ -124,7 +118,6 @@ export interface CruisePage extends CruisePageSummary {
   hero?: CruiseHeroBlock;
   cruiseTeaser?: CruiseTeaser;
   gallery?: CruiseGallery;
-  cruiseIntro?: CruiseIntro;
   introductionDestination?: IntroductionDestination;
 boat?: BoatBlock;
   itinerary?: ItineraryBlock;
@@ -230,11 +223,6 @@ const cruisePageFields = `
     title,
     text,
     images[]${imageFields}
-  },
-  cruiseIntro{
-    heading,
-    body,
-    image${imageFields}
   },
   introductionDestination{
     "heading": pt::text(heading),

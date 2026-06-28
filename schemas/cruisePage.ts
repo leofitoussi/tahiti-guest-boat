@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 import { defineLocalizationFields } from './localization-fields';
-import { activityDescriptionText, h2HeadingText, inlineText, richText } from './portableText';
+import { activityDescriptionText, inlineText, richText } from './portableText';
 
 export const cruisePage = defineType({
   name: 'cruisePage',
@@ -140,55 +140,10 @@ export const cruisePage = defineType({
       ],
     }),
     defineField({
-      name: 'cruiseIntro',
-      title: 'Introduction croisière',
-      type: 'object',
-      description: 'Bloc éditorial affiché après la galerie pour expliquer pourquoi la croisière est adaptée à la destination.',
-      fields: [
-        defineField({
-          name: 'heading',
-          title: 'Titre',
-          type: 'array',
-          of: h2HeadingText,
-        }),
-        defineField({
-          name: 'body',
-          title: 'Texte',
-          type: 'array',
-          of: richText,
-        }),
-        defineField({
-          name: 'image',
-          title: 'Image',
-          type: 'image',
-          options: { hotspot: true },
-          fields: [
-            defineField({
-              name: 'alt',
-              title: 'Texte alternatif',
-              type: 'string',
-              validation: (rule) => rule.required(),
-            }),
-          ],
-        }),
-      ],
-    }),
-    defineField({
-      name: 'boat',
-      title: 'Boat',
-      type: 'boatBlock',
-      validation: (rule) => rule.required().warning('Ajoutez le bateau recommandé pour renforcer la conversion.'),
-    }),
-    defineField({
-      name: 'itinerary',
-      title: 'Itinerary',
-      type: 'itineraryBlock',
-      validation: (rule) => rule.required().warning('Ajoutez un itinéraire indicatif pour rendre la croisière concrète.'),
-    }),
-    defineField({
       name: 'introductionDestination',
       title: 'Introduction destination',
       type: 'object',
+      description: 'Bloc éditorial affiché après la galerie pour expliquer pourquoi la croisière est adaptée à la destination.',
       fields: [
         defineField({ name: 'heading', title: 'Titre', type: 'string' }),
         defineField({ name: 'body', title: 'Texte', type: 'array', of: richText }),
@@ -207,6 +162,19 @@ export const cruisePage = defineType({
           ],
         }),
       ],
+    }),
+    defineField({
+      name: 'boat',
+      title: 'Notre bateau (Na Maka)',
+      type: 'boatBlock',
+      description: 'Bloc expliquant pourquoi le catamaran Na Maka est idéal pour cette croisière. Affiché après l’introduction destination, avant l’itinéraire.',
+      validation: (rule) => rule.required().warning('Ajoutez le bateau recommandé pour renforcer la conversion.'),
+    }),
+    defineField({
+      name: 'itinerary',
+      title: 'Itinéraire',
+      type: 'itineraryBlock',
+      validation: (rule) => rule.required().warning('Ajoutez un itinéraire indicatif pour rendre la croisière concrète.'),
     }),
   ],
   preview: {

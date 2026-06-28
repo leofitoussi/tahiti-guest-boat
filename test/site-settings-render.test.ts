@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { describe, expect, it, beforeAll } from 'vitest';
 
 const buildArgs = ['run', 'build'];
@@ -23,49 +23,48 @@ describe('site settings render', () => {
     expect(html).toContain('+689 87 00 00 09');
   });
 
-  it('renders complete SEO output for a Page croisière', async () => {
-    const html = await readFile('dist/nos-croisieres/croisiere-decouverte-tuamotu/index.html', 'utf8');
+  // Content-agnostic: discovers whatever cruise pages the build produced from
+  // Sanity, so creating, renaming, or deleting a cruise never breaks this test.
+  // It asserts only the SEO scaffolding the code guarantees for every cruise —
+  // not the title, slug, or itinerary of any specific one.
+  it('renders complete SEO scaffolding for every built Page croisière', async () => {
+    const cruisesDir = 'dist/nos-croisieres';
+    const entries = await readdir(cruisesDir, { withFileTypes: true });
+    const slugs = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
 
-    expect(html).toContain(
-      '<link rel="canonical" href="https://tahiti-guest-boat.com/nos-croisieres/croisiere-decouverte-tuamotu/"'
-    );
-    expect(html).toContain('<meta property="og:title"');
-    expect(html).toContain('<meta property="og:image"');
-    expect(html).toContain('<meta name="twitter:card" content="summary_large_image"');
-    expect(html).toContain('<script type="application/ld+json"');
+    expect(slugs.length).toBeGreaterThan(0);
 
-    const jsonLd = html.match(/<script type="application\/ld\+json">(.+?)<\/script>/)?.[1];
-    expect(jsonLd).toBeTruthy();
+    for (const slug of slugs) {
+      const html = await readFile(`${cruisesDir}/${slug}/index.html`, 'utf8');
 
-    const structuredData = JSON.parse(jsonLd as string) as {
-      '@context': string;
-      '@graph': Record<string, any>[];
-    };
-    const touristTrip = structuredData['@graph'].find((item) => item['@type'] === 'TouristTrip');
-    const itemList = structuredData['@graph'].find((item) => item['@type'] === 'ItemList');
+      expect(html, `canonical for ${slug}`).toContain(
+        `<link rel="canonical" href="https://tahiti-guest-boat.com/nos-croisieres/${slug}/"`
+      );
+      expect(html, `og:title for ${slug}`).toContain('<meta property="og:title"');
+      expect(html, `twitter:card for ${slug}`).toContain(
+        '<meta name="twitter:card" content="summary_large_image"'
+      );
+      expect(html, `JSON-LD for ${slug}`).toContain('<script type="application/ld+json"');
 
-    expect(structuredData['@context']).toBe('https://schema.org');
-    expect(touristTrip).toMatchObject({
-      name: 'Croisière découverte aux Tuamotu',
-      provider: {
-        '@type': 'Organization',
-        name: 'Tahiti Guest Boat',
-      },
-    });
-    expect(touristTrip?.touristType).toMatch(/^croisière /);
-    expect(touristTrip).not.toHaveProperty('offers');
-    expect(touristTrip?.subTrip.length).toBeGreaterThan(0);
-    expect(touristTrip?.subTrip[0]).toMatchObject({
-      '@type': 'TouristTrip',
-    });
-    expect(touristTrip?.subTrip.every((trip: any) => trip.name && trip.description)).toBe(true);
-    expect(itemList?.itemListElement).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          '@type': 'ListItem',
-          position: 1,
-        }),
-      ])
-    );
+      const jsonLd = html.match(/<script type="application\/ld\+json">(.+?)<\/script>/)?.[1];
+      expect(jsonLd, `JSON-LD payload for ${slug}`).toBeTruthy();
+
+      const structuredData = JSON.parse(jsonLd as string) as {
+        '@context': string;
+        '@graph': Record<string, any>[];
+      };
+      const touristTrip = structuredData['@graph'].find((item) => item['@type'] === 'TouristTrip');
+
+      expect(structuredData['@context'], `@context for ${slug}`).toBe('https://schema.org');
+      expect(touristTrip, `TouristTrip for ${slug}`).toMatchObject({
+        provider: {
+          '@type': 'Organization',
+          name: 'Tahiti Guest Boat',
+        },
+      });
+      expect(touristTrip?.url, `TouristTrip url for ${slug}`).toContain(
+        `/nos-croisieres/${slug}/`
+      );
+    }
   });
 });

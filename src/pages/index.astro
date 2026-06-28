@@ -14,6 +14,7 @@ import { sanityClient } from 'sanity:client';
 interface HomePage {
   seoTitle?: string;
   seoDescription?: string;
+  seo?: { indexable?: boolean };
   pageBuilder?: Record<string, unknown>[];
 }
 
@@ -28,6 +29,7 @@ const HOME_QUERY = `*[_id == $homeId && !(_id in path("drafts.**"))][0]{
   ${localizedDocumentFields},
   seoTitle,
   seoDescription,
+  seo { indexable },
   ${pageBuilderFields}
 }`;
 
@@ -63,7 +65,7 @@ const heroSources = heroImage ? heroImageSources(heroImage) : undefined;
 const heroPreload = heroSources ? { srcset: heroSources.srcset, sizes: heroSources.sizes } : undefined;
 ---
 
-<BaseLayout title={seoTitle} description={seoDescription} settings={settings} locale={defaultLocale} heroPreload={heroPreload}>
+<BaseLayout title={seoTitle} description={seoDescription} settings={settings} locale={defaultLocale} heroPreload={heroPreload} noindex={!home?.seo?.indexable}>
   <main class="bg-background">
     <PageBuilder blocks={pageBuilder} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} activities={activities} locale={defaultLocale} />
   </main>

@@ -1,6 +1,7 @@
 import { defineField, defineType } from 'sanity';
 import { richText } from './portableText';
 import { defineLocalizationFields } from './localization-fields';
+import { seo as seoType } from './seo';
 
 export const legalPage = defineType({
   name: 'legalPage',
@@ -37,6 +38,11 @@ export const legalPage = defineType({
       title: 'Description SEO',
       type: 'text',
       rows: 3,
+    }),
+    defineField({
+      name: 'seo',
+      title: seoType.title,
+      type: 'seo',
     }),
   ],
 });

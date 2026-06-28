@@ -11,8 +11,8 @@ import BookingBlock from '../../components/cruises/BookingBlock.astro';
 import RelatedCruisesBlock from '../../components/cruises/RelatedCruisesBlock.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import {
+  getAllCruiseSlugs,
   getCruisePage,
-  getCruisePages,
   getRelatedCruises,
   getReviews,
   getSiteSettings,
@@ -24,11 +24,11 @@ import { buildLocalizedMetadata, defaultLocale } from '../../lib/localization';
 const locale = defaultLocale;
 
 export async function getStaticPaths() {
-  const cruises = await getCruisePages(defaultLocale);
+  const slugs = await getAllCruiseSlugs(defaultLocale);
 
-  return cruises.map((cruise) => ({
-    params: { slug: cruise.slug },
-    props: { cruise },
+  return slugs.map(({ slug }) => ({
+    params: { slug },
+    props: { cruise: { slug } },
   }));
 }
 
@@ -66,6 +66,7 @@ const structuredData = [
   settings={settings}
   locale={locale}
   structuredData={structuredData}
+  noindex={!cruise.seo?.indexable}
 >
   <main class="bg-background">
     <HeroBlock block={hero} locale={locale} />

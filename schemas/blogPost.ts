@@ -1,6 +1,7 @@
 import { DocumentTextIcon } from '@sanity/icons';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { defineLocalizationFields } from './localization-fields';
+import { seo as seoType } from './seo';
 
 export const blogPost = defineType({
   name: 'blogPost',
@@ -156,6 +157,18 @@ export const blogPost = defineType({
       type: 'text',
       rows: 3,
       validation: (rule) => rule.max(160),
+    }),
+    defineField({
+      name: 'seo',
+      title: seoType.title,
+      type: 'seo',
+    }),
+    defineField({
+      name: 'visible',
+      title: 'Visible dans le listing',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Cocher pour afficher cet article dans la page /blog. Les articles cachés restent accessibles par URL directe.',
     }),
   ],
   preview: {

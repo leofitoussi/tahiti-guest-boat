@@ -208,29 +208,6 @@ export const cruisePage = defineType({
         }),
       ],
     }),
-    defineField({
-      name: 'bateauRecommande',
-      title: 'Bateau recommandé',
-      type: 'object',
-      fields: [
-        defineField({ name: 'heading', title: 'Titre', type: 'string' }),
-        defineField({ name: 'body', title: 'Texte', type: 'array', of: richText }),
-        defineField({
-          name: 'image',
-          title: 'Image',
-          type: 'image',
-          options: { hotspot: true },
-          fields: [defineField({ name: 'alt', title: 'Texte alternatif', type: 'string', validation: (r) => r.required() })],
-        }),
-        defineField({ name: 'ctaLabel', title: 'Libellé CTA', type: 'string' }),
-        defineField({
-          name: 'ctaUrl',
-          title: 'Lien CTA',
-          type: 'url',
-          validation: (r) => r.uri({ allowRelative: true, scheme: ['http', 'https', 'mailto', 'tel'] }),
-        }),
-      ],
-    }),
   ],
   preview: {
     select: {

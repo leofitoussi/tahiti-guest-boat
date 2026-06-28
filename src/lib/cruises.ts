@@ -116,14 +116,6 @@ export interface IntroductionDestination {
   images?: SanityImage[];
 }
 
-export interface BateauRecommande {
-  heading?: string;
-  body?: TypedObject[];
-  image?: SanityImage;
-  ctaLabel?: string;
-  ctaUrl?: string;
-}
-
 export interface CruisePage extends CruisePageSummary {
   locale?: Locale;
   translationGroup?: string;
@@ -134,8 +126,7 @@ export interface CruisePage extends CruisePageSummary {
   gallery?: CruiseGallery;
   cruiseIntro?: CruiseIntro;
   introductionDestination?: IntroductionDestination;
-  bateauRecommande?: BateauRecommande;
-  boat?: BoatBlock;
+boat?: BoatBlock;
   itinerary?: ItineraryBlock;
 }
 
@@ -259,14 +250,7 @@ const cruisePageFields = `
       }
     }
   },
-  bateauRecommande{
-    heading,
-    body,
-    image${imageFields},
-    ctaLabel,
-    ctaUrl
-  },
-  boat{
+boat{
     heading,
     body,
     image${imageFields},

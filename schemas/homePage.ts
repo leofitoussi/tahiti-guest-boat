@@ -1,6 +1,7 @@
 import { defineField, defineType } from 'sanity';
 import { defineUniquePageBuilderField } from './pageBuilder';
 import { defineLocalizationFields } from './localization-fields';
+import { seo as seoType } from './seo';
 
 export const homePage = defineType({
   name: 'homePage',
@@ -22,6 +23,12 @@ export const homePage = defineType({
       rows: 3,
       group: 'seo',
       validation: (rule) => rule.required().max(160),
+    }),
+    defineField({
+      name: 'seo',
+      title: seoType.title,
+      type: 'seo',
+      group: 'seo',
     }),
     ...defineLocalizationFields(),
 

@@ -40,6 +40,7 @@ export interface BlogPost extends BlogPostSummary {
   body?: TypedObject[];
   seoTitle?: string;
   seoDescription?: string;
+  seo?: { indexable?: boolean };
 }
 
 export interface CruiseLinkSummary {
@@ -162,12 +163,13 @@ const postDetailFields = `{
     "excerpt": pitch.accroche
   },
   seoTitle,
-  seoDescription
+  seoDescription,
+  seo { indexable }
 }`;
 
 const publishedPostFilter = buildLocalizedSluggedDocumentFilter('blogPost') + ' && defined(publishedAt)';
 
-const BLOG_POSTS_QUERY = `*[${publishedPostFilter}] | order(publishedAt desc) ${postFields}`;
+const BLOG_POSTS_QUERY = `*[${publishedPostFilter} && coalesce(visible, false) == true] | order(publishedAt desc) ${postFields}`;
 const BLOG_POST_QUERY = `*[${publishedPostFilter} && slug.current == $slug][0] ${postDetailFields}`;
 
 export async function getBlogPosts(locale: Locale = defaultLocale) {
@@ -184,6 +186,18 @@ export async function getBlogPost(slug: string, locale: Locale = defaultLocale) 
   }
 
   return sanityClient.fetch<BlogPost | null>(BLOG_POST_QUERY, { slug, locale }).catch(() => null);
+}
+
+const ALL_BLOG_SLUGS_QUERY = `*[${publishedPostFilter}] { "slug": slug.current }`;
+
+export async function getAllBlogSlugs(locale: Locale = defaultLocale) {
+  if (!isSanityConfigured) {
+    return [];
+  }
+
+  return sanityClient
+    .fetch<{ slug: string }[]>(ALL_BLOG_SLUGS_QUERY, { locale })
+    .catch(() => []);
 }
 
 export function formatPostDate(date?: string, locale: Locale = defaultLocale) {

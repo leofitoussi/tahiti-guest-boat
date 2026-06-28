@@ -8,6 +8,7 @@ export interface UniquePageDocument {
   translationGroup?: string;
   seoTitle?: string;
   seoDescription?: string;
+  seo?: { indexable?: boolean };
   pageBuilder?: Record<string, unknown>[];
 }
 
@@ -279,6 +280,7 @@ export function buildUniquePageQuery(documentType: UniquePageDocumentType) {
   ${localizedDocumentFields},
   seoTitle,
   seoDescription,
+  seo { indexable },
   ${pageBuilderFields}
 }`;
 }

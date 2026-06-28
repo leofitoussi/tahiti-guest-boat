@@ -1,6 +1,7 @@
 import { defineField, defineType } from 'sanity';
 import { defineLocalizationFields } from './localization-fields';
 import { activityDescriptionText, inlineText, richText } from './portableText';
+import { seo as seoType } from './seo';
 
 export const cruisePage = defineType({
   name: 'cruisePage',
@@ -50,6 +51,18 @@ export const cruisePage = defineType({
       type: 'text',
       rows: 3,
       validation: (rule) => rule.max(170),
+    }),
+    defineField({
+      name: 'seo',
+      title: seoType.title,
+      type: 'seo',
+    }),
+    defineField({
+      name: 'visible',
+      title: 'Visible dans le listing',
+      type: 'boolean',
+      initialValue: false,
+      description: 'Cocher pour afficher cette croisière dans la page /nos-croisieres. Les pages cachées restent accessibles par URL directe.',
     }),
     defineField({
       name: 'hero',

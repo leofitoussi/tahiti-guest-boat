@@ -115,11 +115,12 @@ export interface CruisePage extends CruisePageSummary {
   translationGroup?: string;
   seoTitle?: string;
   seoDescription?: string;
+  seo?: { indexable?: boolean };
   hero?: CruiseHeroBlock;
   cruiseTeaser?: CruiseTeaser;
   gallery?: CruiseGallery;
   introductionDestination?: IntroductionDestination;
-boat?: BoatBlock;
+  boat?: BoatBlock;
   itinerary?: ItineraryBlock;
 }
 
@@ -206,6 +207,7 @@ const cruisePageFields = `
   editorialPriority,
   seoTitle,
   seoDescription,
+  seo { indexable },
   hero{
     title,
     ctaLabel,
@@ -259,7 +261,7 @@ const cruisePageFields = `
 
 const cruisePageFilter = buildLocalizedSluggedDocumentFilter('cruisePage');
 
-const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter}] | order(coalesce(editorialPriority, 0) desc, _createdAt desc) {
+const CRUISE_SUMMARY_QUERY = `*[${cruisePageFilter} && coalesce(visible, false) == true] | order(coalesce(editorialPriority, 0) desc, _createdAt desc) {
   _id,
   _createdAt,
   ${localizedDocumentFields},
@@ -365,6 +367,18 @@ export async function getCruisePages(locale: Locale = defaultLocale) {
   }
 
   return sanityClient.fetch<CruisePageSummary[]>(CRUISE_SUMMARY_QUERY, { locale }).catch(() => []);
+}
+
+const CRUISE_SLUGS_QUERY = `*[${cruisePageFilter}] { "slug": slug.current }`;
+
+export async function getAllCruiseSlugs(locale: Locale = defaultLocale) {
+  if (!isSanityConfigured) {
+    return [];
+  }
+
+  return sanityClient
+    .fetch<{ slug: string }[]>(CRUISE_SLUGS_QUERY, { locale })
+    .catch(() => []);
 }
 
 export async function getCruisePage(slug: string, locale: Locale = defaultLocale) {

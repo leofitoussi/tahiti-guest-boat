@@ -32,6 +32,7 @@ import { cabinTourBlock } from './cabinTourBlock';
 import { faqBlock } from './faqBlock';
 import { practicalInfoBlock } from './practicalInfoBlock';
 import { boatArgumentsBlock } from './boatArgumentsBlock';
+import { seo } from './seo';
 import { whyUsBlock } from './whyUsBlock';
 
 export const schemaTypes = [
@@ -72,4 +73,5 @@ export const schemaTypes = [
   faqBlock,
   practicalInfoBlock,
   boatArgumentsBlock,
+  seo,
 ];

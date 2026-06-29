@@ -15,12 +15,12 @@ describe('site settings render', () => {
     expect(html).toContain('<html lang="fr">');
     expect(html).toContain('rel="canonical"');
     expect(html).toContain('hreflang="fr"');
-    expect(html).toContain('Réservez');
+    expect(html).toContain('Réserver');
     expect(html).toContain('Notre bateau');
     expect(html).toContain('Nos croisières');
     expect(html).toContain('Notre blog');
-    expect(html).toContain('contact@tahiti-guest-boat.com');
-    expect(html).toContain('+689 87 00 00 09');
+    expect(html).toContain('tahitiguestboat@gmail.com');
+    expect(html).toContain('+689 89 34 14 34');
   });
 
   it('injects the FR head tracking scripts unescaped, near the top of the home page head', async () => {

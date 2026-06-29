@@ -36,7 +36,7 @@ const summary = Astro.props.cruise;
 const cruise = ((await getCruisePage(summary.slug, locale)) || summary) as CruisePage;
 const [settings, reviews, relatedCruises] = await Promise.all([
   getSiteSettings(locale),
-  getReviews(3),
+  getReviews(),
   getRelatedCruises(cruise.slug, locale),
 ]);
 

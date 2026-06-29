@@ -206,6 +206,22 @@ export const siteSettings = defineType({
         }),
       ],
     }),
+    defineField({
+      name: 'headScripts',
+      title: 'Scripts <head> (tracking)',
+      type: 'text',
+      rows: 12,
+      description:
+        'Code de suivi injecté tel quel dans le <head> de toutes les pages (analytics, bannière cookies, ' +
+        'Pixel Facebook, Google Ads…). Ordre = ordre de chargement : la bannière de consentement en premier, ' +
+        "puis l'analytics, puis les pixels qu'elle doit gater. À renseigner une seule fois ici (version " +
+        'française) : il est appliqué à toutes les langues du site.',
+      hidden: ({ document }) => document?.locale !== 'fr',
+      validation: (rule) =>
+        rule.custom((value) =>
+          !value || value.includes('<') ? true : 'Cela ne ressemble pas à du HTML/script.'
+        ),
+    }),
   ],
   preview: {
     select: {

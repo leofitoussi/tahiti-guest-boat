@@ -23,6 +23,38 @@ describe('site settings render', () => {
     expect(html).toContain('+689 87 00 00 09');
   });
 
+  it('injects the FR head tracking scripts unescaped, near the top of the home page head', async () => {
+    const html = await readFile('dist/index.html', 'utf8');
+    const head = html.slice(0, html.indexOf('</head>'));
+
+    // Raw, non-escaped injection (set:html, not interpolation).
+    expect(head).toContain('<script data-goatcounter="https://tahiti-guest-boat.goatcounter.com/count"');
+    expect(head).toContain('src="//gc.zgo.at/count.js"');
+    expect(head).not.toContain('&lt;script data-goatcounter');
+
+    // High in the head so a consent banner / analytics loads early — before the title.
+    expect(head.indexOf('data-goatcounter')).toBeLessThan(head.indexOf('<title>'));
+  });
+
+  // The head tracking scripts are global: authored once (FR) and injected into
+  // every template that goes through BaseLayout, not just the home page.
+  it('injects the head tracking scripts into every built Page croisière head', async () => {
+    const cruisesDir = 'dist/nos-croisieres';
+    const entries = await readdir(cruisesDir, { withFileTypes: true });
+    const slugs = entries.filter((entry) => entry.isDirectory()).map((entry) => entry.name);
+
+    expect(slugs.length).toBeGreaterThan(0);
+
+    for (const slug of slugs) {
+      const html = await readFile(`${cruisesDir}/${slug}/index.html`, 'utf8');
+      const head = html.slice(0, html.indexOf('</head>'));
+
+      expect(head, `goatcounter for ${slug}`).toContain(
+        '<script data-goatcounter="https://tahiti-guest-boat.goatcounter.com/count"'
+      );
+    }
+  });
+
   // Content-agnostic: discovers whatever cruise pages the build produced from
   // Sanity, so creating, renaming, or deleting a cruise never breaks this test.
   // It asserts only the SEO scaffolding the code guarantees for every cruise —

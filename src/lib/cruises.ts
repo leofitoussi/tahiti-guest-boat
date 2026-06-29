@@ -155,6 +155,7 @@ export interface SiteSettings {
     fallbackCtaLabel?: string;
     fallbackCtaUrl?: string;
   };
+  headScripts?: string;
 }
 
 export interface Review {
@@ -395,6 +396,28 @@ export async function getSiteSettings(locale: Locale = defaultLocale) {
   }
 
   return sanityClient.fetch<SiteSettings | null>(SITE_SETTINGS_QUERY, { locale }).catch(() => null);
+}
+
+// Head tracking scripts are authored once on the French Site settings document and
+// applied to every locale, so they are read independently of the page locale. The
+// result is memoized so the whole static build only hits Sanity once.
+const TRACKING_HEAD_SCRIPTS_QUERY = `*[_type == "siteSettings" && locale == "fr"][0].headScripts`;
+let cachedHeadScripts: string | null | undefined;
+
+export async function getTrackingHeadScripts(): Promise<string> {
+  if (cachedHeadScripts !== undefined) {
+    return cachedHeadScripts ?? '';
+  }
+
+  if (!isSanityConfigured) {
+    cachedHeadScripts = null;
+    return '';
+  }
+
+  cachedHeadScripts = await sanityClient
+    .fetch<string | null>(TRACKING_HEAD_SCRIPTS_QUERY)
+    .catch(() => null);
+  return cachedHeadScripts ?? '';
 }
 
 export async function getReviews(limit = 3) {

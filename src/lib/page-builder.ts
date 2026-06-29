@@ -145,6 +145,7 @@ export const pageBuilderFields = `pageBuilder[]{
   },
 
   _type == "videoFeatureBlock" => {
+    anchorId,
     iconImage{
       ...,
       asset,
@@ -196,6 +197,7 @@ export const pageBuilderFields = `pageBuilder[]{
   },
 
   _type == "practicalInfoBlock" => {
+    anchorId,
     sectionTitle,
     leftColumn{ title, body },
     rightColumn{ title, body }

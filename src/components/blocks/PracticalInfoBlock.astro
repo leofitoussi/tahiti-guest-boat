@@ -10,12 +10,14 @@ interface Column {
 }
 
 interface Props {
+  anchorId?: string;
   sectionTitle?: string;
   leftColumn?: Column;
   rightColumn?: Column;
 }
 
 const {
+  anchorId,
   sectionTitle = 'Informations pratiques',
   leftColumn,
   rightColumn,
@@ -24,7 +26,7 @@ const {
 const columns = [leftColumn, rightColumn].filter(Boolean) as Column[];
 ---
 
-<Section padding="lg">
+<Section id={anchorId} padding="lg">
   <Container>
     <div class="flex flex-col gap-16 md:gap-20">
     {sectionTitle && (

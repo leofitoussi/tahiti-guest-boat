@@ -47,6 +47,8 @@ export default defineConfig({
               .child(S.document().schemaType('siteSettings').documentId(siteSettingsDocumentId)),
             S.divider(),
             S.documentTypeListItem('cruisePage').title('Cruise pages'),
+            S.documentTypeListItem('activity').title('Activités'),
+            S.documentTypeListItem('activityTag').title('Tags activités'),
             S.documentTypeListItem('review').title('Reviews'),
             S.documentTypeListItem('blogPost').title('Blog posts'),
             S.documentTypeListItem('legalPage').title('Pages légales'),

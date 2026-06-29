@@ -19,6 +19,7 @@ interface SanityImage {
 }
 
 interface Props {
+  anchorId?: string;
   iconImage?: SanityImage;
   title?: unknown[];
   body?: unknown[];
@@ -29,7 +30,7 @@ interface Props {
   locale?: Locale;
 }
 
-const { iconImage, title = [], body = [], ctaLabel, ctaUrl, youtubeUrl, posterImage, locale = defaultLocale } = Astro.props;
+const { anchorId, iconImage, title = [], body = [], ctaLabel, ctaUrl, youtubeUrl, posterImage, locale = defaultLocale } = Astro.props;
 const copy = getSiteCopy(locale);
 
 const videoId = extractYouTubeVideoId(youtubeUrl);
@@ -42,7 +43,7 @@ const posterUrl =
 const posterLqip = posterImage ? urlForImage(posterImage)?.width(32).height(18).fit('crop').blur(18).quality(30).auto('format').url() : undefined;
 ---
 
-<Section padding="lg" class="bg-background">
+<Section id={anchorId} padding="lg" class="bg-background">
   <Container>
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
       {iconUrl && (

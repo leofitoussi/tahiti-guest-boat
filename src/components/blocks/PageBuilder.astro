@@ -139,6 +139,7 @@ const { blocks = [], settings = null, reviews = [], cruises = [], activities = [
       case 'videoFeatureBlock':
         return (
           <VideoFeature
+            anchorId={block.anchorId as string | undefined}
             iconImage={block.iconImage}
             title={block.title}
             body={block.body}
@@ -159,6 +160,7 @@ const { blocks = [], settings = null, reviews = [], cruises = [], activities = [
       case 'practicalInfoBlock':
         return (
           <PracticalInfoBlock
+            anchorId={block.anchorId as string | undefined}
             sectionTitle={block.sectionTitle as string | undefined}
             leftColumn={block.leftColumn as any}
             rightColumn={block.rightColumn as any}

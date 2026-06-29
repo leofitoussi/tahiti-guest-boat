@@ -7,6 +7,19 @@ export const videoFeatureBlock = defineType({
   type: 'object',
   fields: [
     defineField({
+      name: 'anchorId',
+      title: 'Anchor ID',
+      description: 'Optionnel. Exemple: maeva pour créer un lien vers #maeva.',
+      type: 'string',
+      validation: (rule) =>
+        rule.custom((value) => {
+          if (!value) return true;
+          return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value)
+            ? true
+            : 'Utiliser uniquement des minuscules, chiffres et tirets.';
+        }),
+    }),
+    defineField({
       name: 'iconImage',
       title: 'Icon image',
       type: 'image',

@@ -1,5 +1,6 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
+import { media } from 'sanity-plugin-media';
 import { schemaTypes } from './schemas';
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
@@ -18,6 +19,7 @@ export default defineConfig({
   projectId,
   dataset,
   plugins: [
+    media(),
     structureTool({
       structure: (S) =>
         S.list()

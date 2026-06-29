@@ -36,6 +36,7 @@ export default defineConfig({
       dataset,
       apiVersion,
       useCdn: false,
+      studioBasePath: '/studio',
     }),
     react({
       include: [/\.[tj]sx$/],

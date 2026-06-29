@@ -420,7 +420,7 @@ export async function getTrackingHeadScripts(): Promise<string> {
   return cachedHeadScripts ?? '';
 }
 
-export async function getReviews(limit = 3) {
+export async function getReviews(limit = 100) {
   if (!isSanityConfigured) {
     return [];
   }

@@ -1,6 +1,5 @@
 ---
 import Container from '../layout/Container.astro';
-import Grid from '../layout/Grid.astro';
 import Section from '../layout/Section.astro';
 import type { Review } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
@@ -30,12 +29,14 @@ const average = reviews.length
     </div>
     {
       reviews.length > 0 ? (
-        <Grid columns={3}>
+        <div class="-mr-5 md:-mr-8 flex snap-x snap-mandatory overflow-x-auto scroll-smooth gap-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {reviews.map((review) => {
-            const authorImageUrl = review.authorImage ? urlForImage(review.authorImage)?.width(96).height(96).fit('crop').auto('format').url() : undefined;
+            const authorImageUrl = review.authorImage
+              ? urlForImage(review.authorImage)?.width(96).height(96).fit('crop').auto('format').url()
+              : undefined;
 
             return (
-              <article class="rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
+              <article class="snap-start shrink-0 w-[300px] sm:w-[320px] lg:w-[340px] rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
                 <div class="mb-5 flex items-center gap-3">
                   {authorImageUrl ? (
                     <img src={authorImageUrl} alt="" width="48" height="48" loading="lazy" decoding="async" class="size-12 rounded-full object-cover" />
@@ -43,7 +44,7 @@ const average = reviews.length
                     <div class="grid size-12 place-items-center rounded-full bg-muted font-bold text-primary">{review.name?.slice(0, 1) || '?'}</div>
                   )}
                   <div>
-                    <h3 class="font-bold text-foreground">{review.name}</h3>
+                    <h3 class="text-base font-semibold text-foreground">{review.name}</h3>
                     <p class="text-sm text-muted-foreground">{review.rating || 0}/5{review.source === 'google' ? ' · Google' : ''}</p>
                   </div>
                 </div>
@@ -52,7 +53,8 @@ const average = reviews.length
               </article>
             );
           })}
-        </Grid>
+          <div class="shrink-0 w-5 md:w-8" aria-hidden="true" />
+        </div>
       ) : (
         <div class="border border-dashed border-border p-8 text-center text-muted-foreground">
           {copy.blocks.reviewsFallbackDescription}

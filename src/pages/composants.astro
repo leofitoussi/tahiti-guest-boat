@@ -10,7 +10,7 @@ const locale = defaultLocale;
 const page = await getUniquePage('componentsTestPage', locale);
 const [settings, reviews, cruises, activities] = await Promise.all([
   getSiteSettings(locale),
-  getReviews(3),
+  getReviews(),
   getCruisePages(locale),
   getActivities(locale),
 ]);

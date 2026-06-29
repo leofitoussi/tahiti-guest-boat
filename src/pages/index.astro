@@ -41,7 +41,7 @@ const home = isSanityConfigured
 
 const [settings, reviews, cruises, activities] = await Promise.all([
   getSiteSettings(defaultLocale),
-  getReviews(3),
+  getReviews(),
   getCruisePages(defaultLocale),
   getActivities(defaultLocale),
 ]);

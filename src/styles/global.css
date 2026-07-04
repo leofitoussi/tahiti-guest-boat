@@ -59,6 +59,8 @@
   --heading-4: clamp(1.5rem, 2.2vw, 2.25rem);
   --heading-5: clamp(1.25rem, 1.8vw, 1.5rem);
   --heading-6: clamp(1rem, 1.4vw, 1.125rem);
+  /* Component token: accroche croisière headline, smaller ceiling than --heading-2 for long quotes */
+  --heading-2-accroche: clamp(2.25rem, 3.5vw, 3.25rem);
   --line-height-tight: 1.08;
   --line-height-heading: 1.16;
   --line-height-body: 1.65;

@@ -76,9 +76,9 @@ function resolveRow(images: RowImage[]): ResolvedItem[] {
 // Empty rows are dropped so the marquee also supports single-row layouts
 // (e.g. the cruise template gallery) without rendering placeholder rows.
 const rows = [
-  { images: resolveRow(row1), direction:  1, speed: 0.12 },
-  { images: resolveRow(row2), direction: -1, speed: 0.165 },
-  { images: resolveRow(row3), direction:  1, speed: 0.141 },
+  { images: resolveRow(row1), direction: -1, speed: 0.12 },
+  { images: resolveRow(row2), direction:  1, speed: 0.165 },
+  { images: resolveRow(row3), direction: -1, speed: 0.141 },
 ].filter((row) => row.images.length > 0);
 ---
 
@@ -102,7 +102,7 @@ const rows = [
   <div class="marquee-gallery flex flex-col gap-3">
     {rows.map((row) => (
       <div
-        class="marquee-row overflow-hidden"
+        class="marquee-row overflow-x-auto overflow-y-hidden"
         data-direction={row.direction}
         data-speed={row.speed}
       >
@@ -110,7 +110,7 @@ const rows = [
           {[...row.images, ...row.images].map((img, i) => (
             <figure
               class="marquee-item shrink-0 overflow-hidden"
-              style={`height: clamp(9rem, 18vw, 16rem); aspect-ratio: ${img.width} / ${img.height};`}
+              style={`height: 33vh; aspect-ratio: ${img.width} / ${img.height};`}
               aria-hidden={i >= row.images.length ? 'true' : undefined}
             >
               <img
@@ -132,6 +132,17 @@ const rows = [
   </div>
 </Section>
 
+<style>
+  .marquee-row {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .marquee-row::-webkit-scrollbar {
+    display: none;
+  }
+</style>
+
 <script>
   function initMarquee(gallery: HTMLElement) {
     const rowEls = gallery.querySelectorAll<HTMLElement>('.marquee-row');
@@ -145,6 +156,7 @@ const rows = [
       baseSpeed: number;
       x: number;
       setWidth: number;
+      pausedUntil: number;
     };
 
     const rows: RowState[] = [];
@@ -163,7 +175,13 @@ const rows = [
       // Leftward rows (direction=-1): start at 0, move toward -setWidth → images scroll left.
       const x = direction > 0 ? -setWidth : 0;
 
-      rows.push({ track, direction, baseSpeed, x, setWidth });
+      const row: RowState = { track, direction, baseSpeed, x, setWidth, pausedUntil: 0 };
+      rows.push(row);
+
+      // Manual scroll (touch drag or trackpad) takes over from autoplay while it's happening.
+      rowEl.addEventListener('scroll', () => {
+        row.pausedUntil = performance.now() + 600;
+      }, { passive: true });
     });
 
     let scrollBoost = 0;
@@ -180,6 +198,8 @@ const rows = [
       scrollBoost *= 0.92;
 
       rows.forEach((row) => {
+        if (performance.now() < row.pausedUntil) return;
+
         const speed = row.direction * (row.baseSpeed + scrollBoost);
         row.x += speed;
 

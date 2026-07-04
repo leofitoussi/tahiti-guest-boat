@@ -16,9 +16,18 @@ const copy = getSiteCopy(locale);
 const average = reviews.length
   ? reviews.reduce((sum, review) => sum + (review.rating || 0), 0) / reviews.length
   : 0;
+
+function formatReviewDate(date?: string) {
+  if (!date) return undefined;
+  const parsed = new Date(date);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+  const month = parsed.toLocaleDateString('fr-FR', { month: 'long' });
+  const year = parsed.getFullYear().toString().slice(-2);
+  return `${month.charAt(0).toUpperCase()}${month.slice(1)} ${year}`;
+}
 ---
 
-<Section padding="lg" class="bg-background">
+<Section padding="lg" class="bg-background pb-8 md:pb-12">
   <Container>
     <div class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
       <div>
@@ -34,22 +43,21 @@ const average = reviews.length
             const authorImageUrl = review.authorImage
               ? urlForImage(review.authorImage)?.width(96).height(96).fit('crop').auto('format').url()
               : undefined;
+            const formattedDate = formatReviewDate(review.date);
 
             return (
-              <article class="snap-start shrink-0 w-[300px] sm:w-[320px] lg:w-[340px] rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
+              <article class="snap-start shrink-0 self-start w-[300px] sm:w-[320px] lg:w-[340px] rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
                 <div class="mb-5 flex items-center gap-3">
-                  {authorImageUrl ? (
+                  {authorImageUrl && (
                     <img src={authorImageUrl} alt="" width="48" height="48" loading="lazy" decoding="async" class="size-12 rounded-full object-cover" />
-                  ) : (
-                    <div class="grid size-12 place-items-center rounded-full bg-muted font-bold text-primary">{review.name?.slice(0, 1) || '?'}</div>
                   )}
                   <div>
                     <h3 class="text-base font-semibold text-foreground">{review.name}</h3>
-                    <p class="text-sm text-muted-foreground">{review.rating || 0}/5{review.source === 'google' ? ' · Google' : ''}</p>
+                    <p class="text-sm text-muted-foreground">{review.rating || 0}/5{review.source === 'google' ? ' · Google' : ''}{formattedDate ? ` · ${formattedDate}` : ''}</p>
                   </div>
                 </div>
-                <p class="text-base leading-relaxed text-muted-foreground">{review.body}</p>
-                {review.sourceUrl && <a href={review.sourceUrl} class="mt-5 inline-block text-sm font-bold text-primary underline underline-offset-4">{copy.blocks.reviewsLinkLabel}</a>}
+                <p class="text-base leading-relaxed text-muted-foreground line-clamp-6">{review.body}</p>
+                {review.sourceUrl && <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer" class="mt-5 inline-block text-sm font-bold text-primary underline underline-offset-4">{copy.blocks.reviewsLinkLabel}</a>}
               </article>
             );
           })}

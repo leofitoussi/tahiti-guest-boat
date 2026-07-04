@@ -37,12 +37,17 @@ export function buildLayoutViewModel(
   cruises: CruisePageSummary[] = []
 ): LayoutViewModel {
   const copy = getSiteCopy(locale);
-  const cruiseLinks = cruises
-    .filter((cruise) => cruise.slug && (cruise.title || cruise.heroTitle))
-    .map((cruise) => ({
-      label: cruise.title || cruise.heroTitle,
-      href: localizePath(`/nos-croisieres/${cruise.slug}/`, locale),
-    }));
+  const cruiseLinks = cruises.flatMap((cruise) => {
+    const label = cruise.title ?? cruise.heroTitle;
+    if (!cruise.slug || !label) return [];
+
+    return [
+      {
+        label,
+        href: localizePath(`/nos-croisieres/${cruise.slug}/`, locale),
+      },
+    ];
+  });
 
   return {
     brandName: settings?.siteName ?? 'Tahiti Guest Boat',

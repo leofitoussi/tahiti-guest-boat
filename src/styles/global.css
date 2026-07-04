@@ -61,6 +61,8 @@
   --heading-6: clamp(1rem, 1.4vw, 1.125rem);
   /* Component token: accroche croisière headline, smaller ceiling than --heading-2 for long quotes */
   --heading-2-accroche: clamp(2.25rem, 3.5vw, 3.25rem);
+  /* Component token: home hero title, ~48px desktop and slightly smaller on mobile */
+  --heading-hero: clamp(2.5rem, 4vw, 3rem);
   --line-height-tight: 1.08;
   --line-height-heading: 1.16;
   --line-height-body: 1.65;

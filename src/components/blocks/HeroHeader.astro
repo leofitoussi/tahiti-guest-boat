@@ -19,7 +19,7 @@ interface SanityImage {
 }
 
 interface Props {
-  eyebrow?: string; // kept for API compatibility, not rendered
+  keywords?: string[];
   title: string;
   body?: string;
   primaryCta?: Cta;
@@ -28,14 +28,14 @@ interface Props {
   locale?: Locale;
 }
 
-const { title, body, primaryCta, secondaryCta, image, locale = defaultLocale } = Astro.props;
+const { keywords = [], title, body, primaryCta, secondaryCta, image, locale = defaultLocale } = Astro.props;
 
 const hero = image ? heroImageSources(image) : undefined;
 ---
 
 {
   hero && (
-    <div class="h-[60vh] w-full overflow-hidden bg-muted">
+    <div class="h-[60vh] w-full overflow-hidden bg-muted lg:h-[70vh]">
       <img
         src={hero.src}
         srcset={hero.srcset}
@@ -52,31 +52,71 @@ const hero = image ? heroImageSources(image) : undefined;
   )
 }
 
-<Section padding="lg">
+<Section padding="lg" class="!pt-10 md:!pt-28">
   <Container>
-    <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
-      <h1 class="font-heading font-semibold leading-tight text-foreground">
-        {title}
-      </h1>
-      <div class="flex flex-col gap-6">
-        {body && <p class="text-lg leading-relaxed text-muted-foreground md:text-xl">{body}</p>}
-        {
-          (primaryCta || secondaryCta) && (
-            <div class="flex flex-wrap gap-3">
-              {primaryCta && (
-                <a href={localizeHref(primaryCta.href, locale)} class={buttonVariants({ variant: 'primary', size: 'lg', className: '!px-5' })}>
-                  {primaryCta.label}
-                </a>
-              )}
-              {secondaryCta && (
-                <a href={localizeHref(secondaryCta.href, locale)} class={buttonVariants({ variant: 'outline', size: 'lg', className: '!px-5' })}>
-                  {secondaryCta.label}
-                </a>
-              )}
-            </div>
-          )
-        }
-      </div>
-    </div>
+    {
+      keywords.length > 0 ? (
+        <div class="grid gap-10 lg:grid-cols-[minmax(0,220px)_1fr] lg:items-start">
+          <div class="flex flex-row flex-wrap items-center justify-center gap-x-3 text-center font-heading text-primary lg:flex-col lg:items-start lg:justify-start lg:gap-x-0 lg:text-left">
+            {keywords.map((word, i) => {
+              const isLast = i === keywords.length - 1;
+              const isFirst = i === 0;
+              return (
+                <span class={`text-3xl leading-tight lg:text-4xl ${isLast ? 'font-bold italic' : isFirst ? '' : 'italic'}`}>
+                  {word}
+                </span>
+              );
+            })}
+          </div>
+          <div class="flex flex-col gap-6">
+            <h1 class="font-heading font-semibold leading-tight text-foreground" style="font-size: var(--heading-hero)">
+              {title}
+            </h1>
+            {body && <p class="text-base leading-relaxed text-muted-foreground">{body}</p>}
+            {
+              (primaryCta || secondaryCta) && (
+                <div class="flex flex-wrap gap-3">
+                  {primaryCta && (
+                    <a href={localizeHref(primaryCta.href, locale)} class={buttonVariants({ variant: 'primary', size: 'lg', className: '!px-5' })}>
+                      {primaryCta.label}
+                    </a>
+                  )}
+                  {secondaryCta && (
+                    <a href={localizeHref(secondaryCta.href, locale)} class={buttonVariants({ variant: 'outline', size: 'lg', className: '!px-5' })}>
+                      {secondaryCta.label}
+                    </a>
+                  )}
+                </div>
+              )
+            }
+          </div>
+        </div>
+      ) : (
+        <div class="grid gap-10 lg:grid-cols-2 lg:items-start">
+          <h1 class="font-heading font-semibold leading-tight text-foreground" style="font-size: var(--heading-hero)">
+            {title}
+          </h1>
+          <div class="flex flex-col gap-6">
+            {body && <p class="text-base leading-relaxed text-muted-foreground">{body}</p>}
+            {
+              (primaryCta || secondaryCta) && (
+                <div class="flex flex-wrap gap-3">
+                  {primaryCta && (
+                    <a href={localizeHref(primaryCta.href, locale)} class={buttonVariants({ variant: 'primary', size: 'lg', className: '!px-5' })}>
+                      {primaryCta.label}
+                    </a>
+                  )}
+                  {secondaryCta && (
+                    <a href={localizeHref(secondaryCta.href, locale)} class={buttonVariants({ variant: 'outline', size: 'lg', className: '!px-5' })}>
+                      {secondaryCta.label}
+                    </a>
+                  )}
+                </div>
+              )
+            }
+          </div>
+        </div>
+      )
+    }
   </Container>
 </Section>

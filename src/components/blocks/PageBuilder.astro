@@ -48,7 +48,7 @@ const { blocks = [], settings = null, reviews = [], cruises = [], activities = [
       case 'heroHeaderBlock':
         return (
           <HeroHeader
-            eyebrow={block.keywords?.[0]}
+            keywords={block.keywords ?? []}
             title={block.title}
             body={block.body}
             primaryCta={block.primaryCtaLabel && block.primaryCtaLink ? { label: block.primaryCtaLabel, href: block.primaryCtaLink } : undefined}

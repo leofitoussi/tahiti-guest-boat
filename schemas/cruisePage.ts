@@ -109,6 +109,13 @@ export const cruisePage = defineType({
       ],
     }),
     defineField({
+      name: 'bookingBody',
+      title: 'Texte de réservation (tarif, inclus / non inclus)',
+      type: 'array',
+      of: activityDescriptionText,
+      description: 'Texte affiché dans le bloc réservation de cette croisière (tarifs, ce qui est inclus / non inclus).',
+    }),
+    defineField({
       name: 'gallery',
       title: 'Galerie défilante',
       type: 'object',

@@ -1,6 +1,6 @@
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { defineLocalizationFields } from './localization-fields';
-import { h2HeadingText } from './portableText';
+import { activityDescriptionText, h2HeadingText } from './portableText';
 
 export const siteSettings = defineType({
   name: 'siteSettings',
@@ -203,6 +203,14 @@ export const siteSettings = defineType({
               allowRelative: true,
               scheme: ['http', 'https', 'mailto', 'tel'],
             }),
+        }),
+        defineField({
+          name: 'body',
+          title: 'Texte (tarif, inclus / non inclus) — pages génériques hors croisière',
+          description:
+            'Utilisé uniquement sur les pages génériques du Page Builder. Chaque page croisière a son propre texte, indépendant de celui-ci.',
+          type: 'array',
+          of: activityDescriptionText,
         }),
       ],
     }),

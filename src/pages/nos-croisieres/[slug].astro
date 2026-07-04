@@ -77,7 +77,7 @@ const structuredData = [
     <ItineraryBlock block={itinerary} locale={locale} />
     <WhyUsBlock settings={settings} locale={locale} />
     <ReviewsBlock reviews={reviews} locale={locale} />
-    <BookingBlock settings={settings} locale={locale} destinationLabel={cruise.destinationLabel} />
+    <BookingBlock settings={settings} locale={locale} destinationLabel={cruise.destinationLabel} body={cruise.bookingBody} />
     <RelatedCruisesBlock cruises={relatedCruises} locale={locale} />
   </main>
 </BaseLayout>

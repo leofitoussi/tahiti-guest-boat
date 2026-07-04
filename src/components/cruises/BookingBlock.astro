@@ -1,4 +1,6 @@
 ---
+import type { TypedObject } from 'astro-portabletext/types';
+import { PortableText } from 'astro-portabletext';
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
 import { buttonVariants } from '../ui/button';
@@ -10,9 +12,10 @@ interface Props {
   settings?: SiteSettings | null;
   locale?: Locale;
   destinationLabel?: string | null;
+  body?: TypedObject[];
 }
 
-const { settings, locale = defaultLocale, destinationLabel } = Astro.props;
+const { settings, locale = defaultLocale, destinationLabel, body } = Astro.props;
 const copy = getSiteCopy(locale);
 const booking = settings?.bookingEmbed;
 const baseTitle = booking?.title || copy.blocks.bookingTitle;
@@ -27,7 +30,7 @@ const ctaUrl = booking?.fallbackCtaUrl || '/contact';
       <div>
         <p class="text-sm font-bold uppercase tracking-[0.16em] text-primary">{copy.blocks.bookingEyebrow}</p>
         <h2 class="mt-3 font-heading font-semibold leading-tight text-foreground">{title}</h2>
-        <div class="prose prose-sm mt-6 text-muted-foreground" set:html={copy.blocks.bookingBodyHtml} />
+        <div class="prose prose-sm mt-6 text-muted-foreground">{body?.length ? <PortableText value={body} /> : null}</div>
       </div>
       {
         booking?.embedUrl ? (

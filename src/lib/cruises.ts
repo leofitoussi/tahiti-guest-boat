@@ -118,6 +118,7 @@ export interface CruisePage extends CruisePageSummary {
   seo?: { indexable?: boolean };
   hero?: CruiseHeroBlock;
   cruiseTeaser?: CruiseTeaser;
+  bookingBody?: TypedObject[];
   gallery?: CruiseGallery;
   introductionDestination?: IntroductionDestination;
   boat?: BoatBlock;
@@ -154,6 +155,7 @@ export interface SiteSettings {
     embedUrl?: string;
     fallbackCtaLabel?: string;
     fallbackCtaUrl?: string;
+    body?: TypedObject[];
   };
   headScripts?: string;
 }
@@ -222,6 +224,7 @@ const cruisePageFields = `
     pricing,
     image${imageFields}
   },
+  bookingBody,
   gallery{
     title,
     text,
@@ -308,7 +311,8 @@ const SITE_SETTINGS_QUERY = `*[${buildLocalizedSingletonDocumentFilter('siteSett
     providerName,
     embedUrl,
     fallbackCtaLabel,
-    fallbackCtaUrl
+    fallbackCtaUrl,
+    body
   }
 }`;
 

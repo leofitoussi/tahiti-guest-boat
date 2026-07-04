@@ -59,7 +59,6 @@ export interface SiteCopy {
       itineraryDisclaimer: string;
       bookingEyebrow: string;
       bookingTitle: string;
-      bookingBodyHtml: string;
       bookingProviderPrefix: string;
       bookingFallbackDescription: string;
       bookingFallbackCta: string;
@@ -139,7 +138,6 @@ const siteCopy: Record<Locale, SiteCopy> = {
       itineraryDisclaimer: "Cet itinéraire est donné à titre indicatif. Il s'adapte en fonction des conditions météorologiques, des marées et des préférences des passagers.",
       bookingEyebrow: 'Réservation',
       bookingTitle: 'Préparer votre croisière',
-      bookingBodyHtml: `<p>À deux, à quatre, en amoureux, en famille ou entre amis, <strong>chaque programme est personnalisé</strong>.</p><p><strong>Tarif : 250 € par personne et par jour, sur la base de quatre personnes.</strong></p><p><strong>Tout inclus</strong> : location du bateau, skipper, hôtesse, repas, boissons, activités, hors alcool et activités de prestataires.</p><p><strong>Ce qui n'est pas inclus</strong> : alcool et activités nécessitant un prestataire externe.</p>`,
       bookingProviderPrefix: 'Module',
       bookingFallbackDescription:
         'Le module de réservation sera disponible prochainement. Vous pouvez déjà nous écrire pour construire votre croisière.',
@@ -218,7 +216,6 @@ const siteCopy: Record<Locale, SiteCopy> = {
       itineraryDisclaimer: 'This itinerary is provided as a guide only. It adapts according to weather conditions, tides, and passenger preferences.',
       bookingEyebrow: 'Booking',
       bookingTitle: 'Plan your cruise',
-      bookingBodyHtml: `<p>For two, four, as a couple, as a family, or with friends, <strong>every programme is tailored to you</strong>.</p><p><strong>Rate: €250 per person per day, based on four people.</strong></p><p><strong>All-inclusive</strong>: boat rental, skipper, hostess, meals, drinks, activities, excluding alcohol and third-party activities.</p><p><strong>Not included</strong>: alcohol and activities requiring an external provider.</p>`,
       bookingProviderPrefix: 'Module',
       bookingFallbackDescription:
         'The booking module will be available soon. You can already write to us to build your cruise.',

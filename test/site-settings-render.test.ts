@@ -23,6 +23,21 @@ describe('site settings render', () => {
     expect(html).toContain('+689 89 34 14 34');
   });
 
+  // The booking block's tariff/inclusions text is authored per cruise in Sanity
+  // (cruisePage.bookingBody), not hardcoded — there is no shared fallback text
+  // anymore, so a cruise with nothing authored must render no tariff paragraph.
+  it('renders no hardcoded tariff/inclusions fallback text on a Page croisière', async () => {
+    const cruisesDir = 'dist/nos-croisieres';
+    const entries = await readdir(cruisesDir, { withFileTypes: true });
+    const firstSlug = entries.find((entry) => entry.isDirectory())?.name;
+    expect(firstSlug).toBeTruthy();
+
+    const html = await readFile(`${cruisesDir}/${firstSlug}/index.html`, 'utf8');
+
+    expect(html).not.toContain('Tarif : 250 € par personne et par jour');
+    expect(html).not.toContain('chaque programme est personnalisé');
+  });
+
   it('injects the FR head tracking scripts unescaped, near the top of the home page head', async () => {
     const html = await readFile('dist/index.html', 'utf8');
     const head = html.slice(0, html.indexOf('</head>'));

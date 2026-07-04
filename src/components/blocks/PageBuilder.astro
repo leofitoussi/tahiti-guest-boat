@@ -174,7 +174,7 @@ const { blocks = [], settings = null, reviews = [], cruises = [], activities = [
         return <ReviewsBlock reviews={reviews} locale={locale} />;
 
       case 'bookingBlock':
-        return <BookingBlock settings={settings} locale={locale} />;
+        return <BookingBlock settings={settings} locale={locale} body={settings?.bookingEmbed?.body} />;
 
       case 'relatedCruisesBlock':
         return <RelatedCruisesBlock cruises={cruises} locale={locale} />;

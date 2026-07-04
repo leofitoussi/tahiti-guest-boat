@@ -23,6 +23,14 @@ export const heroBlock = defineType({
       },
     }),
     defineField({
+      name: 'overlayOpacity',
+      title: 'Opacité du voile noir (%)',
+      type: 'number',
+      description: 'Assombrit l\'image de fond pour améliorer la lisibilité du titre. 0 = aucun voile (défaut), 100 = noir complet.',
+      initialValue: 0,
+      validation: (rule) => rule.min(0).max(100).integer(),
+    }),
+    defineField({
       name: 'ctaLabel',
       title: 'Libellé du bouton',
       type: 'string',

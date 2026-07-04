@@ -14,6 +14,7 @@ export interface CruiseHeroBlock {
   _key?: string;
   title?: TypedObject[];
   backgroundImage?: SanityImage;
+  overlayOpacity?: number;
   ctaLabel?: string;
   ctaUrl?: string;
 }
@@ -215,6 +216,7 @@ const cruisePageFields = `
     title,
     ctaLabel,
     ctaUrl,
+    overlayOpacity,
     backgroundImage${imageFields}
   },
   cruiseTeaser{

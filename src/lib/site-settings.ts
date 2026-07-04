@@ -38,9 +38,9 @@ export function buildLayoutViewModel(
 ): LayoutViewModel {
   const copy = getSiteCopy(locale);
   const cruiseLinks = cruises
-    .filter((cruise) => cruise.slug && (cruise.heroTitle || cruise.title))
+    .filter((cruise) => cruise.slug && (cruise.title || cruise.heroTitle))
     .map((cruise) => ({
-      label: cruise.heroTitle || cruise.title,
+      label: cruise.title || cruise.heroTitle,
       href: localizePath(`/nos-croisieres/${cruise.slug}/`, locale),
     }));
 

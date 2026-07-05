@@ -38,7 +38,7 @@ export function buildLayoutViewModel(
 ): LayoutViewModel {
   const copy = getSiteCopy(locale);
   const cruiseLinks = cruises.flatMap((cruise) => {
-    const label = cruise.title ?? cruise.heroTitle;
+    const label = cruise.title?.trim() || cruise.heroTitle?.trim();
     if (!cruise.slug || !label) return [];
 
     return [

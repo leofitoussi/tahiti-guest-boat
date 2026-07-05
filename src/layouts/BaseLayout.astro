@@ -55,7 +55,7 @@ const metadata = buildLocalizedMetadata(Astro.url.pathname, {
   <head>
     <meta charset="UTF-8" />
     <meta name="description" content={description ?? copy.shell.defaultDescription} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index,follow'} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     {headScripts && <Fragment set:html={headScripts} />}
     <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />

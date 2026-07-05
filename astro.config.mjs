@@ -1,4 +1,3 @@
-import sitemap from '@astrojs/sitemap';
 import react from '@astrojs/react';
 import sanity from '@sanity/astro';
 import tailwindcss from '@tailwindcss/vite';
@@ -28,9 +27,6 @@ export default defineConfig({
     },
   },
   integrations: [
-    sitemap({
-      filter: (page) => !page.includes('/composants'),
-    }),
     sanity({
       projectId,
       dataset,

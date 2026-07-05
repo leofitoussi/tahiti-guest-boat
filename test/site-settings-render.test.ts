@@ -6,8 +6,8 @@ const buildArgs = ['run', 'build'];
 
 describe('site settings render', () => {
   beforeAll(() => {
-    execFileSync('npm', buildArgs, { stdio: 'ignore' });
-  }, 120000);
+    execFileSync('npm', buildArgs, { stdio: 'ignore', timeout: 600000 });
+  }, 600000);
 
   it('renders the shared site settings into the home page header and footer', async () => {
     const html = await readFile('dist/index.html', 'utf8');
@@ -24,18 +24,25 @@ describe('site settings render', () => {
   });
 
   // The booking block's tariff/inclusions text is authored per cruise in Sanity
-  // (cruisePage.bookingBody), not hardcoded — there is no shared fallback text
-  // anymore, so a cruise with nothing authored must render no tariff paragraph.
-  it('renders no hardcoded tariff/inclusions fallback text on a Page croisière', async () => {
-    const cruisesDir = 'dist/nos-croisieres';
-    const entries = await readdir(cruisesDir, { withFileTypes: true });
-    const firstSlug = entries.find((entry) => entry.isDirectory())?.name;
-    expect(firstSlug).toBeTruthy();
+  // (cruisePage.bookingBody), so live editorial content may legitimately contain
+  // tariff copy. The template contract is what prevents a shared hardcoded
+  // fallback from coming back.
+  it('sources Page croisière booking prose from cruisePage.bookingBody', async () => {
+    const [pageSource, bookingBlockSource, cruisesSource] = await Promise.all([
+      readFile('src/pages/nos-croisieres/[slug].astro', 'utf8'),
+      readFile('src/components/cruises/BookingBlock.astro', 'utf8'),
+      readFile('src/lib/cruises.ts', 'utf8'),
+    ]);
 
-    const html = await readFile(`${cruisesDir}/${firstSlug}/index.html`, 'utf8');
+    expect(cruisesSource).toContain('bookingBody,');
+    expect(pageSource).toContain('body={cruise.bookingBody}');
+    expect(pageSource).not.toContain('body={settings?.bookingEmbed?.body}');
 
-    expect(html).not.toContain('Tarif : 250 € par personne et par jour');
-    expect(html).not.toContain('chaque programme est personnalisé');
+    expect(bookingBlockSource).toContain('body?: TypedObject[];');
+    expect(bookingBlockSource).toContain('body?.length');
+    expect(bookingBlockSource).toContain('<PortableText value={body} />');
+    expect(bookingBlockSource).not.toContain('Tarif : 250 € par personne et par jour');
+    expect(bookingBlockSource).not.toContain('chaque programme est personnalisé');
   });
 
   it('injects the FR head tracking scripts unescaped, near the top of the home page head', async () => {

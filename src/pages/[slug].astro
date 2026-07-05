@@ -28,7 +28,7 @@ const title = page.seoTitle || `${page.title} | Tahiti Guest Boat`;
 const description = page.seoDescription || `${page.title} — Tahiti Guest Boat`;
 ---
 
-<BaseLayout title={title} description={description} locale={locale}>
+<BaseLayout title={title} description={description} locale={locale} noindex={!page.seo?.indexable}>
   <main class="bg-background">
     <Section padding="lg" class="border-b border-border/70 bg-muted/30">
       <Container class="max-w-[820px]">

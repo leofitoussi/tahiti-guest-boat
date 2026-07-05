@@ -17,6 +17,7 @@ export interface LegalPage extends LegalPageSummary {
   body: TypedObject[];
   seoTitle?: string;
   seoDescription?: string;
+  seo?: { indexable?: boolean };
 }
 
 const legalPageFields = `
@@ -25,6 +26,7 @@ const legalPageFields = `
   "slug": slug.current,
   seoTitle,
   seoDescription,
+  seo { indexable },
   body
 `;
 

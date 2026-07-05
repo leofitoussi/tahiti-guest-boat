@@ -6,6 +6,7 @@ describe('Astro pages — noindex derived from seo.indexable', () => {
   const pageFiles = [
     'src/pages/nos-croisieres/[slug].astro',
     'src/pages/blog/[slug].astro',
+    'src/pages/[slug].astro',
     'src/pages/index.astro',
     'src/pages/notre-bateau.astro',
     'src/pages/contact.astro',
@@ -17,6 +18,12 @@ describe('Astro pages — noindex derived from seo.indexable', () => {
       expect(source).toMatch(/noindex.*seo.*indexable|seo.*indexable.*noindex/s);
     });
   }
+
+  it('BaseLayout emits an explicit robots directive for indexable pages', async () => {
+    const source = await readFile('src/layouts/BaseLayout.astro', 'utf8');
+
+    expect(source).toContain('index,follow');
+  });
 });
 
 // ── Cycle 4 ──────────────────────────────────────────────────────────────────

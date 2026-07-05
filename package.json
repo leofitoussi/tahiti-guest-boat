@@ -5,9 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && npm run seo:check",
     "preview": "astro preview",
     "check": "astro check",
+    "seo:check": "node scripts/check-seo.mjs",
     "test": "vitest run",
     "sanity:deploy": "sanity deploy",
     "sanity:dataset": "sanity dataset list"
@@ -39,6 +40,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.5",
     "@types/node": "^25.9.1",
+    "saxes": "^6.0.0",
     "shadcn": "^4.8.2",
     "typescript": "^5.9.3",
     "vitest": "^4.1.7"

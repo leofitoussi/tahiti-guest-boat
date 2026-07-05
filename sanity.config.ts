@@ -2,6 +2,7 @@ import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { media } from 'sanity-plugin-media';
 import { schemaTypes } from './schemas';
+import { deploySiteTool } from './studio/tools/deploySiteTool';
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const nodeEnv = typeof process !== 'undefined' ? process.env : {};
@@ -58,4 +59,5 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
   },
+  tools: (prev) => [...prev, deploySiteTool],
 });

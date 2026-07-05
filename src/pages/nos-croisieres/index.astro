@@ -1,10 +1,7 @@
 ---
 import Container from '../../components/layout/Container.astro';
-import Grid from '../../components/layout/Grid.astro';
 import Section from '../../components/layout/Section.astro';
 import { Badge } from '../../components/ui/badge';
-import { buttonVariants } from '../../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCruisePages } from '../../lib/cruises';
 import { defaultLocale, localizePath } from '../../lib/localization';
@@ -40,46 +37,66 @@ const cruises = await getCruisePages(locale);
       <Container>
         {
           cruises.length > 0 ? (
-            <Grid columns={3}>
+            <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
               {cruises.map((cruise) => {
                 const imageUrl = cruise.heroImage
-                  ? urlForImage(cruise.heroImage)?.width(860).height(580).fit('crop').quality(82).auto('format').url()
+                  ? urlForImage(cruise.heroImage)?.width(760).height(507).fit('crop').quality(82).auto('format').url()
                   : undefined;
 
                 return (
-                  <Card className="transition hover:-translate-y-1 hover:shadow-md">
+                  <article>
                     <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class="block">
                       {imageUrl ? (
                         <img
                           src={imageUrl}
                           alt={cruise.heroImage?.alt || ''}
-                          width="860"
-                          height="580"
+                          width="760"
+                          height="507"
                           loading="lazy"
                           decoding="async"
-                          class="aspect-[1.48] w-full object-cover"
+                          class="aspect-[3/2] w-full object-cover"
                         />
                       ) : (
-                        <div class="aspect-[1.48] w-full bg-muted" />
+                        <div class="aspect-[3/2] bg-muted" />
                       )}
                     </a>
-                    <CardHeader>
-                      <CardTitle>
-                      <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class="transition hover:text-primary">
-                        {cruise.heroTitle || cruise.title}
-                      </a>
-                      </CardTitle>
-                      {cruise.excerpt && <CardDescription className="line-clamp-4">{cruise.excerpt}</CardDescription>}
-                    </CardHeader>
-                    <CardContent>
-                      <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class={buttonVariants({ variant: 'ghost', className: 'px-0' })}>
+
+                    <div class="mt-5">
+                      <h3 class="font-heading text-xl font-semibold leading-snug text-foreground">
+                        <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class="transition hover:text-primary">
+                          {cruise.heroTitle || cruise.title}
+                        </a>
+                      </h3>
+                      {cruise.excerpt && (
+                        <p class="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-4">
+                          {cruise.excerpt}
+                        </p>
+                      )}
+                      <a
+                        href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)}
+                        class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 transition hover:text-primary/80"
+                      >
                         {copy.blocks.discoverCta}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M9 18l6-6-6-6" />
+                        </svg>
                       </a>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </article>
                 );
               })}
-          </Grid>
+          </div>
         ) : (
           <div class="border border-dashed border-border p-8 text-center">
               <h2 class="font-heading font-semibold text-foreground">{copy.pages.cruisesIndex.emptyTitle}</h2>

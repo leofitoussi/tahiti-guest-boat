@@ -39,8 +39,8 @@ const imageFirst = desktopLayout === 'image-text';
 
 <Section padding="lg" class="bg-background">
   <Container>
-    <div class="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-      <div class:list={['flex flex-col gap-6', imageFirst && 'lg:order-2']}>
+    <div class="grid gap-10 lg:grid-cols-[1fr_1fr] lg:items-stretch">
+      <div class:list={['flex flex-col gap-6 py-6 lg:py-10', imageFirst && 'lg:order-2']}>
         <CruiseHeading
           as="h2"
           value={heading}
@@ -64,7 +64,7 @@ const imageFirst = desktopLayout === 'image-text';
             height="760"
             loading="lazy"
             decoding="async"
-            class:list={['aspect-[1.58] w-full object-cover shadow-sm ring-1 ring-border/70', imageFirst && 'lg:order-1']}
+            class:list={['h-full w-full object-cover shadow-sm ring-1 ring-border/70', imageFirst && 'lg:order-1']}
             style={{ backgroundColor: image?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
           />
         )

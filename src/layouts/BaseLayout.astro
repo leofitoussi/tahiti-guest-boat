@@ -42,6 +42,9 @@ const [settings, cruisePages, headScripts] = await Promise.all([
 const logoUrl = settings?.logo
   ? urlForImage(settings.logo)?.width(360).auto('format').url()
   : undefined;
+const faviconUrl = settings?.favicon
+  ? urlForImage(settings.favicon)?.width(64).height(64).fit('crop').auto('format').url()
+  : undefined;
 const layoutViewModel = buildLayoutViewModel(settings, logoUrl, locale, cruisePages);
 const metadata = buildLocalizedMetadata(Astro.url.pathname, {
   locale,
@@ -57,6 +60,7 @@ const metadata = buildLocalizedMetadata(Astro.url.pathname, {
     <meta name="description" content={description ?? copy.shell.defaultDescription} />
     <meta name="robots" content={noindex ? 'noindex, nofollow' : 'index,follow'} />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {faviconUrl && <link rel="icon" href={faviconUrl} />}
     {headScripts && <Fragment set:html={headScripts} />}
     <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
     {heroPreload && (

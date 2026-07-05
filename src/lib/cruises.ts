@@ -132,6 +132,7 @@ export interface SiteSettings {
   siteName?: string;
   logo?: SanityImage;
   logoAlt?: string;
+  favicon?: SanityImage;
   reservationText?: string;
   reservationLink?: string;
   nav?: {
@@ -299,6 +300,7 @@ const SITE_SETTINGS_QUERY = `*[${buildLocalizedSingletonDocumentFilter('siteSett
   siteName,
   logo${imageFields},
   logoAlt,
+  favicon${imageFields},
   reservationText,
   reservationLink,
   nav[]{label, href, hasDropdown},

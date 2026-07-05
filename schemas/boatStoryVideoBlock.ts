@@ -7,20 +7,6 @@ export const boatStoryVideoBlock = defineType({
   type: 'object',
   fields: [
     defineField({
-      name: 'iconImage',
-      title: 'Icon image',
-      type: 'image',
-      fields: [
-        defineField({
-          name: 'alt',
-          title: 'Alternative text',
-          type: 'string',
-          validation: (rule) => rule.required(),
-        }),
-      ],
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
       name: 'title',
       title: 'Title',
       type: 'array',

@@ -130,7 +130,7 @@ const [featured, ...rest] = posts;
                       {post.publishedAt && (
                         <span class="text-xs font-medium text-muted-foreground">{formatPostDate(post.publishedAt, locale)}</span>
                       )}
-                      <h2 class="font-heading text-xl font-semibold leading-tight text-foreground">
+                      <h2 class="font-heading font-semibold leading-tight text-foreground" style="font-size: var(--heading-6)">
                         <a href={localizePath(`/blog/${post.slug}/`, locale)} class="transition hover:text-primary">
                           {post.title}
                         </a>

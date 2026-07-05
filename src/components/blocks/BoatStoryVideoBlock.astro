@@ -19,7 +19,6 @@ interface SanityImage {
 }
 
 interface Props {
-  iconImage?: SanityImage;
   title?: TypedObject[];
   body?: TypedObject[];
   youtubeUrl?: string;
@@ -29,7 +28,6 @@ interface Props {
 }
 
 const {
-  iconImage,
   title = [],
   body = [],
   youtubeUrl,
@@ -44,26 +42,21 @@ const embedUrl = videoId ? getYouTubeEmbedUrl(videoId) : undefined;
 const posterUrl =
   posterImage ? urlForImage(posterImage)?.width(1600).height(900).fit('crop').quality(84).auto('format').url() : videoId ? getYouTubePosterUrl(videoId) : undefined;
 const posterLqip = posterImage ? urlForImage(posterImage)?.width(32).height(18).fit('crop').blur(18).quality(30).auto('format').url() : undefined;
-const iconUrl = iconImage ? urlForImage(iconImage)?.width(240).auto('format').url() : undefined;
 const frameTitle = videoTitle || copy.blocks.videoFrameTitle;
 ---
 
 <Section padding="lg" class="bg-muted/40">
   <Container>
     <div class="mx-auto flex max-w-5xl flex-col items-center">
-      {
-        iconUrl && (
-          <img
-            src={iconUrl}
-            alt={iconImage?.alt || ''}
-            width="240"
-            height="180"
-            loading="lazy"
-            decoding="async"
-            class="mb-10 h-auto w-32 object-contain sm:w-40"
-          />
-        )
-      }
+      <img
+        src="/images/tahiti-guest-boat-catamaran-signature.svg"
+        alt="Tahiti Guest Boat catamaran"
+        width="124"
+        height="124"
+        loading="lazy"
+        decoding="async"
+        class="mb-10 h-auto w-32 object-contain sm:w-40"
+      />
 
       <div class="grid w-full gap-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start lg:gap-12">
         {title.length > 0 && (

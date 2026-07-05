@@ -4,3 +4,9 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+[[redirects]]
+  from = "/category/blog/"
+  to = "/blog/"
+  status = 301
+  force = true

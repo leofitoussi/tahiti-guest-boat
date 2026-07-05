@@ -67,7 +67,7 @@ const spanClasses = (marks: string[] = []) => [
       />
     )
   }
-  <div class="absolute inset-0 -z-10 bg-background" style={`opacity: ${clampedOverlayOpacity}`}></div>
+  <div class="absolute inset-0 -z-10 bg-muted" style={`opacity: ${clampedOverlayOpacity}`}></div>
 
   <Container class="flex min-h-[520px] items-start justify-center pb-24 pt-28 text-center md:min-h-[660px] md:pb-32 md:pt-36 lg:min-h-[760px] lg:pt-44">
     <div class="mx-auto flex max-w-6xl flex-col items-center">
@@ -95,4 +95,5 @@ const spanClasses = (marks: string[] = []) => [
   </Container>
 
   <div class="pointer-events-none absolute inset-x-[-8%] bottom-[-1px] h-20 rounded-t-[100%] bg-background md:h-28 lg:h-32"></div>
+  <div class="pointer-events-none absolute inset-x-[-8%] bottom-[-1px] h-20 rounded-t-[100%] bg-muted/40 md:h-28 lg:h-32"></div>
 </section>

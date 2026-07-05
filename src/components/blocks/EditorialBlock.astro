@@ -110,7 +110,7 @@ const textOrderClasses = [
           </div>
         )}
 
-        <div class="flex flex-row flex-wrap gap-3 pt-2">
+        <div class="flex flex-row flex-wrap items-center gap-3 pt-2">
           {primaryCtaLabel && primaryCtaLink && (
             <a href={localizeHref(primaryCtaLink, locale)} class={buttonVariants({ variant: 'primary', size: 'lg', className: 'w-fit' })}>
               {primaryCtaLabel}
@@ -120,11 +120,25 @@ const textOrderClasses = [
             <a
               href={localizeHref(secondaryCtaLink, locale)}
               class:list={[
-                buttonVariants({ variant: 'outline', size: 'lg', className: 'w-fit' }),
-                invertBackground && 'btn-outline-inverted',
+                'inline-flex items-center gap-1 pl-8 text-sm font-medium text-primary underline underline-offset-4 transition hover:text-primary/80',
+                invertBackground && 'cta-link-inverted',
               ]}
             >
               {secondaryCtaLabel}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 18l6-6-6-6" />
+              </svg>
             </a>
           )}
         </div>
@@ -153,13 +167,11 @@ const textOrderClasses = [
     font-style: italic;
   }
 
-  .btn-outline-inverted {
-    border-color: rgb(255 255 255 / 0.35);
-    background-color: transparent;
+  .cta-link-inverted {
     color: #ffffff;
   }
 
-  .btn-outline-inverted:hover {
-    background-color: rgb(255 255 255 / 0.08);
+  .cta-link-inverted:hover {
+    color: rgb(255 255 255 / 0.8);
   }
 </style>

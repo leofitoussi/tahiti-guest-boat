@@ -21,6 +21,15 @@ export const siteSettings = defineType({
         hotspot: false,
       },
     }),
+    defineField({
+      name: 'favicon',
+      title: 'Favicon',
+      description: 'Icône affichée dans l’onglet du navigateur. Utiliser une image carrée (idéalement 512×512px, PNG ou SVG).',
+      type: 'image',
+      options: {
+        hotspot: false,
+      },
+    }),
     ...defineLocalizationFields(),
     defineField({
       name: 'logoAlt',

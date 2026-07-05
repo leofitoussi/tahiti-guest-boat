@@ -21,8 +21,8 @@ const galleryImages = (block.images ?? []).slice(0, 3);
 
 <Section padding="lg" class="bg-background">
   <Container>
-    <div class="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-start">
-      <div class="flex flex-col gap-6">
+    <div class="grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-stretch">
+      <div class="flex flex-col gap-6 py-6 lg:py-10">
         <CruiseHeading
           as="h2"
           value={block.heading}
@@ -32,7 +32,7 @@ const galleryImages = (block.images ?? []).slice(0, 3);
       </div>
       {
         galleryImages.length > 0 && (
-          <div class:list={['grid gap-4', galleryImages.length > 1 ? 'grid-rows-[auto_auto]' : '']}>
+          <div class:list={['grid h-full gap-4', galleryImages.length > 1 ? 'grid-rows-[auto_auto]' : '']}>
             {galleryImages.map((image, index) => {
               const w = index === 0 ? 980 : 760;
               const h = index === 0 ? 720 : 500;
@@ -47,7 +47,7 @@ const galleryImages = (block.images ?? []).slice(0, 3);
                   decoding="async"
                   class:list={[
                     'w-full object-cover ring-1 ring-border',
-                    index === 0 ? 'aspect-[1.36]' : 'aspect-[1.52] md:ml-auto md:w-3/4',
+                    index === 0 ? 'h-full' : 'aspect-[1.52] md:ml-auto md:w-3/4',
                   ]}
                   style={{ backgroundColor: image.metadata?.palette?.dominant?.background || 'var(--muted)' }}
                 />

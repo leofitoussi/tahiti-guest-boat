@@ -46,9 +46,7 @@ export interface SiteCopy {
     blogPost: {
       backToBlog: string;
       tableOfContents: string;
-      primaryCruise: string;
-      secondaryCruises: string;
-      discoverCruise: string;
+      relatedCruisesTitle: string;
       fallbackDescription: string;
       updatedOn: string;
     };
@@ -127,9 +125,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
       blogPost: {
         backToBlog: 'Retour au blog',
         tableOfContents: 'Sommaire',
-        primaryCruise: 'Croisière principale',
-        secondaryCruises: 'Croisières secondaires',
-        discoverCruise: 'Découvrir cette croisière',
+        relatedCruisesTitle: 'Nos inspirations de croisière',
         fallbackDescription: 'Article du blog Tahiti Guest Boat.',
         updatedOn: 'Mis à jour le',
       },
@@ -207,9 +203,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
       blogPost: {
         backToBlog: 'Back to blog',
         tableOfContents: 'On this page',
-        primaryCruise: 'Primary cruise',
-        secondaryCruises: 'Secondary cruises',
-        discoverCruise: 'Discover this cruise',
+        relatedCruisesTitle: 'Our cruise inspiration',
         fallbackDescription: 'Tahiti Guest Boat blog article.',
         updatedOn: 'Updated on',
       },

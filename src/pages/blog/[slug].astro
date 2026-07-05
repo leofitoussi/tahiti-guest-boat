@@ -52,7 +52,14 @@ const secondaryCruises = post.secondaryCruises ?? [];
             {copy.pages.blogPost.backToBlog}
           </a>
           <div class="flex flex-col gap-5">
-            {post.publishedAt && (
+            {post.updatedAt ? (
+              <time
+                datetime={post.updatedAt}
+                class="text-sm font-medium tracking-wide text-muted-foreground uppercase"
+              >
+                {copy.pages.blogPost.updatedOn} {formatPostDate(post.updatedAt, locale)}
+              </time>
+            ) : post.publishedAt && (
               <time
                 datetime={post.publishedAt}
                 class="text-sm font-medium tracking-wide text-muted-foreground uppercase"

@@ -22,6 +22,7 @@ export interface SiteCopy {
         readArticle: string;
         emptyTitle: string;
         emptyDescription: string;
+        updatedOn: string;
       };
     contact: {
       title: string;
@@ -49,6 +50,7 @@ export interface SiteCopy {
       secondaryCruises: string;
       discoverCruise: string;
       fallbackDescription: string;
+      updatedOn: string;
     };
   };
     blocks: {
@@ -98,6 +100,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
         readArticle: "Lire l'article",
         emptyTitle: 'Aucun article publié pour le moment',
         emptyDescription: 'Les articles ajoutés dans Sanity Studio apparaîtront ici après publication et rebuild du site.',
+        updatedOn: 'Mis à jour le',
       },
       contact: {
         title: 'Contact | Tahiti Guest Boat',
@@ -128,6 +131,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
         secondaryCruises: 'Croisières secondaires',
         discoverCruise: 'Découvrir cette croisière',
         fallbackDescription: 'Article du blog Tahiti Guest Boat.',
+        updatedOn: 'Mis à jour le',
       },
     },
     blocks: {
@@ -176,6 +180,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
         readArticle: 'Read article',
         emptyTitle: 'No published articles yet',
         emptyDescription: 'Articles added in Sanity Studio will appear here after publication and a site rebuild.',
+        updatedOn: 'Updated on',
       },
       contact: {
         title: 'Contact | Tahiti Guest Boat',
@@ -206,6 +211,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
         secondaryCruises: 'Secondary cruises',
         discoverCruise: 'Discover this cruise',
         fallbackDescription: 'Tahiti Guest Boat blog article.',
+        updatedOn: 'Updated on',
       },
     },
     blocks: {

@@ -81,7 +81,11 @@ const [featured, ...rest] = posts;
             })()}
             <div class="flex flex-col justify-between gap-6 p-8 md:p-10 lg:p-12">
               <div class="flex flex-col gap-4">
-                {featured.publishedAt && (
+                {featured.updatedAt ? (
+                  <span class="text-sm font-medium text-muted-foreground">
+                    {copy.pages.blogIndex.updatedOn} {formatPostDate(featured.updatedAt, locale)}
+                  </span>
+                ) : featured.publishedAt && (
                   <span class="text-sm font-medium text-muted-foreground">{formatPostDate(featured.publishedAt, locale)}</span>
                 )}
                 <h2 class="font-heading font-semibold leading-tight text-foreground transition group-hover:text-primary" style="font-size: var(--heading-4)">
@@ -127,7 +131,11 @@ const [featured, ...rest] = posts;
                       )}
                     </a>
                     <div class="flex flex-1 flex-col gap-3 p-6">
-                      {post.publishedAt && (
+                      {post.updatedAt ? (
+                        <span class="text-xs font-medium text-muted-foreground">
+                          {copy.pages.blogIndex.updatedOn} {formatPostDate(post.updatedAt, locale)}
+                        </span>
+                      ) : post.publishedAt && (
                         <span class="text-xs font-medium text-muted-foreground">{formatPostDate(post.publishedAt, locale)}</span>
                       )}
                       <h2 class="font-heading font-semibold leading-tight text-foreground" style="font-size: var(--heading-6)">

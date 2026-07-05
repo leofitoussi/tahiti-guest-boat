@@ -29,6 +29,7 @@ export interface BlogPostSummary {
   translationGroup?: string;
   excerpt?: string;
   publishedAt?: string;
+  updatedAt?: string;
   mainImage?: SanityImage;
   primaryCruise?: CruiseLinkSummary;
   secondaryCruises?: CruiseLinkSummary[];
@@ -74,6 +75,7 @@ const postFields = `{
   "slug": slug.current,
   excerpt,
   publishedAt,
+  "updatedAt": _updatedAt,
   mainImage{
     ...,
     asset,
@@ -113,6 +115,7 @@ const postDetailFields = `{
   "slug": slug.current,
   excerpt,
   publishedAt,
+  "updatedAt": _updatedAt,
   mainImage{
     ...,
     asset,

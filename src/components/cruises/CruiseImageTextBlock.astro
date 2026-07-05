@@ -64,7 +64,7 @@ const imageFirst = desktopLayout === 'image-text';
             height="760"
             loading="lazy"
             decoding="async"
-            class:list={['h-full w-full object-cover shadow-sm ring-1 ring-border/70', imageFirst && 'lg:order-1']}
+            class:list={['aspect-[1200/760] h-full w-full object-cover shadow-sm ring-1 ring-border/70', imageFirst && 'lg:order-1']}
             style={{ backgroundColor: image?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
           />
         )

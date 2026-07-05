@@ -224,6 +224,15 @@ export const siteSettings = defineType({
       ],
     }),
     defineField({
+      name: 'sameAs',
+      title: 'Réseaux sociaux (sameAs)',
+      description:
+        'Liens vers les profils sociaux de l’entreprise (Facebook, Instagram…), utilisés dans les données ' +
+        'structurées Organization pour que Google associe ces profils à l’entité de l’entreprise.',
+      type: 'array',
+      of: [{ type: 'url' }],
+    }),
+    defineField({
       name: 'headScripts',
       title: 'Scripts <head> (tracking)',
       type: 'text',

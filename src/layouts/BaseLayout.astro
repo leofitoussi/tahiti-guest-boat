@@ -2,16 +2,27 @@
 import '../styles/global.css';
 import Header from '../components/navigation/Header.astro';
 import Footer from '../components/navigation/Footer.astro';
-import { getCruisePages, getSiteSettings, getTrackingHeadScripts, type SiteSettings } from '../lib/cruises';
+import { getCruisePages, getReviews, getSiteSettings, getTrackingHeadScripts, type SiteSettings } from '../lib/cruises';
 import { buildLayoutViewModel } from '../lib/site-settings';
 import { urlForImage } from '../lib/sanity';
 import { buildLocalizedMetadata, defaultLocale, type Locale } from '../lib/localization';
 import { getSiteCopy } from '../lib/site-copy';
+import { buildOrganizationStructuredData, buildWebsiteStructuredData } from '../lib/site-seo';
+
+// Facebook/Instagram profiles seeded ahead of the siteSettings.sameAs field being
+// deployable in Sanity Studio (schema change requires a Studio redeploy before
+// editors can see/use it). Real settings.sameAs values take precedence once set.
+const DEFAULT_SAME_AS = [
+  'https://www.facebook.com/p/Sail-with-Tahiti-Guest-Boat-61575614675016/',
+  'https://www.instagram.com/tahitiguestboat/',
+];
 
 interface Props {
   title: string;
   description?: string;
   image?: string;
+  imageWidth?: number;
+  imageHeight?: number;
   settings?: SiteSettings | null;
   locale?: Locale;
   alternatePaths?: Partial<Record<Locale, string>>;
@@ -24,6 +35,8 @@ const {
   title,
   description,
   image,
+  imageWidth,
+  imageHeight,
   settings: providedSettings,
   locale = defaultLocale,
   alternatePaths = {},
@@ -33,10 +46,11 @@ const {
 } = Astro.props;
 
 const copy = getSiteCopy(locale);
-const [settings, cruisePages, headScripts] = await Promise.all([
+const [settings, cruisePages, headScripts, reviews] = await Promise.all([
   providedSettings ? Promise.resolve(providedSettings) : getSiteSettings(locale),
   getCruisePages(locale),
   getTrackingHeadScripts(),
+  getReviews(),
 ]);
 
 const logoUrl = settings?.logo
@@ -51,6 +65,21 @@ const metadata = buildLocalizedMetadata(Astro.url.pathname, {
   siteUrl: Astro.site?.href,
   alternatePaths,
 });
+
+const siteUrl = (Astro.site?.href ?? 'https://tahiti-guest-boat.com/').replace(/\/$/, '');
+const allStructuredData = [
+  buildOrganizationStructuredData({
+    siteUrl,
+    siteName: layoutViewModel.brandName,
+    logoUrl,
+    sameAs: settings?.sameAs?.length ? settings.sameAs : DEFAULT_SAME_AS,
+    contactEmail: settings?.contactEmail,
+    contactPhone: settings?.contactPhone,
+    reviews,
+  }),
+  buildWebsiteStructuredData({ siteUrl, siteName: layoutViewModel.brandName }),
+  ...structuredData,
+];
 ---
 
 <!doctype html>
@@ -81,12 +110,16 @@ const metadata = buildLocalizedMetadata(Astro.url.pathname, {
     <meta property="og:description" content={description ?? copy.shell.defaultDescription} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={metadata.canonical} />
+    <meta property="og:site_name" content={layoutViewModel.brandName} />
+    <meta property="og:locale" content="fr_FR" />
     {image && <meta property="og:image" content={image} />}
+    {image && imageWidth && <meta property="og:image:width" content={String(imageWidth)} />}
+    {image && imageHeight && <meta property="og:image:height" content={String(imageHeight)} />}
     <meta name="twitter:card" content={image ? 'summary_large_image' : 'summary'} />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description ?? copy.shell.defaultDescription} />
     {image && <meta name="twitter:image" content={image} />}
-    {structuredData.map((data) => (
+    {allStructuredData.map((data) => (
       <script type="application/ld+json" is:inline set:html={JSON.stringify(data)} />
     ))}
   </head>

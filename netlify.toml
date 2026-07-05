@@ -10,3 +10,12 @@
   to = "/blog/"
   status = 301
   force = true
+
+# Canonical URL normalization: any path without a trailing slash redirects to
+# its trailing-slash form. force = false so exact static file matches (assets,
+# robots.txt, sitemaps) are served as-is instead of being redirected.
+[[redirects]]
+  from = "/*"
+  to = "/:splat/"
+  status = 301
+  force = false

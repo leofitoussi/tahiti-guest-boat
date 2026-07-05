@@ -147,6 +147,7 @@ export interface SiteSettings {
   footerText?: string;
   contactEmail?: string;
   contactPhone?: string;
+  sameAs?: string[];
   whyUsTitle?: TypedObject[];
   whyUsArguments?: {
     body?: string;
@@ -308,6 +309,7 @@ const SITE_SETTINGS_QUERY = `*[${buildLocalizedSingletonDocumentFilter('siteSett
   footerText,
   contactEmail,
   contactPhone,
+  sameAs,
   whyUsTitle,
   whyUsArguments[]{body},
   bookingEmbed{

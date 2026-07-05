@@ -6,10 +6,11 @@ import Section from '../../components/layout/Section.astro';
 import { buttonVariants } from '../../components/ui/button';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatPostDate, getAllBlogSlugs, getBlogPost, type BlogPost } from '../../lib/blog';
-import { defaultLocale, localizePath } from '../../lib/localization';
+import { buildLocalizedMetadata, defaultLocale, localizePath } from '../../lib/localization';
 import { extractHeadings } from '../../lib/portable-text-headings';
 import { getSiteCopy } from '../../lib/site-copy';
 import { urlForImage } from '../../lib/sanity';
+import { buildBlogPostingStructuredData } from '../../lib/blog-seo';
 
 const locale = defaultLocale;
 const copy = getSiteCopy(locale);
@@ -33,9 +34,29 @@ const mainImageUrl = post.mainImage
   ? urlForImage(post.mainImage)?.width(1440).height(810).fit('crop').quality(84).auto('format').url()
   : undefined;
 const secondaryCruises = post.secondaryCruises ?? [];
+const metadata = buildLocalizedMetadata(Astro.url.pathname, {
+  locale,
+  siteUrl: Astro.site?.href,
+});
+const structuredData = [
+  buildBlogPostingStructuredData(post, {
+    canonicalUrl: metadata.canonical,
+    siteUrl: (Astro.site?.href ?? 'https://tahiti-guest-boat.com/').replace(/\/$/, ''),
+    image: mainImageUrl,
+  }),
+];
 ---
 
-<BaseLayout title={title} description={description} image={mainImageUrl} locale={locale} noindex={!post.seo?.indexable}>
+<BaseLayout
+  title={title}
+  description={description}
+  image={mainImageUrl}
+  imageWidth={1440}
+  imageHeight={810}
+  locale={locale}
+  structuredData={structuredData}
+  noindex={!post.seo?.indexable}
+>
   <main class="bg-background">
     <article>
 
@@ -43,7 +64,7 @@ const secondaryCruises = post.secondaryCruises ?? [];
       <Section padding="lg" class="border-b border-border/70 bg-muted/30">
         <Container class="max-w-[960px]">
           <a
-            href={localizePath('/blog', locale)}
+            href={localizePath('/blog/', locale)}
             class={buttonVariants({ variant: 'ghost', className: 'mb-6 w-fit px-0 text-muted-foreground hover:text-foreground' })}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="mr-1.5">

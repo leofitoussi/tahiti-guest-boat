@@ -100,16 +100,17 @@ describe('site settings render', () => {
       );
       expect(html, `JSON-LD for ${slug}`).toContain('<script type="application/ld+json"');
 
-      const jsonLd = html.match(/<script type="application\/ld\+json">(.+?)<\/script>/)?.[1];
-      expect(jsonLd, `JSON-LD payload for ${slug}`).toBeTruthy();
+      // BaseLayout now renders several JSON-LD scripts (sitewide Organization/WebSite,
+      // then the page-specific one) — find the one carrying the cruise's TouristTrip graph.
+      const jsonLdBlocks = [...html.matchAll(/<script type="application\/ld\+json"[^>]*>(.+?)<\/script>/g)].map(
+        (match) => JSON.parse(match[1]) as { '@context'?: string; '@graph'?: Record<string, any>[] }
+      );
+      const structuredData = jsonLdBlocks.find((block) => Array.isArray(block['@graph']));
+      expect(structuredData, `JSON-LD graph payload for ${slug}`).toBeTruthy();
 
-      const structuredData = JSON.parse(jsonLd as string) as {
-        '@context': string;
-        '@graph': Record<string, any>[];
-      };
-      const touristTrip = structuredData['@graph'].find((item) => item['@type'] === 'TouristTrip');
+      const touristTrip = structuredData!['@graph']!.find((item) => item['@type'] === 'TouristTrip');
 
-      expect(structuredData['@context'], `@context for ${slug}`).toBe('https://schema.org');
+      expect(structuredData!['@context'], `@context for ${slug}`).toBe('https://schema.org');
       expect(touristTrip, `TouristTrip for ${slug}`).toMatchObject({
         provider: {
           '@type': 'Organization',

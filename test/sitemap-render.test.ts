@@ -16,12 +16,12 @@ describe('generated SEO sitemap files', () => {
       readFile('dist/robots.txt', 'utf8'),
     ]);
 
-    expect(sitemapIndex).toContain('https://tahiti-guest-boat.com/sitemap-pages.xml');
-    expect(sitemapIndex).toContain('https://tahiti-guest-boat.com/sitemap-blog.xml');
-    expect(sitemapIndex).toContain('https://tahiti-guest-boat.com/sitemap-cruises.xml');
+    expect(sitemapIndex).toContain('https://tahitiguestboat.com/sitemap-pages.xml');
+    expect(sitemapIndex).toContain('https://tahitiguestboat.com/sitemap-blog.xml');
+    expect(sitemapIndex).toContain('https://tahitiguestboat.com/sitemap-cruises.xml');
     expect(pagesSitemap).toContain('<urlset');
     expect(blogSitemap).toContain('<urlset');
     expect(cruisesSitemap).toContain('<urlset');
-    expect(robots).toContain('Sitemap: https://tahiti-guest-boat.com/sitemap-index.xml');
+    expect(robots).toContain('Sitemap: https://tahitiguestboat.com/sitemap-index.xml');
   });
 });

@@ -4,7 +4,7 @@ import { extname, join, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { SaxesParser } from 'saxes';
 
-const DEFAULT_SITE_URL = 'https://tahiti-guest-boat.com';
+const DEFAULT_SITE_URL = 'https://tahitiguestboat.com';
 
 export class SeoCheckError extends Error {
   constructor(messages) {

@@ -41,7 +41,7 @@ const metadata = buildLocalizedMetadata(Astro.url.pathname, {
 const structuredData = [
   buildBlogPostingStructuredData(post, {
     canonicalUrl: metadata.canonical,
-    siteUrl: (Astro.site?.href ?? 'https://tahiti-guest-boat.com/').replace(/\/$/, ''),
+    siteUrl: (Astro.site?.href ?? 'https://tahitiguestboat.com/').replace(/\/$/, ''),
     image: mainImageUrl,
   }),
 ];
@@ -142,98 +142,6 @@ const structuredData = [
               <BlogContent value={post.body} />
             </div>
           </Section>
-
-          {/* Related cruises */}
-          {(post.primaryCruise || secondaryCruises.length > 0) && (
-            <Section padding="lg" class="border-t border-border/70 bg-muted/30 lg:py-20">
-              <div class="max-w-[860px]">
-                <p class="mb-8 text-xs font-semibold tracking-widest text-muted-foreground uppercase">
-                  {copy.pages.blogPost.primaryCruise}
-                </p>
-                <div class="grid gap-5 sm:grid-cols-2">
-                  {post.primaryCruise && (() => {
-                    const cruiseImageUrl = post.primaryCruise.heroImage
-                      ? urlForImage(post.primaryCruise.heroImage)?.width(640).height(380).fit('crop').quality(82).auto('format').url()
-                      : undefined;
-                    return (
-                      <article class="group overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card shadow-xs transition hover:shadow-md">
-                        {cruiseImageUrl && (
-                          <div class="overflow-hidden">
-                            <img
-                              src={cruiseImageUrl}
-                              alt={post.primaryCruise.heroImage?.alt || post.primaryCruise.heroTitle || ''}
-                              width="640"
-                              height="380"
-                              loading="lazy"
-                              decoding="async"
-                              class="aspect-[5/3] w-full object-cover transition duration-500 group-hover:scale-[1.02]"
-                              style={{ backgroundColor: post.primaryCruise.heroImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
-                            />
-                          </div>
-                        )}
-                        <div class="flex flex-col gap-4 p-6">
-                          <h2 class="font-heading text-2xl font-semibold leading-tight text-foreground">
-                            {post.primaryCruise.heroTitle || post.primaryCruise.title}
-                          </h2>
-                          {post.primaryCruise.excerpt && (
-                            <p class="text-sm leading-relaxed text-muted-foreground">{post.primaryCruise.excerpt}</p>
-                          )}
-                          <a
-                            href={localizePath(`/nos-croisieres/${post.primaryCruise.slug}/`, locale)}
-                            class={buttonVariants({ variant: 'primary', className: 'mt-2 w-fit' })}
-                          >
-                            {copy.pages.blogPost.discoverCruise}
-                          </a>
-                        </div>
-                      </article>
-                    );
-                  })()}
-
-                  {secondaryCruises.length > 0 && (
-                    <div class="flex flex-col gap-4">
-                      {secondaryCruises.map((cruise) => {
-                        const cruiseImageUrl = cruise.heroImage
-                          ? urlForImage(cruise.heroImage)?.width(480).height(200).fit('crop').quality(80).auto('format').url()
-                          : undefined;
-                        return (
-                          <a
-                            href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)}
-                            class="group flex items-center gap-4 overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card p-4 shadow-xs transition hover:shadow-md hover:-translate-y-0.5"
-                          >
-                            {cruiseImageUrl && (
-                              <div class="shrink-0 overflow-hidden rounded-[var(--radius-control)]">
-                                <img
-                                  src={cruiseImageUrl}
-                                  alt={cruise.heroImage?.alt || cruise.heroTitle || ''}
-                                  width="96"
-                                  height="72"
-                                  loading="lazy"
-                                  decoding="async"
-                                  class="h-18 w-24 object-cover transition duration-500 group-hover:scale-[1.04]"
-                                  style={{ backgroundColor: cruise.heroImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
-                                />
-                              </div>
-                            )}
-                            <div class="min-w-0 flex-1">
-                              <h3 class="font-heading text-lg font-semibold leading-tight text-foreground transition group-hover:text-primary">
-                                {cruise.heroTitle || cruise.title}
-                              </h3>
-                              {cruise.excerpt && (
-                                <p class="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{cruise.excerpt}</p>
-                              )}
-                            </div>
-                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="shrink-0 text-muted-foreground transition group-hover:text-primary group-hover:translate-x-0.5">
-                              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                          </a>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Section>
-          )}
         </div>
 
         {/* TOC desktop — sidebar sticky */}
@@ -241,6 +149,117 @@ const structuredData = [
           <TableOfContents headings={headings} label={copy.pages.blogPost.tableOfContents} variant="desktop" />
         </div>
       </div>
+
+      {/* Related cruises */}
+      {(post.primaryCruise || secondaryCruises.length > 0) && (
+        <Section padding="lg" class="border-t border-border/70 bg-muted/30 lg:py-20">
+          <Container>
+            <p class="mb-8 text-sm font-bold uppercase tracking-[0.16em] text-primary">
+              {copy.pages.blogPost.primaryCruise}
+            </p>
+            <div class="grid gap-5 sm:grid-cols-2">
+              {post.primaryCruise && (() => {
+                const cruiseImageUrl = post.primaryCruise.heroImage
+                  ? urlForImage(post.primaryCruise.heroImage)?.width(640).height(380).fit('crop').quality(82).auto('format').url()
+                  : undefined;
+                const primaryCruisePath = localizePath(`/nos-croisieres/${post.primaryCruise.slug}/`, locale);
+                return (
+                  <article class="group overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card shadow-xs transition hover:-translate-y-1 hover:shadow-md">
+                    <a href={primaryCruisePath} class="block">
+                      {cruiseImageUrl ? (
+                        <img
+                          src={cruiseImageUrl}
+                          alt={post.primaryCruise.heroImage?.alt || post.primaryCruise.heroTitle || ''}
+                          width="640"
+                          height="380"
+                          loading="lazy"
+                          decoding="async"
+                          class="aspect-[1.52] w-full object-cover"
+                          style={{ backgroundColor: post.primaryCruise.heroImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                        />
+                      ) : (
+                        <div class="aspect-[1.52] bg-muted" />
+                      )}
+                    </a>
+                    <div class="p-6">
+                      <h2 class="font-heading text-2xl font-semibold leading-tight text-foreground">
+                        <a href={primaryCruisePath} class="transition hover:text-primary">
+                          {post.primaryCruise.heroTitle || post.primaryCruise.title}
+                        </a>
+                      </h2>
+                      {post.primaryCruise.excerpt && (
+                        <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{post.primaryCruise.excerpt}</p>
+                      )}
+                      <a
+                        href={primaryCruisePath}
+                        class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 transition hover:text-primary/80"
+                      >
+                        {copy.pages.blogPost.discoverCruise}
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="14"
+                          height="14"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          aria-hidden="true"
+                        >
+                          <path d="M9 18l6-6-6-6" />
+                        </svg>
+                      </a>
+                    </div>
+                  </article>
+                );
+              })()}
+
+              {secondaryCruises.length > 0 && (
+                <div class="flex flex-col gap-4">
+                  {secondaryCruises.map((cruise) => {
+                    const cruiseImageUrl = cruise.heroImage
+                      ? urlForImage(cruise.heroImage)?.width(480).height(200).fit('crop').quality(80).auto('format').url()
+                      : undefined;
+                    return (
+                      <a
+                        href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)}
+                        class="group flex items-center gap-4 overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card p-4 shadow-xs transition hover:shadow-md hover:-translate-y-0.5"
+                      >
+                        {cruiseImageUrl && (
+                          <div class="shrink-0 overflow-hidden rounded-[var(--radius-control)]">
+                            <img
+                              src={cruiseImageUrl}
+                              alt={cruise.heroImage?.alt || cruise.heroTitle || ''}
+                              width="96"
+                              height="72"
+                              loading="lazy"
+                              decoding="async"
+                              class="h-18 w-24 object-cover transition duration-500 group-hover:scale-[1.04]"
+                              style={{ backgroundColor: cruise.heroImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+                            />
+                          </div>
+                        )}
+                        <div class="min-w-0 flex-1">
+                          <h3 class="font-heading text-lg font-semibold leading-tight text-foreground transition group-hover:text-primary">
+                            {cruise.heroTitle || cruise.title}
+                          </h3>
+                          {cruise.excerpt && (
+                            <p class="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{cruise.excerpt}</p>
+                          )}
+                        </div>
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="shrink-0 text-muted-foreground transition group-hover:text-primary group-hover:translate-x-0.5">
+                          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </Container>
+        </Section>
+      )}
 
     </article>
   </main>

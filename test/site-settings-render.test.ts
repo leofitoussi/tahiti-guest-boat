@@ -92,7 +92,7 @@ describe('site settings render', () => {
       const html = await readFile(`${cruisesDir}/${slug}/index.html`, 'utf8');
 
       expect(html, `canonical for ${slug}`).toContain(
-        `<link rel="canonical" href="https://tahiti-guest-boat.com/nos-croisieres/${slug}/"`
+        `<link rel="canonical" href="https://tahitiguestboat.com/nos-croisieres/${slug}/"`
       );
       expect(html, `og:title for ${slug}`).toContain('<meta property="og:title"');
       expect(html, `twitter:card for ${slug}`).toContain(

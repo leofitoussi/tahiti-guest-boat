@@ -13,5 +13,8 @@ export default defineConfig({
   test: {
     // Prevent concurrent builds from writing to dist/ simultaneously
     fileParallelism: false,
+    // Exclude nested git worktrees (e.g. .claude/worktrees/*) so their own
+    // copies of the test suite aren't picked up alongside the main one.
+    exclude: ['**/node_modules/**', '**/dist/**', '**/.git/**', '**/.claude/worktrees/**'],
   },
 });

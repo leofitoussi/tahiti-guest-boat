@@ -11,7 +11,7 @@ const dataset = env.PUBLIC_SANITY_DATASET || 'production';
 const apiVersion = env.PUBLIC_SANITY_API_VERSION || '2026-05-27';
 
 export default defineConfig({
-  site: env.PUBLIC_SITE_URL || 'https://tahiti-guest-boat.com',
+  site: env.PUBLIC_SITE_URL || 'https://tahitiguestboat.com',
   vite: {
     plugins: [tailwindcss()],
     server: {

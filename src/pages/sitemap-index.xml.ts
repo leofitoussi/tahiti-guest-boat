@@ -4,7 +4,7 @@ import { buildSitemapIndexXml } from '../lib/seo-sitemap';
 
 export const GET: APIRoute = async ({ site }) => {
   const groups = await getSitemapGroups();
-  const xml = buildSitemapIndexXml(site ?? 'https://tahiti-guest-boat.com', getSitemapReferences(groups));
+  const xml = buildSitemapIndexXml(site ?? 'https://tahitiguestboat.com', getSitemapReferences(groups));
 
   return new Response(xml, {
     headers: {

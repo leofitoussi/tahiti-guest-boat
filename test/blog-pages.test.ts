@@ -8,7 +8,8 @@ describe('blog article template — cruise relationship links', () => {
   it('links to the primary cruise via /nos-croisieres/[slug]/', async () => {
     const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
     expect(source).toContain('primaryCruise');
-    expect(source).toContain('/nos-croisieres/');
+    const blockSource = await readFile('src/components/cruises/RelatedCruisesBlock.astro', 'utf8');
+    expect(blockSource).toContain('/nos-croisieres/');
   });
 
   it('links to secondary cruises via /nos-croisieres/[slug]/', async () => {
@@ -17,9 +18,9 @@ describe('blog article template — cruise relationship links', () => {
   });
 
   it('renders the cruise relationship section only when at least one cruise is linked', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/cruises/RelatedCruisesBlock.astro', 'utf8');
     // Guard condition — section hidden when no cruises
-    expect(source).toMatch(/primaryCruise\s*\|\|\s*secondaryCruises|secondaryCruises\.length\s*>\s*0/);
+    expect(source).toContain('cruises.length > 0');
   });
 });
 

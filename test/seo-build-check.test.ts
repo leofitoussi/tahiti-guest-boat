@@ -15,15 +15,15 @@ async function makeDist() {
 
 async function writeValidDist(dir: string) {
   await writeFile(
-    join(dir, 'sitemap-index.xml'),
+    join(dir, 'sitemap_index.xml'),
     `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <sitemap><loc>https://example.com/sitemap-pages.xml</loc></sitemap>
+  <sitemap><loc>https://example.com/page-sitemap.xml</loc></sitemap>
 </sitemapindex>
 `
   );
   await writeFile(
-    join(dir, 'sitemap-pages.xml'),
+    join(dir, 'page-sitemap.xml'),
     `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -38,7 +38,7 @@ async function writeValidDist(dir: string) {
     `User-agent: *
 Allow: /
 
-Sitemap: https://example.com/sitemap-index.xml
+Sitemap: https://example.com/sitemap_index.xml
 `
   );
   await writeFile(
@@ -69,7 +69,7 @@ describe('SEO post-build checks', () => {
     const distDir = await makeDist();
     await writeValidDist(distDir);
     await writeFile(
-      join(distDir, 'sitemap-pages.xml'),
+      join(distDir, 'page-sitemap.xml'),
       `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://example.com/page/</loc><lastmod>2026-06-01T10:00:00.000Z</lastmod></url>

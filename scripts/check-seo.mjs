@@ -22,7 +22,7 @@ export async function checkSeoBuild(options = {}) {
 
   try {
     const baseUrl = `http://127.0.0.1:${server.port}`;
-    const sitemapIndexUrl = new URL('/sitemap-index.xml', siteUrl).toString();
+    const sitemapIndexUrl = new URL('/sitemap_index.xml', siteUrl).toString();
     const robotsUrl = new URL('/robots.txt', baseUrl).toString();
 
     const [sitemapIndexResponse, robotsResponse] = await Promise.all([
@@ -36,7 +36,7 @@ export async function checkSeoBuild(options = {}) {
     }
 
     const sitemapIndexXml = await sitemapIndexResponse.text();
-    const sitemapIndex = parseXml(sitemapIndexXml, 'sitemap-index.xml', errors);
+    const sitemapIndex = parseXml(sitemapIndexXml, 'sitemap_index.xml', errors);
     const sitemapUrls = sitemapIndex.locs;
 
     if (robotsResponse.status !== 200) {

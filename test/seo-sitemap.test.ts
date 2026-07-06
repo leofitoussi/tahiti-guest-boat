@@ -6,14 +6,14 @@ import { buildRobotsTxt, buildSitemapIndexXml, buildUrlsetXml, toSitemapUrls } f
 describe('SEO sitemap generation', () => {
   it('builds a sitemap index that references each content sitemap with absolute URLs', () => {
     const xml = buildSitemapIndexXml('https://tahiti-guest-boat.com', [
-      { path: '/sitemap-pages.xml', lastmod: '2026-06-01T10:00:00.000Z' },
-      { path: '/sitemap-blog.xml', lastmod: '2026-06-02T10:00:00.000Z' },
+      { path: '/page-sitemap.xml', lastmod: '2026-06-01T10:00:00.000Z' },
+      { path: '/post-sitemap.xml', lastmod: '2026-06-02T10:00:00.000Z' },
       { path: '/sitemap-cruises.xml', lastmod: '2026-06-03T10:00:00.000Z' },
     ]);
 
     expect(xml).toContain('<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
-    expect(xml).toContain('<loc>https://tahiti-guest-boat.com/sitemap-pages.xml</loc>');
-    expect(xml).toContain('<loc>https://tahiti-guest-boat.com/sitemap-blog.xml</loc>');
+    expect(xml).toContain('<loc>https://tahiti-guest-boat.com/page-sitemap.xml</loc>');
+    expect(xml).toContain('<loc>https://tahiti-guest-boat.com/post-sitemap.xml</loc>');
     expect(xml).toContain('<loc>https://tahiti-guest-boat.com/sitemap-cruises.xml</loc>');
     expect(xml).toContain('<lastmod>2026-06-03T10:00:00.000Z</lastmod>');
   });
@@ -91,7 +91,7 @@ describe('SEO sitemap generation', () => {
     expect(buildRobotsTxt('https://tahiti-guest-boat.com')).toBe(`User-agent: *
 Allow: /
 
-Sitemap: https://tahiti-guest-boat.com/sitemap-index.xml
+Sitemap: https://tahiti-guest-boat.com/sitemap_index.xml
 `);
   });
 

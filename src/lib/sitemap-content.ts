@@ -98,12 +98,12 @@ export function buildSitemapGroups(content: SitemapContentResult): Record<Sitema
   return {
     pages: {
       name: 'pages',
-      path: '/sitemap-pages.xml',
+      path: '/page-sitemap.xml',
       urls: toSitemapUrls(content.pages ?? []),
     },
     blog: {
       name: 'blog',
-      path: '/sitemap-blog.xml',
+      path: '/post-sitemap.xml',
       urls: toSitemapUrls(content.blog ?? []),
     },
     cruises: {

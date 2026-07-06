@@ -24,11 +24,22 @@ export async function checkSeoBuild(options = {}) {
     const baseUrl = `http://127.0.0.1:${server.port}`;
     const sitemapIndexUrl = new URL('/sitemap_index.xml', siteUrl).toString();
     const robotsUrl = new URL('/robots.txt', baseUrl).toString();
+    const llmsTxtUrl = new URL('/llms.txt', baseUrl).toString();
 
-    const [sitemapIndexResponse, robotsResponse] = await Promise.all([
+    const [sitemapIndexResponse, robotsResponse, llmsTxtResponse] = await Promise.all([
       fetchLocalUrl(sitemapIndexUrl, baseUrl, errors),
       fetch(robotsUrl, { redirect: 'manual' }),
+      fetch(llmsTxtUrl, { redirect: 'manual' }),
     ]);
+
+    if (llmsTxtResponse.status !== 200) {
+      errors.push(`llms.txt returned HTTP ${llmsTxtResponse.status}`);
+    } else {
+      const llmsTxt = await llmsTxtResponse.text();
+      if (!llmsTxt.startsWith('# ')) {
+        errors.push('llms.txt must start with a Markdown H1 ("# ")');
+      }
+    }
 
     if (!sitemapIndexResponse) {
       throwIfErrors(errors);

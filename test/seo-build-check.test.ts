@@ -42,6 +42,13 @@ Sitemap: https://example.com/sitemap_index.xml
 `
   );
   await writeFile(
+    join(dir, 'llms.txt'),
+    `# Example
+
+> Summary.
+`
+  );
+  await writeFile(
     join(dir, 'page', 'index.html'),
     `<!doctype html><html><head>
 <link rel="canonical" href="https://example.com/page/" />
@@ -80,6 +87,26 @@ describe('SEO post-build checks', () => {
 
     await expect(checkSeoBuild({ distDir, siteUrl: 'https://example.com' })).rejects.toThrow(
       'Duplicate sitemap URL: https://example.com/page/'
+    );
+  });
+
+  it('fails when llms.txt is missing', async () => {
+    const distDir = await makeDist();
+    await writeValidDist(distDir);
+    await rm(join(distDir, 'llms.txt'));
+
+    await expect(checkSeoBuild({ distDir, siteUrl: 'https://example.com' })).rejects.toThrow(
+      'llms.txt returned HTTP 404'
+    );
+  });
+
+  it('fails when llms.txt does not start with an H1', async () => {
+    const distDir = await makeDist();
+    await writeValidDist(distDir);
+    await writeFile(join(distDir, 'llms.txt'), 'Example\n\n> Summary.\n');
+
+    await expect(checkSeoBuild({ distDir, siteUrl: 'https://example.com' })).rejects.toThrow(
+      'llms.txt must start with a Markdown H1 ("# ")'
     );
   });
 

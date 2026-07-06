@@ -90,6 +90,7 @@ describe('SEO sitemap generation', () => {
   it('builds robots.txt with the production sitemap index URL', () => {
     expect(buildRobotsTxt('https://tahiti-guest-boat.com')).toBe(`User-agent: *
 Allow: /
+Disallow: /merci/
 
 Sitemap: https://tahiti-guest-boat.com/sitemap_index.xml
 `);

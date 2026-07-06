@@ -62,6 +62,7 @@ ${entries}
 export function buildRobotsTxt(siteUrl: string | URL) {
   return `User-agent: *
 Allow: /
+Disallow: /merci/
 
 Sitemap: ${buildAbsoluteUrl(siteUrl, '/sitemap_index.xml')}
 `;

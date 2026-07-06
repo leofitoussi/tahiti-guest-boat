@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Button, Card, Flex, Stack, Text} from '@sanity/ui';
+import {Badge, Button, Card, Flex, Stack, Text} from '@sanity/ui';
 import {RocketIcon} from '@sanity/icons';
 import type {Tool} from 'sanity';
 
@@ -47,14 +47,14 @@ function DeploySiteTool() {
             onClick={handleDeploy}
           />
           {status === 'success' && (
-            <Text size={1} tone="positive">
+            <Badge tone="positive" fontSize={1}>
               Déploiement lancé
-            </Text>
+            </Badge>
           )}
           {status === 'error' && (
-            <Text size={1} tone="critical">
+            <Badge tone="critical" fontSize={1}>
               Échec du déclenchement, réessayez
-            </Text>
+            </Badge>
           )}
         </Flex>
       </Stack>

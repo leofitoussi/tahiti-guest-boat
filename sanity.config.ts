@@ -26,7 +26,7 @@ export default defineConfig({
         { id: 'fr', title: 'French' },
         { id: 'en', title: 'English' },
       ],
-      schemaTypes: ['homePage'],
+      schemaTypes: ['homePage', 'siteSettings'],
       allowCreateMetaDoc: true,
     }),
     structureTool({

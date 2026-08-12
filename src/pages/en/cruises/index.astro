@@ -1,0 +1,91 @@
+---
+import Container from '../../../components/layout/Container.astro';
+import Section from '../../../components/layout/Section.astro';
+import { Badge } from '../../../components/ui/badge';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getCruisePages } from '../../../lib/cruises';
+import { localizePath } from '../../../lib/localization';
+import { getSiteCopy } from '../../../lib/site-copy';
+import { urlForImage } from '../../../lib/sanity';
+
+const locale = 'en' as const;
+const copy = getSiteCopy(locale);
+const cruises = await getCruisePages(locale);
+---
+
+<BaseLayout
+  title={copy.pages.cruisesIndex.title}
+  description={copy.pages.cruisesIndex.description}
+  locale={locale}
+  alternatePaths={{ fr: '/nos-croisieres/' }}
+>
+  <main class="bg-background">
+    <Section padding="lg" class="border-b border-border/70 bg-muted/30">
+      <Container>
+        <div class="flex max-w-4xl flex-col gap-5">
+          <Badge>{copy.pages.cruisesIndex.badge}</Badge>
+          <h1 class="font-heading font-semibold leading-tight text-foreground">{copy.pages.cruisesIndex.heading}</h1>
+          <div class="max-w-3xl text-lg leading-relaxed text-muted-foreground md:text-xl">
+            <p class="mb-4 font-bold text-foreground">{copy.pages.cruisesIndex.introLead}</p>
+            <p>{copy.pages.cruisesIndex.introBody}</p>
+            <p class="mt-4">{copy.pages.cruisesIndex.introTail}</p>
+          </div>
+        </div>
+      </Container>
+    </Section>
+
+    <Section padding="lg">
+      <Container>
+        {cruises.length > 0 ? (
+          <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-3 md:gap-10">
+            {cruises.map((cruise) => {
+              const imageUrl = cruise.heroImage
+                ? urlForImage(cruise.heroImage)?.width(760).height(507).fit('crop').quality(82).auto('format').url()
+                : undefined;
+
+              return (
+                <article>
+                  <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class="block">
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={cruise.heroImage?.alt || ''}
+                        width="760"
+                        height="507"
+                        loading="lazy"
+                        decoding="async"
+                        class="aspect-[3/2] w-full object-cover"
+                      />
+                    ) : (
+                      <div class="aspect-[3/2] bg-muted" />
+                    )}
+                  </a>
+
+                  <div class="mt-5">
+                    <h2 class="font-heading text-xl font-semibold leading-snug text-foreground">
+                      <a href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)} class="transition hover:text-primary">
+                        {cruise.heroTitle || cruise.title}
+                      </a>
+                    </h2>
+                    {cruise.excerpt && <p class="mt-2 text-sm leading-relaxed text-muted-foreground line-clamp-4">{cruise.excerpt}</p>}
+                    <a
+                      href={localizePath(`/nos-croisieres/${cruise.slug}/`, locale)}
+                      class="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 transition hover:text-primary/80"
+                    >
+                      {copy.blocks.discoverCta}
+                    </a>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        ) : (
+          <div class="border border-dashed border-border p-8 text-center">
+            <h2 class="font-heading font-semibold text-foreground">{copy.pages.cruisesIndex.emptyTitle}</h2>
+            <p class="mx-auto mt-3 max-w-2xl text-muted-foreground">{copy.pages.cruisesIndex.emptyDescription}</p>
+          </div>
+        )}
+      </Container>
+    </Section>
+  </main>
+</BaseLayout>

@@ -1,7 +1,7 @@
 ---
 import { DesktopNavigation } from './DesktopNavigation';
 import { MobileDrawer } from './MobileDrawer';
-import { defaultLocale } from '../../lib/localization';
+import { buildLanguageSwitcher, defaultLocale, type LanguageSwitcherOption, type Locale } from '../../lib/localization';
 import { getSiteCopy } from '../../lib/site-copy';
 
 interface NavItem {
@@ -25,7 +25,10 @@ interface Props {
   ctaLabel?: string;
   ctaHref?: string;
   mobileMenuLabel?: string;
+  closeMenuLabel?: string;
   navigationLabel?: string;
+  languageOptions?: LanguageSwitcherOption[];
+  locale?: Locale;
 }
 
 const {
@@ -37,8 +40,10 @@ const {
   cruiseLinks = [],
   ctaLabel,
   ctaHref = '/contact',
+  locale = defaultLocale,
+  languageOptions = buildLanguageSwitcher(locale),
 } = Astro.props;
-const copy = getSiteCopy(defaultLocale);
+const copy = getSiteCopy(locale);
 const mobileMenuLabel = Astro.props.mobileMenuLabel ?? copy.shell.mobileMenuLabel;
 const navigationLabel = Astro.props.navigationLabel ?? copy.shell.navigationLabel;
 ---
@@ -55,7 +60,14 @@ const navigationLabel = Astro.props.navigationLabel ?? copy.shell.navigationLabe
       }
     </a>
 
-    <DesktopNavigation navItems={navItems} cruiseLinks={cruiseLinks} ctaLabel={ctaLabel} ctaHref={ctaHref} />
+    <DesktopNavigation
+      navItems={navItems}
+      cruiseLinks={cruiseLinks}
+      ctaLabel={ctaLabel}
+      ctaHref={ctaHref}
+      locale={locale}
+      languageOptions={languageOptions}
+    />
 
     <div class="md:hidden">
       <MobileDrawer
@@ -64,7 +76,10 @@ const navigationLabel = Astro.props.navigationLabel ?? copy.shell.navigationLabe
         ctaLabel={ctaLabel}
         ctaHref={ctaHref}
         menuLabel={mobileMenuLabel}
+        closeMenuLabel={Astro.props.closeMenuLabel}
         navigationLabel={navigationLabel}
+        locale={locale}
+        languageOptions={languageOptions}
         client:media="(max-width: 767px)"
       />
     </div>

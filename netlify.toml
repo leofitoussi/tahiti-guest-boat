@@ -11,6 +11,14 @@
   status = 301
   force = true
 
+# Unknown English URLs keep the English experience while published /en pages
+# continue to win because this rule does not force over existing files.
+[[redirects]]
+  from = "/en/*"
+  to = "/en/404/"
+  status = 404
+  force = false
+
 # Canonical URL normalization: any path without a trailing slash redirects to
 # its trailing-slash form. force = false so exact static file matches (assets,
 # robots.txt, sitemaps) are served as-is instead of being redirected.

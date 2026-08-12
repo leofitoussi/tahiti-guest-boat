@@ -1,5 +1,12 @@
 import type { CruisePageSummary, SiteSettings } from './cruises';
-import { defaultLocale, localizeHref, localizePath, type Locale } from './localization';
+import {
+  buildLanguageSwitcher,
+  defaultLocale,
+  localizeHref,
+  localizePath,
+  type LanguageSwitcherOption,
+  type Locale,
+} from './localization';
 import { getSiteCopy } from './site-copy';
 
 export interface LayoutLink {
@@ -20,7 +27,9 @@ export interface LayoutViewModel {
   footerText?: string;
   logoAlt: string;
   logoUrl?: string;
+  languageOptions: LanguageSwitcherOption[];
   mobileMenuLabel: string;
+  closeMenuLabel: string;
   navItems: (LayoutLink & {
     label: string;
     href: string;
@@ -34,7 +43,8 @@ export function buildLayoutViewModel(
   settings: SiteSettings | null | undefined,
   logoUrl?: string,
   locale: Locale = defaultLocale,
-  cruises: CruisePageSummary[] = []
+  cruises: CruisePageSummary[] = [],
+  alternatePaths: Partial<Record<Locale, string>> = {},
 ): LayoutViewModel {
   const copy = getSiteCopy(locale);
   const cruiseLinks = cruises.flatMap((cruise) => {
@@ -52,7 +62,7 @@ export function buildLayoutViewModel(
   return {
     brandName: settings?.siteName ?? 'Tahiti Guest Boat',
     homeHref: localizePath('/', locale),
-    ctaLabel: settings?.reservationText ?? 'Réserver',
+    ctaLabel: settings?.reservationText ?? copy.shell.reservationLabel,
     ctaHref: settings?.reservationLink ? localizeHref(settings.reservationLink, locale) : localizePath('/reservation', locale),
     contactEmail: settings?.contactEmail,
     contactPhone: settings?.contactPhone,
@@ -67,6 +77,7 @@ export function buildLayoutViewModel(
     logoAlt: settings?.logoAlt ?? 'Logo Tahiti Guest Boat',
     logoUrl,
     mobileMenuLabel: copy.shell.mobileMenuLabel,
+    closeMenuLabel: copy.shell.closeMenuLabel,
     navItems:
       settings?.nav?.map((item) => ({
         label: item.label ?? '',
@@ -75,5 +86,6 @@ export function buildLayoutViewModel(
       })) ?? [],
     navigationLabel: copy.shell.navigationLabel,
     footerNavigationLabel: copy.shell.footerNavigationLabel,
+    languageOptions: buildLanguageSwitcher(locale, alternatePaths),
   };
 }

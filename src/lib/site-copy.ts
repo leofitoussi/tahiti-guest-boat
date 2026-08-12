@@ -3,8 +3,11 @@ import { defaultLocale, type Locale } from './localization';
 export interface SiteCopy {
   shell: {
     mobileMenuLabel: string;
+    closeMenuLabel: string;
     navigationLabel: string;
     footerNavigationLabel: string;
+    languageSwitcherLabel: string;
+    reservationLabel: string;
     defaultFooterText: string;
     defaultDescription: string;
   };
@@ -43,13 +46,21 @@ export interface SiteCopy {
       emptyTitle: string;
       emptyDescription: string;
     };
-    blogPost: {
-      backToBlog: string;
-      tableOfContents: string;
-      relatedCruisesTitle: string;
-      fallbackDescription: string;
-      updatedOn: string;
-    };
+      blogPost: {
+        backToBlog: string;
+        tableOfContents: string;
+        relatedCruisesTitle: string;
+        fallbackDescription: string;
+        updatedOn: string;
+      };
+      notFound: {
+        title: string;
+        description: string;
+        eyebrow: string;
+        heading: string;
+        body: string;
+        backHome: string;
+      };
   };
     blocks: {
       relatedCruisesEyebrow: string;
@@ -79,8 +90,11 @@ const siteCopy: Record<Locale, SiteCopy> = {
   fr: {
     shell: {
       mobileMenuLabel: 'Ouvrir le menu',
+      closeMenuLabel: 'Fermer le menu',
       navigationLabel: 'Navigation',
       footerNavigationLabel: 'Explorer',
+      languageSwitcherLabel: 'Changer de langue',
+      reservationLabel: 'Réserver',
       defaultFooterText: 'Croisieres privees et experiences lagon en Polynesie francaise.',
       defaultDescription: 'Croisieres privees et experiences lagon en Polynesie francaise avec Tahiti Guest Boat.',
     },
@@ -129,6 +143,14 @@ const siteCopy: Record<Locale, SiteCopy> = {
         fallbackDescription: 'Article du blog Tahiti Guest Boat.',
         updatedOn: 'Mis à jour le',
       },
+      notFound: {
+        title: 'Page introuvable | Tahiti Guest Boat',
+        description: "Cette page n'existe pas.",
+        eyebrow: 'Erreur 404',
+        heading: 'Vous avez largué les amarres trop tôt',
+        body: "Cette page n'existe pas — ou elle a coulé quelque part entre Bora Bora et Raiatea. Pas de panique : notre skipper connaît le chemin du retour.",
+        backHome: 'Retourner à bon port',
+      },
     },
     blocks: {
       relatedCruisesEyebrow: 'À découvrir aussi',
@@ -157,8 +179,11 @@ const siteCopy: Record<Locale, SiteCopy> = {
   en: {
     shell: {
       mobileMenuLabel: 'Open menu',
+      closeMenuLabel: 'Close menu',
       navigationLabel: 'Navigation',
       footerNavigationLabel: 'Explore',
+      languageSwitcherLabel: 'Change language',
+      reservationLabel: 'Book your cruise',
       defaultFooterText: 'Private cruises and lagoon experiences in French Polynesia.',
       defaultDescription: 'Private cruises and lagoon experiences in French Polynesia with Tahiti Guest Boat.',
     },
@@ -206,6 +231,14 @@ const siteCopy: Record<Locale, SiteCopy> = {
         relatedCruisesTitle: 'Our cruise inspiration',
         fallbackDescription: 'Tahiti Guest Boat blog article.',
         updatedOn: 'Updated on',
+      },
+      notFound: {
+        title: 'Page not found | Tahiti Guest Boat',
+        description: 'This page does not exist.',
+        eyebrow: '404 error',
+        heading: 'You cast off too soon',
+        body: "This page does not exist — or it sank somewhere between Bora Bora and Raiatea. Do not worry: our skipper knows the way back.",
+        backHome: 'Return to safe harbour',
       },
     },
     blocks: {

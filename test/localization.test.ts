@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildLocalizedMetadata,
+  buildLanguageSwitcher,
   localizeHref,
   localizePath,
   stripLocalePrefix,
@@ -13,6 +14,10 @@ describe('localization helpers', () => {
 
   it('prefixes English paths under /en', () => {
     expect(localizePath('/nos-croisieres/lagon/', 'en')).toBe('/en/nos-croisieres/lagon/');
+  });
+
+  it('keeps the English homepage on its canonical trailing-slash path', () => {
+    expect(localizePath('/', 'en')).toBe('/en/');
   });
 
   it('leaves external hrefs untouched', () => {
@@ -41,5 +46,15 @@ describe('localization helpers', () => {
       ])
     );
   });
-});
 
+  it('builds a language switcher from published alternate paths only', () => {
+    expect(buildLanguageSwitcher('fr', { en: '/en/' })).toEqual([
+      { locale: 'fr', label: 'Français', shortLabel: 'FR', isCurrent: true },
+      { locale: 'en', label: 'English', shortLabel: 'EN', isCurrent: false, href: '/en/' },
+    ]);
+
+    expect(buildLanguageSwitcher('fr')).toEqual([
+      { locale: 'fr', label: 'Français', shortLabel: 'FR', isCurrent: true },
+    ]);
+  });
+});

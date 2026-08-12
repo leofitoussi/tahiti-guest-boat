@@ -10,8 +10,9 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { defaultLocale, localizeHref, type Locale } from "../../lib/localization"
+import { defaultLocale, localizeHref, type LanguageSwitcherOption, type Locale } from "../../lib/localization"
 import { getSiteCopy } from "../../lib/site-copy"
+import { LanguageSwitcher } from "./LanguageSwitcher"
 
 interface NavItem {
   label: string
@@ -30,8 +31,10 @@ interface MobileDrawerProps {
   ctaLabel?: string
   ctaHref?: string
   menuLabel?: string
+  closeMenuLabel?: string
   navigationLabel?: string
   locale?: Locale
+  languageOptions?: LanguageSwitcherOption[]
 }
 
 function shouldRenderCruiseLinks(item: NavItem, cruiseLinks: CruiseLink[]) {
@@ -48,11 +51,14 @@ export function MobileDrawer({
   ctaLabel,
   ctaHref = "/contact",
   menuLabel,
+  closeMenuLabel,
   navigationLabel,
   locale = defaultLocale,
+  languageOptions,
 }: MobileDrawerProps) {
   const copy = getSiteCopy(locale)
   const resolvedMenuLabel = menuLabel ?? copy.shell.mobileMenuLabel
+  const resolvedCloseMenuLabel = closeMenuLabel ?? copy.shell.closeMenuLabel
   const resolvedNavigationLabel = navigationLabel ?? copy.shell.navigationLabel
 
   return (
@@ -66,7 +72,7 @@ export function MobileDrawer({
             {resolvedNavigationLabel}
           </span>
           <SheetClose
-            render={<Button variant="ghost" size="icon-sm" aria-label="Fermer" />}
+            render={<Button variant="ghost" size="icon-sm" aria-label={resolvedCloseMenuLabel} />}
           >
             <XIcon />
           </SheetClose>
@@ -127,6 +133,9 @@ export function MobileDrawer({
             </SheetClose>
           </div>
         ) : null}
+        <div className="shrink-0 border-t border-border/70 px-5 pb-8 pt-5">
+          <LanguageSwitcher locale={locale} options={languageOptions} />
+        </div>
       </SheetContent>
     </Sheet>
   )

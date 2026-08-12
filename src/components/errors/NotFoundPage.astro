@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { defaultLocale, localizePath, type Locale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = defaultLocale } = Astro.props;
+const copy = getSiteCopy(locale);
+---
+
+<BaseLayout
+  title={copy.pages.notFound.title}
+  description={copy.pages.notFound.description}
+  locale={locale}
+  noindex={true}
+>
+  <main class="bg-background flex min-h-[60vh] flex-col items-center justify-center px-6 py-32 text-center">
+    <p class="text-sm font-semibold uppercase tracking-widest text-[#285aaa]">{copy.pages.notFound.eyebrow}</p>
+    <h1 class="mt-4 font-[family-name:var(--font-family-heading)] text-4xl md:text-5xl">
+      {copy.pages.notFound.heading}
+    </h1>
+    <p class="mt-6 max-w-md text-base text-muted-foreground">{copy.pages.notFound.body}</p>
+    <a
+      href={localizePath('/', locale)}
+      class="mt-10 inline-flex items-center justify-center rounded-[var(--radius-control)] bg-[#285aaa] px-8 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-[#1f4a91]"
+    >
+      {copy.pages.notFound.backHome}
+    </a>
+  </main>
+</BaseLayout>

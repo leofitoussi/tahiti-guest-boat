@@ -179,7 +179,7 @@ describe('layout navigation — automatic cruise links', () => {
     const source = await readFile('src/layouts/BaseLayout.astro', 'utf8');
 
     expect(source).toContain('getCruisePages');
-    expect(source).toContain('buildLayoutViewModel(settings, logoUrl, locale, cruisePages)');
+    expect(source).toContain('buildLayoutViewModel(settings, logoUrl, locale, cruisePages, alternatePaths)');
     expect(source).toContain('cruiseLinks={layoutViewModel.cruiseLinks}');
   });
 

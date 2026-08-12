@@ -13,6 +13,14 @@ export interface TranslationLink {
   path: string;
 }
 
+export interface LanguageSwitcherOption {
+  locale: Locale;
+  label: string;
+  shortLabel: string;
+  isCurrent: boolean;
+  href?: string;
+}
+
 export interface TranslationPair {
   group: string;
   source: TranslationLink;
@@ -38,6 +46,34 @@ function isExternalHref(href: string) {
   return /^(https?:|mailto:|tel:|#)/i.test(href);
 }
 
+const languageLabels: Record<Locale, { label: string; shortLabel: string }> = {
+  fr: { label: 'Français', shortLabel: 'FR' },
+  en: { label: 'English', shortLabel: 'EN' },
+};
+
+export function buildLanguageSwitcher(
+  locale: Locale = defaultLocale,
+  alternatePaths: Partial<Record<Locale, string>> = {},
+): LanguageSwitcherOption[] {
+  return locales.flatMap((targetLocale) => {
+    const isCurrent = targetLocale === locale;
+    const href = alternatePaths[targetLocale];
+
+    if (!isCurrent && !href) {
+      return [];
+    }
+
+    return [
+      {
+        locale: targetLocale,
+        ...languageLabels[targetLocale],
+        isCurrent,
+        ...(isCurrent || !href ? {} : { href }),
+      },
+    ];
+  });
+}
+
 export function localizePath(path: string, locale: Locale = defaultLocale) {
   const normalized = normalizePath(path);
 
@@ -46,7 +82,7 @@ export function localizePath(path: string, locale: Locale = defaultLocale) {
   }
 
   if (normalized === '/') {
-    return '/en';
+    return '/en/';
   }
 
   if (normalized.startsWith('/en')) {

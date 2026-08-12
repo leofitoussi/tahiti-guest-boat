@@ -42,6 +42,33 @@ describe('site settings render', () => {
     expect(englishHtml).toContain('<meta property="og:locale" content="en_US"');
   });
 
+  it('renders a localized accessible language switcher only for published versions', async () => {
+    const frenchHtml = await readFile('dist/index.html', 'utf8');
+
+    if (!frenchHtml.includes('hreflang="en"')) {
+      expect(frenchHtml).not.toContain('aria-label="Changer de langue"');
+      return;
+    }
+
+    expect(frenchHtml).toContain('aria-label="Changer de langue"');
+    expect(frenchHtml).toContain('aria-label="English"');
+
+    const englishHtml = await readFile('dist/en/index.html', 'utf8');
+    expect(englishHtml).toContain('aria-label="Change language"');
+    expect(englishHtml).toContain('aria-label="Français"');
+    expect(englishHtml).toContain('&quot;closeMenuLabel&quot;:[0,&quot;Close menu&quot;]');
+    expect(englishHtml).not.toContain('&quot;closeMenuLabel&quot;:[0,&quot;Fermer le menu&quot;]');
+  });
+
+  it('builds an English 404 page with an English home link', async () => {
+    const englishNotFound = await readFile('dist/en/404/index.html', 'utf8');
+
+    expect(englishNotFound).toContain('<html lang="en">');
+    expect(englishNotFound).toContain('Page not found');
+    expect(englishNotFound).toContain('href="/en/"');
+    expect(englishNotFound).toContain('<meta name="robots" content="noindex, nofollow">');
+  });
+
   // The booking block's tariff/inclusions text is authored per cruise in Sanity
   // (cruisePage.bookingBody), so live editorial content may legitimately contain
   // tariff copy. The template contract is what prevents a shared hardcoded

@@ -8,7 +8,8 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu"
 import { ChevronDownIcon } from "lucide-react"
-import { defaultLocale, localizeHref, type Locale } from "../../lib/localization"
+import { defaultLocale, localizeHref, type LanguageSwitcherOption, type Locale } from "../../lib/localization"
+import { LanguageSwitcher } from "./LanguageSwitcher"
 
 interface NavItem {
   label: string
@@ -27,6 +28,7 @@ interface DesktopNavigationProps {
   ctaLabel?: string
   ctaHref?: string
   locale?: Locale
+  languageOptions?: LanguageSwitcherOption[]
 }
 
 function shouldRenderCruiseDropdown(item: NavItem, cruiseLinks: CruiseLink[]) {
@@ -43,6 +45,7 @@ export function DesktopNavigation({
   ctaLabel,
   ctaHref = "/contact",
   locale = defaultLocale,
+  languageOptions,
 }: DesktopNavigationProps) {
   return (
     <div className="hidden items-center gap-4 md:flex">
@@ -90,6 +93,7 @@ export function DesktopNavigation({
           {ctaLabel}
         </a>
       ) : null}
+      <LanguageSwitcher locale={locale} options={languageOptions} />
     </div>
   )
 }

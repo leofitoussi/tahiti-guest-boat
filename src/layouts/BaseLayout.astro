@@ -59,7 +59,7 @@ const logoUrl = settings?.logo
 const faviconUrl = settings?.favicon
   ? urlForImage(settings.favicon)?.width(64).height(64).fit('crop').auto('format').url()
   : undefined;
-const layoutViewModel = buildLayoutViewModel(settings, logoUrl, locale, cruisePages);
+const layoutViewModel = buildLayoutViewModel(settings, logoUrl, locale, cruisePages, alternatePaths);
 const metadata = buildLocalizedMetadata(Astro.url.pathname, {
   locale,
   siteUrl: Astro.site?.href,
@@ -134,7 +134,10 @@ const allStructuredData = [
       ctaHref={layoutViewModel.ctaHref}
       cruiseLinks={layoutViewModel.cruiseLinks}
       mobileMenuLabel={layoutViewModel.mobileMenuLabel}
+      closeMenuLabel={layoutViewModel.closeMenuLabel}
       navigationLabel={layoutViewModel.navigationLabel}
+      locale={locale}
+      languageOptions={layoutViewModel.languageOptions}
     />
     <slot />
     <Footer
@@ -149,6 +152,7 @@ const allStructuredData = [
       contactEmail={layoutViewModel.contactEmail}
       contactPhone={layoutViewModel.contactPhone}
       navigationLabel={layoutViewModel.footerNavigationLabel}
+      locale={locale}
     />
   </body>
 </html>

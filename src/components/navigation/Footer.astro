@@ -1,5 +1,5 @@
 ---
-import { defaultLocale } from '../../lib/localization';
+import { defaultLocale, type Locale } from '../../lib/localization';
 import { getSiteCopy } from '../../lib/site-copy';
 
 interface FooterLink {
@@ -19,6 +19,7 @@ interface Props {
   contactEmail?: string;
   contactPhone?: string;
   navigationLabel?: string;
+  locale?: Locale;
 }
 
 const {
@@ -31,8 +32,9 @@ const {
   cruisesNavigationLabel = 'Croisières',
   contactEmail,
   contactPhone,
+  locale = defaultLocale,
 } = Astro.props;
-const copy = getSiteCopy(defaultLocale);
+const copy = getSiteCopy(locale);
 const navigationLabel = Astro.props.navigationLabel ?? copy.shell.footerNavigationLabel;
 
 const year = new Date().getFullYear();

@@ -1,33 +1,5 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getSiteSettings } from '../lib/cruises';
-import { defaultLocale } from '../lib/localization';
-
-const locale = defaultLocale;
-const settings = await getSiteSettings(locale);
+import NotFoundPage from '../components/errors/NotFoundPage.astro';
 ---
 
-<BaseLayout
-  title="Page introuvable | Tahiti Guest Boat"
-  description="Cette page n'existe pas."
-  settings={settings}
-  locale={locale}
-  noindex={true}
->
-  <main class="bg-background flex min-h-[60vh] flex-col items-center justify-center px-6 py-32 text-center">
-    <p class="text-sm font-semibold uppercase tracking-widest text-[#285aaa]">Erreur 404</p>
-    <h1 class="mt-4 font-[family-name:var(--font-family-heading)] text-4xl md:text-5xl">
-      Vous avez largué les amarres trop tôt
-    </h1>
-    <p class="mt-6 max-w-md text-base text-muted-foreground">
-      Cette page n'existe pas — ou elle a coulé quelque part entre Bora Bora et Raiatea.
-      Pas de panique&nbsp;: notre skipper connaît le chemin du retour.
-    </p>
-    <a
-      href="/"
-      class="mt-10 inline-flex items-center justify-center rounded-[var(--radius-control)] bg-[#285aaa] px-8 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-[#1f4a91]"
-    >
-      Retourner à bon port
-    </a>
-  </main>
-</BaseLayout>
+<NotFoundPage />

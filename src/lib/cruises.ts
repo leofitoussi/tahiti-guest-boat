@@ -411,7 +411,7 @@ export async function getSiteSettings(locale: Locale = defaultLocale) {
 // Head tracking scripts are authored once on the French Site settings document and
 // applied to every locale, so they are read independently of the page locale. The
 // result is memoized so the whole static build only hits Sanity once.
-const TRACKING_HEAD_SCRIPTS_QUERY = `*[_type == "siteSettings" && locale == "fr"][0].headScripts`;
+const TRACKING_HEAD_SCRIPTS_QUERY = `*[_type == "siteSettings" && (language == "fr" || (!defined(language) && locale == "fr") || (!defined(language) && !defined(locale)))] | order(_updatedAt desc)[0].headScripts`;
 let cachedHeadScripts: string | null | undefined;
 
 export async function getTrackingHeadScripts(): Promise<string> {

@@ -1,12 +1,11 @@
 import { sanityClient } from 'sanity:client';
+import { HOME_PAGE_ID } from './home-page';
 import { isSanityConfigured } from './sanity';
 import { defaultLocale } from './localization';
 import type { SitemapContentDocument, SitemapReference, SitemapUrl } from './seo-sitemap';
 import { formatSitemapDate, toSitemapUrls } from './seo-sitemap';
 
-const HOME_PAGE_ID = 'f512860b-c337-4a81-b057-a93acdc2c961';
-
-const localizedDefaultFilter = `(locale == $locale || (!defined(locale) && $locale == "${defaultLocale}"))`;
+const localizedDefaultFilter = `(language == $locale || (!defined(language) && locale == $locale) || (!defined(language) && !defined(locale) && $locale == "${defaultLocale}"))`;
 const publishedDocumentFilter = `!(_id in path("drafts.**")) && ${localizedDefaultFilter}`;
 const indexableBlogFilter = `_type == "blogPost" && defined(slug.current) && defined(publishedAt) && ${publishedDocumentFilter} && seo.indexable == true`;
 const indexableCruiseFilter = `_type == "cruisePage" && defined(slug.current) && ${publishedDocumentFilter} && seo.indexable == true`;
@@ -20,6 +19,14 @@ export const SITEMAP_CONTENT_QUERY = `{
       _updatedAt,
       _createdAt,
       seo { indexable }
+    },
+    ...*[_type == "translation.metadata" && !(_id in path("drafts.**")) && references($homeId)][0].translations[
+      defined(value->) && value->language == "en" && value->seo.indexable == true
+    ][0...1]{
+      "path": "/en/",
+      "_updatedAt": value->_updatedAt,
+      "_createdAt": value->_createdAt,
+      "seo": value->seo { indexable }
     },
     ...*[_type == "boatPage" && ${publishedDocumentFilter}][0...1]{
       "path": "/notre-bateau/",

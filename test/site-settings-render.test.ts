@@ -23,6 +23,25 @@ describe('site settings render', () => {
     expect(html).toContain('+689 89 34 14 34');
   });
 
+  it('builds the English Homepage only when Sanity exposes a published linked version', async () => {
+    const frenchHtml = await readFile('dist/index.html', 'utf8');
+    let englishHtml: string;
+
+    try {
+      englishHtml = await readFile('dist/en/index.html', 'utf8');
+    } catch {
+      expect(frenchHtml).not.toContain('hreflang="en"');
+      return;
+    }
+
+    expect(frenchHtml).toContain('hreflang="en"');
+    expect(englishHtml).toContain('<html lang="en">');
+    expect(englishHtml).toContain('<link rel="canonical" href="https://tahitiguestboat.com/en/"');
+    expect(englishHtml).toContain('hreflang="fr"');
+    expect(englishHtml).toContain('hreflang="en"');
+    expect(englishHtml).toContain('<meta property="og:locale" content="en_US"');
+  });
+
   // The booking block's tariff/inclusions text is authored per cruise in Sanity
   // (cruisePage.bookingBody), so live editorial content may legitimately contain
   // tariff copy. The template contract is what prevents a shared hardcoded

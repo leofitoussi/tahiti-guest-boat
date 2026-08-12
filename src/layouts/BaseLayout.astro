@@ -5,7 +5,7 @@ import Footer from '../components/navigation/Footer.astro';
 import { getCruisePages, getReviews, getSiteSettings, getTrackingHeadScripts, type SiteSettings } from '../lib/cruises';
 import { buildLayoutViewModel } from '../lib/site-settings';
 import { urlForImage } from '../lib/sanity';
-import { buildLocalizedMetadata, defaultLocale, type Locale } from '../lib/localization';
+import { buildLocalizedMetadata, buildOpenGraphLocale, defaultLocale, type Locale } from '../lib/localization';
 import { getSiteCopy } from '../lib/site-copy';
 import { buildOrganizationStructuredData, buildWebsiteStructuredData } from '../lib/site-seo';
 
@@ -111,7 +111,7 @@ const allStructuredData = [
     <meta property="og:type" content="website" />
     <meta property="og:url" content={metadata.canonical} />
     <meta property="og:site_name" content={layoutViewModel.brandName} />
-    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale" content={buildOpenGraphLocale(locale)} />
     {image && <meta property="og:image" content={image} />}
     {image && imageWidth && <meta property="og:image:width" content={String(imageWidth)} />}
     {image && imageHeight && <meta property="og:image:height" content={String(imageHeight)} />}

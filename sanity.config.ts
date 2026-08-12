@@ -1,5 +1,6 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
+import { documentInternationalization } from '@sanity/document-internationalization';
 import { media } from 'sanity-plugin-media';
 import { schemaTypes } from './schemas';
 import { deploySiteTool } from './studio/tools/deploySiteTool';
@@ -8,7 +9,6 @@ const env = (import.meta as ImportMeta & { env?: Record<string, string | undefin
 const nodeEnv = typeof process !== 'undefined' ? process.env : {};
 const projectId = env?.PUBLIC_SANITY_PROJECT_ID || nodeEnv.PUBLIC_SANITY_PROJECT_ID || 'hct2hzrl';
 const dataset = env?.PUBLIC_SANITY_DATASET || nodeEnv.PUBLIC_SANITY_DATASET || 'production';
-const homePageDocumentId = 'f512860b-c337-4a81-b057-a93acdc2c961';
 const boatPageDocumentId = 'boatPage';
 const contactPageDocumentId = 'contactPage';
 const componentsTestPageDocumentId = 'componentsTestPage';
@@ -21,15 +21,22 @@ export default defineConfig({
   dataset,
   plugins: [
     media(),
+    documentInternationalization({
+      supportedLanguages: [
+        { id: 'fr', title: 'French' },
+        { id: 'en', title: 'English' },
+      ],
+      schemaTypes: ['homePage'],
+      allowCreateMetaDoc: true,
+    }),
     structureTool({
       structure: (S) =>
         S.list()
           .title('Content')
           .items([
             S.listItem()
-              .title('Homepage')
-              .schemaType('homePage')
-              .child(S.document().schemaType('homePage').documentId(homePageDocumentId)),
+              .title('Homepage (FR/EN)')
+              .child(S.documentTypeList('homePage').title('Versions linguistiques')),
             S.listItem()
               .title('Boat page')
               .schemaType('boatPage')

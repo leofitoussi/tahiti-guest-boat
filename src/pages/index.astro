@@ -5,39 +5,13 @@ import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../l
 import { heroImageSources, isSanityConfigured } from '../lib/sanity';
 import { defaultLocale } from '../lib/localization';
 import { getSiteCopy } from '../lib/site-copy';
-import { localizedDocumentFields } from '../lib/sanity-localization';
-import { pageBuilderFields } from '../lib/page-builder';
-import { sanityClient } from 'sanity:client';
-
-// ─── Types ───────────────────────────────────────────────────────────────────
-
-interface HomePage {
-  seoTitle?: string;
-  seoDescription?: string;
-  seo?: { indexable?: boolean };
-  pageBuilder?: Record<string, unknown>[];
-}
-
-// ─── Query Sanity ─────────────────────────────────────────────────────────────
-
-// La homepage est un singleton épinglé sur cet ID dans le Studio (cf. sanity.config.ts).
-// On cible explicitement ce document pour éviter qu'un doublon `homePage` plus récemment
-// modifié ne soit servi à la place (sinon `order(_updatedAt desc)[0]` choisit le mauvais).
-const HOME_PAGE_ID = 'f512860b-c337-4a81-b057-a93acdc2c961';
-
-const HOME_QUERY = `*[_id == $homeId && !(_id in path("drafts.**"))][0]{
-  ${localizedDocumentFields},
-  seoTitle,
-  seoDescription,
-  seo { indexable },
-  ${pageBuilderFields}
-}`;
+import { getHomePagePair, resolveHomePageVersion } from '../lib/home-page';
 
 // ─── Fetch ────────────────────────────────────────────────────────────────────
 
-const home = isSanityConfigured
-  ? await sanityClient.fetch<HomePage | null>(HOME_QUERY, { homeId: HOME_PAGE_ID }).catch(() => null)
-  : null;
+const homePair = isSanityConfigured ? await getHomePagePair() : null;
+const home = homePair ? resolveHomePageVersion(homePair, defaultLocale) : null;
+const englishHome = homePair ? resolveHomePageVersion(homePair, 'en') : null;
 
 const [settings, reviews, cruises, activities] = await Promise.all([
   getSiteSettings(defaultLocale),
@@ -65,7 +39,15 @@ const heroSources = heroImage ? heroImageSources(heroImage) : undefined;
 const heroPreload = heroSources ? { srcset: heroSources.srcset, sizes: heroSources.sizes } : undefined;
 ---
 
-<BaseLayout title={seoTitle} description={seoDescription} settings={settings} locale={defaultLocale} heroPreload={heroPreload} noindex={!home?.seo?.indexable}>
+<BaseLayout
+  title={seoTitle}
+  description={seoDescription}
+  settings={settings}
+  locale={defaultLocale}
+  alternatePaths={englishHome ? { en: '/en/' } : {}}
+  heroPreload={heroPreload}
+  noindex={!home?.seo?.indexable}
+>
   <main class="bg-background">
     <PageBuilder blocks={pageBuilder} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} activities={activities} locale={defaultLocale} />
   </main>

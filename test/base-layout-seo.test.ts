@@ -23,11 +23,11 @@ describe('BaseLayout — sitewide Organization/WebSite JSON-LD and Open Graph ta
     expect(source).toContain('property="og:site_name"');
   });
 
-  it('emits a hardcoded og:locale of fr_FR', async () => {
+  it('emits an Open Graph locale matching the rendered language', async () => {
     const source = await readFile('src/layouts/BaseLayout.astro', 'utf8');
 
     expect(source).toContain('property="og:locale"');
-    expect(source).toContain('fr_FR');
+    expect(source).toContain('buildOpenGraphLocale(locale)');
   });
 
   it('emits og:image:width and og:image:height driven by new imageWidth/imageHeight props', async () => {

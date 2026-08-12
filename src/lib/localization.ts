@@ -4,6 +4,10 @@ export type Locale = (typeof locales)[number];
 
 export const defaultLocale: Locale = 'fr';
 
+export function buildOpenGraphLocale(locale: Locale) {
+  return locale === 'en' ? 'en_US' : 'fr_FR';
+}
+
 export interface TranslationLink {
   locale: Locale;
   path: string;
@@ -102,4 +106,3 @@ export function buildLocalizedMetadata(
     alternates,
   };
 }
-

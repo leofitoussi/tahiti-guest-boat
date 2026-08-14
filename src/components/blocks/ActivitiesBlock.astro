@@ -4,15 +4,10 @@ import type { TypedObject } from 'astro-portabletext/types';
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
 import SectionHeading from '../cruises/SectionHeading.astro';
-import type { Activity, ActivityTag } from '../../lib/cruises';
+import { localizeActivityPortableText, resolveVisibleActivityGroups, type ActivityGroup } from '../../lib/activities';
+import type { Activity } from '../../lib/cruises';
+import { defaultLocale, type Locale } from '../../lib/localization';
 import { urlForImage } from '../../lib/sanity';
-
-interface ActivityGroup {
-  _key?: string;
-  heading?: string;
-  description?: TypedObject[];
-  tagFilters?: ActivityTag[];
-}
 
 interface Props {
   anchorId?: string;
@@ -20,29 +15,11 @@ interface Props {
   intro?: TypedObject[];
   groups?: ActivityGroup[];
   activities?: Activity[];
+  locale?: Locale;
 }
 
-const { anchorId, title = [], intro = [], groups = [], activities = [] } = Astro.props;
-
-function getMatchingActivities(group: ActivityGroup) {
-  const filterIds = (group.tagFilters ?? []).map((tag) => tag._id).filter(Boolean);
-
-  if (filterIds.length === 0) {
-    return [];
-  }
-
-  return activities.filter((activity) => {
-    const activityTagIds = new Set((activity.tags ?? []).map((tag) => tag._id).filter(Boolean));
-    return filterIds.every((tagId) => activityTagIds.has(tagId));
-  });
-}
-
-const visibleGroups = groups
-  .map((group) => ({
-    ...group,
-    activities: getMatchingActivities(group),
-  }))
-  .filter((group) => group.activities.length > 0);
+const { anchorId, title = [], intro = [], groups = [], activities = [], locale = defaultLocale } = Astro.props;
+const visibleGroups = resolveVisibleActivityGroups(groups, activities, locale);
 ---
 
 {
@@ -57,7 +34,7 @@ const visibleGroups = groups
           )}
           {intro.length > 0 && (
             <div class="activities-copy mt-5">
-              <PortableText value={intro} />
+              <PortableText value={localizeActivityPortableText(intro, locale)} />
             </div>
           )}
         </div>
@@ -73,7 +50,7 @@ const visibleGroups = groups
                 )}
                 {group.description && group.description.length > 0 && (
                   <div class="activities-copy mt-4">
-                    <PortableText value={group.description} />
+                    <PortableText value={localizeActivityPortableText(group.description, locale)} />
                   </div>
                 )}
               </div>
@@ -109,7 +86,7 @@ const visibleGroups = groups
                         {activity.title && <h4 class="font-heading text-xl font-semibold leading-tight text-foreground">{activity.title}</h4>}
                         {activity.description && activity.description.length > 0 && (
                           <div class="activities-copy mt-3">
-                            <PortableText value={activity.description} />
+                            <PortableText value={localizeActivityPortableText(activity.description, locale)} />
                           </div>
                         )}
                       </div>

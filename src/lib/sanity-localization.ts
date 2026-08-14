@@ -1,5 +1,10 @@
 import { defaultLocale, type Locale } from './localization';
 
+export interface LocalizedDocumentLike {
+  language?: Locale | null;
+  locale?: Locale | null;
+}
+
 export const localizedDocumentFields = `
   language,
   locale,
@@ -18,4 +23,8 @@ export function buildLocalizedSingletonDocumentFilter(documentType: string) {
 
 export function normalizeLocale(locale: string | undefined): Locale {
   return locale === 'en' ? 'en' : defaultLocale;
+}
+
+export function isDocumentInLocale(document: LocalizedDocumentLike, locale: Locale) {
+  return (document.language ?? document.locale ?? defaultLocale) === locale;
 }

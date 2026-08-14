@@ -5,6 +5,7 @@ import { defaultLocale, type Locale } from './localization';
 import {
   buildLocalizedSingletonDocumentFilter,
   buildLocalizedSluggedDocumentFilter,
+  isDocumentInLocale,
   localizedDocumentFields,
 } from './sanity-localization';
 import type { SanityImage } from './blog';
@@ -178,6 +179,7 @@ export interface ActivityTag {
   _id: string;
   title?: string;
   slug?: string;
+  language?: Locale;
   locale?: Locale;
   translationGroup?: string;
 }
@@ -188,6 +190,10 @@ export interface Activity {
   image?: SanityImage;
   description?: TypedObject[];
   priority?: 1 | 2 | 3;
+  isPublished?: boolean;
+  language?: Locale;
+  locale?: Locale;
+  translationGroup?: string;
   tags?: ActivityTag[];
 }
 
@@ -338,17 +344,20 @@ const REVIEWS_QUERY = `*[
 }`;
 
 const ACTIVITIES_QUERY = `*[
-  _type == "activity" &&
-  locale == $locale &&
-  isPublished == true &&
-  !(_id in path("drafts.**"))
+  ${buildLocalizedSingletonDocumentFilter('activity')} &&
+  isPublished == true
 ] | order(priority desc, title asc) {
   _id,
+  ${localizedDocumentFields},
   title,
   image${imageFields},
   description,
   priority,
-  tags[]->{
+  isPublished,
+  "tags": *[
+    ${buildLocalizedSingletonDocumentFilter('activityTag')} &&
+    _id in ^.tags[]._ref
+  ]{
     _id,
     ${localizedDocumentFields},
     title,
@@ -443,7 +452,14 @@ export async function getActivities(locale: Locale = defaultLocale) {
     return [];
   }
 
-  return sanityClient.fetch<Activity[]>(ACTIVITIES_QUERY, { locale }).catch(() => []);
+  const activities = await sanityClient.fetch<Activity[]>(ACTIVITIES_QUERY, { locale }).catch(() => []);
+
+  return activities
+    .filter((activity) => activity.isPublished !== false && isDocumentInLocale(activity, locale))
+    .map((activity) => ({
+      ...activity,
+      tags: (activity.tags ?? []).filter((tag) => isDocumentInLocale(tag, locale)),
+    }));
 }
 
 export async function getRelatedCruises(slug: string, locale: Locale = defaultLocale) {

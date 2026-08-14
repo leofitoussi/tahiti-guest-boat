@@ -4,6 +4,7 @@ import { documentInternationalization } from '@sanity/document-internationalizat
 import { media } from 'sanity-plugin-media';
 import { schemaTypes } from './schemas';
 import { deploySiteTool } from './studio/tools/deploySiteTool';
+import { remapActivityTranslationReferences } from './src/lib/activity-translations';
 
 const env = (import.meta as ImportMeta & { env?: Record<string, string | undefined> }).env;
 const nodeEnv = typeof process !== 'undefined' ? process.env : {};
@@ -26,8 +27,9 @@ export default defineConfig({
         { id: 'fr', title: 'French' },
         { id: 'en', title: 'English' },
       ],
-      schemaTypes: ['homePage', 'siteSettings'],
+      schemaTypes: ['homePage', 'siteSettings', 'activity', 'activityTag'],
       allowCreateMetaDoc: true,
+      callback: remapActivityTranslationReferences,
     }),
     structureTool({
       structure: (S) =>

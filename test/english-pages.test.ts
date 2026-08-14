@@ -16,9 +16,9 @@ describe('English global navigation destinations', () => {
   it('renders the English boat page from the English Sanity version', async () => {
     const source = await readFile('src/pages/en/our-boat.astro', 'utf8');
 
-    expect(source).toContain("getUniquePage('boatPage', locale)");
+    expect(source).toContain("getUniquePageVersions('boatPage')");
     expect(source).toContain("const locale = 'en' as const");
-    expect(source).toContain("fr: '/notre-bateau/'");
+    expect(source).toContain("pageVersions.fr ? { fr: '/notre-bateau/' } : {}");
   });
 
   it('renders the English contact page from the English Sanity version', async () => {

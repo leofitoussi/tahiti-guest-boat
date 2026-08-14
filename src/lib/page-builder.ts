@@ -4,6 +4,10 @@ import { defaultLocale, type Locale } from './localization';
 import { buildLocalizedSingletonDocumentFilter, localizedDocumentFields } from './sanity-localization';
 
 export interface UniquePageDocument {
+  _id?: string;
+  _createdAt?: string;
+  _updatedAt?: string;
+  language?: Locale;
   locale?: Locale;
   translationGroup?: string;
   seoTitle?: string;
@@ -277,14 +281,61 @@ export const pageBuilderFields = `pageBuilder[]{
 
 type UniquePageDocumentType = 'boatPage' | 'contactPage' | 'componentsTestPage';
 
-export function buildUniquePageQuery(documentType: UniquePageDocumentType) {
-  return `*[${buildLocalizedSingletonDocumentFilter(documentType)}][0]{
+const uniquePageProjection = `
   ${localizedDocumentFields},
   seoTitle,
   seoDescription,
   seo { indexable },
   ${pageBuilderFields}
-}`;
+`;
+
+export function buildUniquePageQuery(documentType: UniquePageDocumentType) {
+  return `*[${buildLocalizedSingletonDocumentFilter(documentType)}]
+    | order(coalesce(_updatedAt, _createdAt) desc, _id asc)[0]{${uniquePageProjection}}`;
+}
+
+export function buildUniquePageVersionsQuery(documentType: UniquePageDocumentType) {
+  return `*[
+    _type == "${documentType}" &&
+    !(_id in path("drafts.**"))
+  ] | order(coalesce(_updatedAt, _createdAt) desc, _id asc){
+    _id,
+    _createdAt,
+    _updatedAt,
+    ${uniquePageProjection}
+  }`;
+}
+
+export function resolveUniquePageVersion(
+  versions: UniquePageDocument[],
+  locale: Locale = defaultLocale,
+): UniquePageDocument | null {
+  return (
+    versions
+      .filter((version) => (version.language ?? version.locale ?? defaultLocale) === locale)
+      .toSorted((left, right) => {
+        const leftDate = left._updatedAt ?? left._createdAt ?? '';
+        const rightDate = right._updatedAt ?? right._createdAt ?? '';
+        return rightDate.localeCompare(leftDate) || (left._id ?? '').localeCompare(right._id ?? '');
+      })[0] ?? null
+  );
+}
+
+export async function getUniquePageVersions(
+  documentType: UniquePageDocumentType,
+): Promise<Record<Locale, UniquePageDocument | null>> {
+  if (!isSanityConfigured) {
+    return { fr: null, en: null };
+  }
+
+  const versions = await sanityClient
+    .fetch<UniquePageDocument[]>(buildUniquePageVersionsQuery(documentType))
+    .catch(() => []);
+
+  return {
+    fr: resolveUniquePageVersion(versions, 'fr'),
+    en: resolveUniquePageVersion(versions, 'en'),
+  };
 }
 
 export async function getUniquePage(documentType: UniquePageDocumentType, locale: Locale = defaultLocale) {

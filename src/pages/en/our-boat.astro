@@ -2,12 +2,13 @@
 import PageBuilder from '../../components/blocks/PageBuilder.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../../lib/cruises';
-import { getUniquePage } from '../../lib/page-builder';
+import { getUniquePageVersions } from '../../lib/page-builder';
 import { getSiteCopy } from '../../lib/site-copy';
 
 const locale = 'en' as const;
 const copy = getSiteCopy(locale);
-const page = await getUniquePage('boatPage', locale);
+const pageVersions = await getUniquePageVersions('boatPage');
+const page = pageVersions[locale];
 const [settings, reviews, cruises, activities] = await Promise.all([
   getSiteSettings(locale),
   getReviews(),
@@ -25,7 +26,7 @@ const pageBuilder = (page?.pageBuilder as Record<string, unknown>[] | undefined)
   description={description}
   settings={settings}
   locale={locale}
-  alternatePaths={{ fr: '/notre-bateau/' }}
+  alternatePaths={pageVersions.fr ? { fr: '/notre-bateau/' } : {}}
   noindex={!page?.seo?.indexable}
 >
   <main class="bg-background">

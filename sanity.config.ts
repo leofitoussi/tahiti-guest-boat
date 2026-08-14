@@ -27,7 +27,7 @@ export default defineConfig({
         { id: 'fr', title: 'French' },
         { id: 'en', title: 'English' },
       ],
-      schemaTypes: ['homePage', 'siteSettings', 'activity', 'activityTag'],
+      schemaTypes: ['homePage', 'siteSettings', 'boatPage', 'contactPage', 'cruisePage', 'blogPost', 'legalPage', 'activity', 'activityTag'],
       allowCreateMetaDoc: true,
       callback: remapActivityTranslationReferences,
     }),

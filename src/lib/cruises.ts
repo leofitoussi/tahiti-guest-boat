@@ -2,6 +2,7 @@ import { sanityClient } from 'sanity:client';
 import type { TypedObject } from 'astro-portabletext/types';
 import { isSanityConfigured } from './sanity';
 import { defaultLocale, type Locale } from './localization';
+import type { CruiseTranslationVersion } from './cruise-routes';
 import {
   buildLocalizedSingletonDocumentFilter,
   buildLocalizedSluggedDocumentFilter,
@@ -302,6 +303,20 @@ const CRUISE_PAGE_QUERY = `*[${cruisePageFilter} && slug.current == $slug][0] {
   ${cruisePageFields}
 }`;
 
+const CRUISE_TRANSLATION_VERSIONS_QUERY = `*[
+  _type == "cruisePage" &&
+  !(_id in path("drafts.**")) &&
+  defined(slug.current) &&
+  (
+    (defined($translationGroup) && translationGroup == $translationGroup) ||
+    (defined($documentId) && _id in *[_type == "translation.metadata" && references($documentId)][0].translations[].value._ref)
+  )
+] {
+  _id,
+  ${localizedDocumentFields},
+  "slug": slug.current
+}`;
+
 const SITE_SETTINGS_QUERY = `*[${buildLocalizedSingletonDocumentFilter('siteSettings')}] | order(_updatedAt desc)[0] {
   ${localizedDocumentFields},
   siteName,
@@ -407,6 +422,37 @@ export async function getCruisePage(slug: string, locale: Locale = defaultLocale
   }
 
   return sanityClient.fetch<CruisePage | null>(CRUISE_PAGE_QUERY, { slug, locale }).catch(() => null);
+}
+
+export async function getCruiseTranslationVersions(
+  source?: string | Pick<CruisePage, '_id' | 'translationGroup'>,
+): Promise<CruiseTranslationVersion[]> {
+  const translationGroup = typeof source === 'string' ? source : source?.translationGroup;
+  const documentId = typeof source === 'string' ? undefined : source?._id;
+
+  if (!isSanityConfigured || (!translationGroup && !documentId)) {
+    return [];
+  }
+
+  const documents = await sanityClient
+    .fetch<
+      {
+        _id?: string;
+        language?: Locale;
+        locale?: Locale;
+        slug?: string;
+      }[]
+    >(CRUISE_TRANSLATION_VERSIONS_QUERY, { translationGroup, documentId })
+    .catch(() => []);
+
+  return documents.flatMap((document) => {
+    if (!document.slug) {
+      return [];
+    }
+
+    const locale = document.language ?? document.locale ?? defaultLocale;
+    return [{ locale, slug: document.slug, isPublished: !document._id?.startsWith('drafts.') }];
+  });
 }
 
 export async function getSiteSettings(locale: Locale = defaultLocale) {

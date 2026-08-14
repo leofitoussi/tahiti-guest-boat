@@ -11,7 +11,8 @@ import { urlForImage } from '../../lib/sanity';
 
 const locale = defaultLocale;
 const copy = getSiteCopy(locale);
-const posts = await getBlogPosts(locale);
+const [posts, englishPosts] = await Promise.all([getBlogPosts(locale), getBlogPosts('en')]);
+const alternatePaths = englishPosts.length > 0 ? { en: '/en/blog/' } : {};
 
 const [featured, ...rest] = posts;
 ---
@@ -20,6 +21,7 @@ const [featured, ...rest] = posts;
   title={copy.pages.blogIndex.title}
   description={copy.pages.blogIndex.description}
   locale={locale}
+  alternatePaths={alternatePaths}
 >
   <main class="bg-background">
 

@@ -1,15 +1,15 @@
 ---
-import HeroBlock from '../../components/cruises/HeroBlock.astro';
-import CruiseTeaserBlock from '../../components/cruises/CruiseTeaserBlock.astro';
-import CruiseGalleryBlock from '../../components/cruises/CruiseGalleryBlock.astro';
-import IntroductionDestinationBlock from '../../components/cruises/IntroductionDestinationBlock.astro';
-import BoatBlock from '../../components/cruises/BoatBlock.astro';
-import ItineraryBlock from '../../components/cruises/ItineraryBlock.astro';
-import WhyUsBlock from '../../components/cruises/WhyUsBlock.astro';
-import ReviewsBlock from '../../components/cruises/ReviewsBlock.astro';
-import BookingBlock from '../../components/cruises/BookingBlock.astro';
-import RelatedCruisesBlock from '../../components/cruises/RelatedCruisesBlock.astro';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import HeroBlock from '../../../components/cruises/HeroBlock.astro';
+import CruiseTeaserBlock from '../../../components/cruises/CruiseTeaserBlock.astro';
+import CruiseGalleryBlock from '../../../components/cruises/CruiseGalleryBlock.astro';
+import IntroductionDestinationBlock from '../../../components/cruises/IntroductionDestinationBlock.astro';
+import BoatBlock from '../../../components/cruises/BoatBlock.astro';
+import ItineraryBlock from '../../../components/cruises/ItineraryBlock.astro';
+import WhyUsBlock from '../../../components/cruises/WhyUsBlock.astro';
+import ReviewsBlock from '../../../components/cruises/ReviewsBlock.astro';
+import BookingBlock from '../../../components/cruises/BookingBlock.astro';
+import RelatedCruisesBlock from '../../../components/cruises/RelatedCruisesBlock.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
 import {
   getAllCruiseSlugs,
   getCruisePage,
@@ -18,15 +18,16 @@ import {
   getReviews,
   getSiteSettings,
   type CruisePage,
-} from '../../lib/cruises';
-import { buildCruiseAlternatePaths } from '../../lib/cruise-routes';
-import { buildCruiseSeoImage, buildCruiseStructuredData } from '../../lib/cruise-seo';
-import { buildLocalizedMetadata, defaultLocale } from '../../lib/localization';
+} from '../../../lib/cruises';
+import { buildCruiseAlternatePaths } from '../../../lib/cruise-routes';
+import { buildCruiseSeoImage, buildCruiseStructuredData } from '../../../lib/cruise-seo';
+import { buildLocalizedMetadata } from '../../../lib/localization';
+import { getSiteCopy } from '../../../lib/site-copy';
 
-const locale = defaultLocale;
+const locale = 'en' as const;
 
 export async function getStaticPaths() {
-  const slugs = await getAllCruiseSlugs(defaultLocale);
+  const slugs = await getAllCruiseSlugs('en');
 
   return slugs.map(({ slug }) => ({
     params: { slug },
@@ -34,8 +35,13 @@ export async function getStaticPaths() {
   }));
 }
 
-const summary = Astro.props.cruise;
-const cruise = ((await getCruisePage(summary.slug, locale)) || summary) as CruisePage;
+const summary = Astro.props.cruise as { slug: string };
+const cruise = (await getCruisePage(summary.slug, locale)) as CruisePage | null;
+
+if (!cruise) {
+  return;
+}
+
 const [settings, reviews, relatedCruises, translations] = await Promise.all([
   getSiteSettings(locale),
   getReviews(),
@@ -44,9 +50,9 @@ const [settings, reviews, relatedCruises, translations] = await Promise.all([
 ]);
 
 const alternatePaths = buildCruiseAlternatePaths(translations, locale);
-
+const copy = getSiteCopy(locale);
 const title = cruise.seoTitle || `${cruise.title} | Tahiti Guest Boat`;
-const description = cruise.seoDescription || cruise.excerpt || 'Croisière privée en catamaran avec Tahiti Guest Boat.';
+const description = cruise.seoDescription || cruise.excerpt || copy.pages.cruisesIndex.description;
 const hero = cruise.hero ?? {};
 const boat = cruise.boat ?? {};
 const itinerary = cruise.itinerary ?? { steps: [] };

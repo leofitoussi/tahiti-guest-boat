@@ -25,11 +25,13 @@ export async function checkSeoBuild(options = {}) {
     const sitemapIndexUrl = new URL('/sitemap_index.xml', siteUrl).toString();
     const robotsUrl = new URL('/robots.txt', baseUrl).toString();
     const llmsTxtUrl = new URL('/llms.txt', baseUrl).toString();
+    const englishLlmsTxtUrl = new URL('/en/llms.txt', baseUrl).toString();
 
-    const [sitemapIndexResponse, robotsResponse, llmsTxtResponse] = await Promise.all([
+    const [sitemapIndexResponse, robotsResponse, llmsTxtResponse, englishLlmsTxtResponse] = await Promise.all([
       fetchLocalUrl(sitemapIndexUrl, baseUrl, errors),
       fetch(robotsUrl, { redirect: 'manual' }),
       fetch(llmsTxtUrl, { redirect: 'manual' }),
+      fetch(englishLlmsTxtUrl, { redirect: 'manual' }),
     ]);
 
     if (llmsTxtResponse.status !== 200) {
@@ -38,6 +40,15 @@ export async function checkSeoBuild(options = {}) {
       const llmsTxt = await llmsTxtResponse.text();
       if (!llmsTxt.startsWith('# ')) {
         errors.push('llms.txt must start with a Markdown H1 ("# ")');
+      }
+    }
+
+    if (englishLlmsTxtResponse.status !== 200) {
+      errors.push(`en/llms.txt returned HTTP ${englishLlmsTxtResponse.status}`);
+    } else {
+      const englishLlmsTxt = await englishLlmsTxtResponse.text();
+      if (!englishLlmsTxt.startsWith('# ')) {
+        errors.push('en/llms.txt must start with a Markdown H1 ("# ")');
       }
     }
 
@@ -72,14 +83,19 @@ export async function checkSeoBuild(options = {}) {
 
     checkDuplicateUrls(pageUrls, errors);
 
+    const pageHtml = new Map();
     for (const pageUrl of pageUrls) {
       const response = await fetchLocalUrl(pageUrl, baseUrl, errors);
       if (!response) continue;
 
       const html = await response.text();
+      pageHtml.set(normalizeAbsoluteUrl(pageUrl), html);
       checkCanonical(pageUrl, html, errors);
       checkMetaRobots(pageUrl, html, errors);
     }
+
+    checkHreflangAlternates(pageUrls, pageHtml, errors);
+    await checkInternalLinks(pageUrls, pageHtml, baseUrl, errors);
 
     throwIfErrors(errors);
     return { checkedUrls: pageUrls.length };
@@ -199,10 +215,103 @@ function checkCanonical(pageUrl, html, errors) {
     const canonicalUrl = new URL(canonicalHref);
     if (!/^https?:$/.test(canonicalUrl.protocol)) {
       errors.push(`${pageUrl} canonical must be absolute HTTP(S): ${canonicalHref}`);
+    } else if (canonicalUrl.toString() !== new URL(pageUrl).toString()) {
+      errors.push(`${pageUrl} canonical must match sitemap URL but points to ${canonicalUrl.toString()}`);
     }
   } catch {
     errors.push(`${pageUrl} canonical must be absolute: ${canonicalHref}`);
   }
+}
+
+function checkHreflangAlternates(pageUrls, pageHtml, errors) {
+  const sitemapUrls = new Set(pageUrls.map(normalizeAbsoluteUrl));
+
+  for (const pageUrl of pageUrls) {
+    const html = pageHtml.get(normalizeAbsoluteUrl(pageUrl));
+    if (!html) continue;
+
+    for (const alternate of parseAlternateLinks(html)) {
+      let alternateUrl;
+
+      try {
+        alternateUrl = normalizeAbsoluteUrl(alternate.href);
+      } catch {
+        errors.push(`${pageUrl} has an invalid hreflang URL: ${alternate.href}`);
+        continue;
+      }
+
+      if (!sitemapUrls.has(alternateUrl)) {
+        errors.push(`${pageUrl} hreflang ${alternate.hreflang} points to a URL outside the sitemap: ${alternate.href}`);
+        continue;
+      }
+
+      const targetHtml = pageHtml.get(alternateUrl);
+      const reciprocal = targetHtml && parseAlternateLinks(targetHtml).some(
+        (targetAlternate) => normalizeAbsoluteUrl(targetAlternate.href) === normalizeAbsoluteUrl(pageUrl),
+      );
+
+      if (!reciprocal) {
+        errors.push(`${pageUrl} hreflang alternate is not reciprocal: ${alternate.href}`);
+      }
+    }
+  }
+}
+
+function parseAlternateLinks(html) {
+  return [...html.matchAll(/<link\b[^>]*>/gi)].flatMap((match) => {
+    const tag = match[0];
+    const rel = tag.match(/\brel=["']([^"']+)["']/i)?.[1] ?? '';
+    const hreflang = tag.match(/\bhreflang=["']([^"']+)["']/i)?.[1];
+    const href = tag.match(/\bhref=["']([^"']+)["']/i)?.[1];
+
+    return rel.split(/\s+/i).includes('alternate') && hreflang && href ? [{ hreflang, href }] : [];
+  });
+}
+
+async function checkInternalLinks(pageUrls, pageHtml, baseUrl, errors) {
+  for (const pageUrl of pageUrls) {
+    const html = pageHtml.get(normalizeAbsoluteUrl(pageUrl));
+    if (!html) continue;
+
+    for (const anchor of parseAnchorLinks(html)) {
+      if (anchor.isLanguageSwitcher) continue;
+
+      const { href } = anchor;
+      if (/^(?:#|mailto:|tel:|javascript:)/i.test(href)) continue;
+
+      let targetUrl;
+      try {
+        targetUrl = new URL(href, pageUrl);
+      } catch {
+        errors.push(`${pageUrl} contains an invalid internal link: ${href}`);
+        continue;
+      }
+
+      if (!/^https?:$/.test(targetUrl.protocol) || targetUrl.origin !== new URL(pageUrl).origin) continue;
+
+      if (new URL(pageUrl).pathname.startsWith('/en/') && !targetUrl.pathname.startsWith('/en/')) {
+        errors.push(`${pageUrl} English page contains a French internal link: ${href}`);
+        continue;
+      }
+
+      await fetchLocalUrl(targetUrl.toString(), baseUrl, errors);
+    }
+  }
+}
+
+function parseAnchorLinks(html) {
+  return [...html.matchAll(/<a\b[^>]*>/gi)].flatMap((match) => {
+    const tag = match[0];
+    const href = tag.match(/\bhref=["']([^"']+)["']/i)?.[1];
+    const isLanguageSwitcher = /\bdata-language-switcher=["']true["']/i.test(tag);
+    return href ? [{ href, isLanguageSwitcher }] : [];
+  });
+}
+
+function normalizeAbsoluteUrl(value) {
+  const url = new URL(value);
+  url.hash = '';
+  return url.toString();
 }
 
 function checkMetaRobots(pageUrl, html, errors) {

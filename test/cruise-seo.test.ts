@@ -116,6 +116,28 @@ describe('buildCruiseStructuredData — graph shape', () => {
     const list = (result['@graph'] as any[]).find((n) => n['@type'] === 'ItemList');
     expect(list).toBeUndefined();
   });
+
+  it('uses English keywords and English cruise URLs for an English page', () => {
+    const result = buildCruiseStructuredData(
+      {
+        title: 'Private cruise in Bora Bora',
+        destinationLabel: 'Bora Bora',
+        seoDescription: 'A private cruise in Bora Bora.',
+      } as any,
+      {
+        canonicalUrl: 'https://example.com/en/cruises/private-bora-bora/',
+        locale: 'en',
+        relatedCruises: [{ slug: 'private-moorea', title: 'Private cruise in Moorea' } as any],
+      },
+    );
+    const graph = result['@graph'] as any[];
+    const trip = graph.find((node) => node['@type'] === 'TouristTrip');
+    const list = graph.find((node) => node['@type'] === 'ItemList');
+
+    expect(trip.touristType).toBe('cruise Bora Bora');
+    expect(list.name).toBe('Other cruises');
+    expect(list.itemListElement[0].url).toBe('https://example.com/en/cruises/private-moorea/');
+  });
 });
 
 // ── Cycle 19 — SEO image selection ──────────────────────────────────────────

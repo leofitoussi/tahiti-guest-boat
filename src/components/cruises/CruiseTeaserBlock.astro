@@ -3,12 +3,16 @@ import Container from '../layout/Container.astro';
 import CruiseHeading from './CruiseHeading.astro';
 import type { CruiseTeaser } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
+import { defaultLocale, type Locale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
 
 interface Props {
   block?: CruiseTeaser;
+  locale?: Locale;
 }
 
-const { block } = Astro.props;
+const { block, locale = defaultLocale } = Astro.props;
+const copy = getSiteCopy(locale);
 
 const imageUrl = block?.image
   ? urlForImage(block.image)?.width(1600).height(900).fit('crop').quality(84).auto('format').url()
@@ -23,7 +27,7 @@ const hasContent = hasHeadline || Boolean(imageUrl);
 // Icons are frontend-owned and consistent across all cruise pages
 const markers = [
   {
-    label: 'Capacité',
+    label: copy.blocks.cruiseCapacityLabel,
     value: block?.capacity,
     svgPaths: [
       'M12 11.25a3.25 3.25 0 1 0 0-6.5 3.25 3.25 0 0 0 0 6.5Z',
@@ -33,7 +37,7 @@ const markers = [
     ],
   },
   {
-    label: 'Durée minimum',
+    label: copy.blocks.cruiseDurationLabel,
     value: block?.minimumDuration,
     svgPaths: [
       'M6.75 3.75v2.5',
@@ -44,7 +48,7 @@ const markers = [
     ],
   },
   {
-    label: 'Tarif',
+    label: copy.blocks.cruisePricingLabel,
     value: block?.pricing,
     svgPaths: [
       'M7.25 4.75h9.5c.83 0 1.5.67 1.5 1.5v13l-6.25-3-6.25 3v-13c0-.83.67-1.5 1.5-1.5Z',
@@ -63,7 +67,7 @@ const markers = [
           <div class="mx-auto flex max-w-5xl flex-col items-center text-center [--heading-2:var(--heading-2-accroche)]">
             <img
               src="/images/tahiti-guest-boat-catamaran-signature.svg"
-              alt="Tahiti Guest Boat catamaran"
+              alt={copy.blocks.cruiseImageAlt}
               width="124"
               height="124"
               loading="lazy"

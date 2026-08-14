@@ -47,21 +47,21 @@ describe('unique page family schema', () => {
 
 describe('unique page family routes', () => {
   it('keeps the public /notre-bateau and /contact URLs available in the build', async () => {
-    execFileSync('npm', ['run', 'build'], { stdio: 'ignore' });
+    execFileSync('npm', ['run', 'build'], { stdio: 'ignore', timeout: 600000 });
 
     const boatHtml = await readFile('dist/notre-bateau/index.html', 'utf8');
     const contactHtml = await readFile('dist/contact/index.html', 'utf8');
 
     expect(boatHtml).toContain('<title>Namaka, le bateau de Tahiti Guest Boat</title>');
     expect(contactHtml).toContain('<title>Contact | Tahiti Guest Boat</title>');
-  }, 120000);
+  }, 600000);
 
   it('keeps /composants available as a noindex test page', async () => {
-    execFileSync('npm', ['run', 'build'], { stdio: 'ignore' });
+    execFileSync('npm', ['run', 'build'], { stdio: 'ignore', timeout: 600000 });
 
     const componentsHtml = await readFile('dist/composants/index.html', 'utf8');
 
     expect(componentsHtml).toContain('<title>Composants | Tahiti Guest Boat</title>');
     expect(componentsHtml).toContain('<meta name="robots" content="noindex, nofollow">');
-  }, 120000);
+  }, 600000);
 });

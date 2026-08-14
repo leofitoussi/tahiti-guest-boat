@@ -2,40 +2,15 @@
 import PageBuilder from '../../components/blocks/PageBuilder.astro';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../../lib/cruises';
-import { heroImageSources } from '../../lib/sanity';
+import { heroImageSources, isSanityConfigured } from '../../lib/sanity';
 import { getSiteCopy } from '../../lib/site-copy';
-import { getHomePagePair, resolveHomePageVersion, type HomePageDocument } from '../../lib/home-page';
+import { getHomePagePair, resolveHomePageVersion } from '../../lib/home-page';
 
-interface Props {
-  home: HomePageDocument;
-  alternatePaths: { fr?: string };
-}
-
-export async function getStaticPaths() {
-  const pair = await getHomePagePair();
-  const home = pair ? resolveHomePageVersion(pair, 'en') : null;
-
-  if (!home) {
-    return [];
-  }
-
-  return [
-    {
-      params: { path: undefined },
-      props: {
-        home,
-        alternatePaths: {
-          fr: pair && resolveHomePageVersion(pair, 'fr') ? '/' : undefined,
-        },
-      },
-    },
-  ];
-}
-
-const { home, alternatePaths } = Astro.props as Props;
+const pair = isSanityConfigured ? await getHomePagePair() : null;
+const home = pair ? resolveHomePageVersion(pair, 'en') : null;
 const locale = 'en' as const;
 const copy = getSiteCopy(locale);
-const pageBuilder = home.pageBuilder ?? [];
+const pageBuilder = home?.pageBuilder ?? [];
 
 const [settings, reviews, cruises, activities] = await Promise.all([
   getSiteSettings(locale),
@@ -44,8 +19,8 @@ const [settings, reviews, cruises, activities] = await Promise.all([
   getActivities(locale),
 ]);
 
-const seoTitle = home.seoTitle ?? copy.pages.home.title;
-const seoDescription = home.seoDescription ?? copy.pages.home.description;
+const seoTitle = home?.seoTitle ?? copy.pages.home.title;
+const seoDescription = home?.seoDescription ?? copy.pages.home.description;
 const heroBlock = pageBuilder.find((block) => block._type === 'heroHeaderBlock' || block._type === 'homeHeroBlock');
 const heroImage = heroBlock?.image as Parameters<typeof heroImageSources>[0] | undefined;
 const heroSources = heroImage ? heroImageSources(heroImage) : undefined;
@@ -57,9 +32,9 @@ const heroPreload = heroSources ? { srcset: heroSources.srcset, sizes: heroSourc
   description={seoDescription}
   settings={settings}
   locale={locale}
-  alternatePaths={alternatePaths}
+  alternatePaths={pair && resolveHomePageVersion(pair, 'fr') ? { fr: '/' } : {}}
   heroPreload={heroPreload}
-  noindex={!home.seo?.indexable}
+  noindex={!home?.seo?.indexable}
 >
   <main class="bg-background">
     <PageBuilder blocks={pageBuilder} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} activities={activities} locale={locale} />

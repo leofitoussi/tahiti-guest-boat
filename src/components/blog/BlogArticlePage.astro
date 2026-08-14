@@ -1,0 +1,131 @@
+---
+import BlogContent from './BlogContent.astro';
+import TableOfContents from './TableOfContents.astro';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import RelatedCruisesBlock from '../cruises/RelatedCruisesBlock.astro';
+import { buttonVariants } from '../ui/button';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatPostDate, type BlogPost } from '../../lib/blog';
+import { buildLocalizedMetadata, defaultLocale, localizePath, type Locale } from '../../lib/localization';
+import { extractHeadings } from '../../lib/portable-text-headings';
+import { getSiteCopy } from '../../lib/site-copy';
+import { urlForImage } from '../../lib/sanity';
+import { buildBlogPostingStructuredData } from '../../lib/blog-seo';
+
+interface Props {
+  post: BlogPost;
+  locale?: Locale;
+  alternatePaths?: Partial<Record<Locale, string>>;
+}
+
+const { post, locale = defaultLocale, alternatePaths = {} } = Astro.props;
+const copy = getSiteCopy(locale);
+const headings = extractHeadings(post.body);
+
+const title = post.seoTitle || `${post.title} | Tahiti Guest Boat`;
+const description = post.seoDescription || post.excerpt || copy.pages.blogPost.fallbackDescription;
+const mainImageUrl = post.mainImage
+  ? urlForImage(post.mainImage)?.width(1440).height(810).fit('crop').quality(84).auto('format').url()
+  : undefined;
+const secondaryCruises = post.secondaryCruises ?? [];
+const relatedCruises = [post.primaryCruise, ...secondaryCruises].filter(
+  (cruise): cruise is NonNullable<typeof cruise> => Boolean(cruise),
+);
+const metadata = buildLocalizedMetadata(Astro.url.pathname, {
+  locale,
+  siteUrl: Astro.site?.href,
+  alternatePaths,
+});
+const structuredData = [
+  buildBlogPostingStructuredData(post, {
+    canonicalUrl: metadata.canonical,
+    siteUrl: (Astro.site?.href ?? 'https://tahitiguestboat.com/').replace(/\/$/, ''),
+    image: mainImageUrl,
+  }),
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  image={mainImageUrl}
+  imageWidth={1440}
+  imageHeight={810}
+  locale={locale}
+  alternatePaths={alternatePaths}
+  structuredData={structuredData}
+  noindex={!post.seo?.indexable}
+>
+  <main class="bg-background">
+    <article>
+      <Section padding="lg" class="border-b border-border/70 bg-muted/30">
+        <Container class="max-w-[960px]">
+          <a
+            href={localizePath('/blog/', locale)}
+            class={buttonVariants({ variant: 'ghost', className: 'mb-6 w-fit px-0 text-muted-foreground hover:text-foreground' })}
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" class="mr-1.5">
+              <path d="M13 8H3M7 12l-4-4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            {copy.pages.blogPost.backToBlog}
+          </a>
+          <div class="flex flex-col gap-5">
+            {post.updatedAt ? (
+              <time datetime={post.updatedAt} class="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+                {copy.pages.blogPost.updatedOn} {formatPostDate(post.updatedAt, locale)}
+              </time>
+            ) : post.publishedAt && (
+              <time datetime={post.publishedAt} class="text-sm font-medium tracking-wide text-muted-foreground uppercase">
+                {formatPostDate(post.publishedAt, locale)}
+              </time>
+            )}
+            <h1 class="font-heading font-semibold leading-[--line-height-heading] text-foreground" style="font-size: var(--heading-1)">
+              {post.title}
+            </h1>
+            {post.excerpt && <p class="max-w-2xl text-xl leading-relaxed text-muted-foreground">{post.excerpt}</p>}
+          </div>
+        </Container>
+      </Section>
+
+      {mainImageUrl && (
+        <div class="border-b border-border/70">
+          <Container class="px-0 sm:px-5 md:px-8">
+            <figure>
+              <img
+                src={mainImageUrl}
+                alt={post.mainImage?.alt || ''}
+                width="1440"
+                height="810"
+                loading="eager"
+                decoding="async"
+                fetchpriority="high"
+                class="max-h-[600px] w-full object-cover sm:rounded-b-[var(--radius-surface)]"
+                style={{ backgroundColor: post.mainImage?.metadata?.palette?.dominant?.background || 'var(--muted)' }}
+              />
+              {post.mainImage?.caption && <figcaption class="px-5 py-3 text-sm text-muted-foreground sm:px-1">{post.mainImage.caption}</figcaption>}
+            </figure>
+          </Container>
+        </div>
+      )}
+
+      <div class="mx-auto w-full max-w-[960px] px-5 md:px-8 lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:gap-12 lg:items-start">
+        <div>
+          <Section padding="lg" class="lg:py-20">
+            <div class="lg:hidden">
+              <TableOfContents headings={headings} label={copy.pages.blogPost.tableOfContents} variant="mobile" />
+            </div>
+            <div class="max-w-[68ch]">
+              <BlogContent value={post.body} />
+            </div>
+          </Section>
+        </div>
+        <div class="hidden lg:block lg:sticky lg:self-start lg:pt-6" style="top: var(--toc-sticky-top, 6rem);">
+          <TableOfContents headings={headings} label={copy.pages.blogPost.tableOfContents} variant="desktop" />
+        </div>
+      </div>
+
+      <RelatedCruisesBlock cruises={relatedCruises} locale={locale} title={copy.pages.blogPost.relatedCruisesTitle} />
+    </article>
+  </main>
+</BaseLayout>

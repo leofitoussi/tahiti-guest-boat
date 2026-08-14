@@ -3,6 +3,22 @@ import { sanityClient } from 'sanity:client';
 import { buildLlmsTxt, getLlmsTxtContent, LLMS_TXT_QUERY } from '../src/lib/llms-txt';
 
 describe('llms.txt generation', () => {
+  it('renders an English discovery document with English section labels and paths', () => {
+    const output = buildLlmsTxt({
+      siteName: 'Tahiti Guest Boat',
+      summary: 'Private sailing cruises in Polynesia.',
+      pages: [{ title: 'Our cruises', path: '/en/cruises/' }],
+      optional: [],
+      cruises: [{ title: 'Private Bora Bora cruise', path: '/en/cruises/private-bora-bora/' }],
+      blog: [{ title: 'Travel guide', path: '/en/blog/travel-guide/' }],
+    }, 'en');
+
+    expect(output).toContain('## Cruises');
+    expect(output).toContain('## Blog');
+    expect(output).not.toContain('## Croisières');
+    expect(output).not.toContain('/nos-croisieres/');
+  });
+
   it('requires seo.indexable == true for legal pages, cruises, and blog posts', () => {
     const legalPagesFilter = LLMS_TXT_QUERY.match(/"legalPages": \*\[(.*?)\]/)?.[1];
     const cruisesFilter = LLMS_TXT_QUERY.match(/"cruises": \*\[(.*?)\]/)?.[1];
@@ -154,6 +170,34 @@ describe('llms.txt generation', () => {
 
 - [Les meilleures plages secrètes](/blog/plages-secretes/): Notre sélection de criques cachées.
 `);
+    } finally {
+      sanityClient.fetch = originalFetch;
+    }
+  });
+
+  it('does not advertise unpublished English singleton or archive surfaces', async () => {
+    const originalFetch = sanityClient.fetch;
+    sanityClient.fetch = (async (query: string) => {
+      if (query.includes('siteSettings')) {
+        return { siteName: 'Tahiti Guest Boat' };
+      }
+      return {
+        homeTranslation: { seoDescription: 'English summary.', seo: { indexable: true } },
+        surfaceAvailability: { home: true, boat: false, contact: false, cruises: false, blog: false },
+        legalPages: [],
+        cruises: [],
+        blog: [],
+      };
+    }) as unknown as typeof sanityClient.fetch;
+
+    try {
+      const markdown = await getLlmsTxtContent('en');
+
+      expect(markdown).toContain('(/en/)');
+      expect(markdown).not.toContain('/en/our-boat/');
+      expect(markdown).not.toContain('/en/contact/');
+      expect(markdown).not.toContain('/en/cruises/');
+      expect(markdown).not.toContain('/en/blog/');
     } finally {
       sanityClient.fetch = originalFetch;
     }

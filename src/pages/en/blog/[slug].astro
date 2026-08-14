@@ -1,13 +1,12 @@
 ---
-import BlogArticlePage from '../../components/blog/BlogArticlePage.astro';
-import { getAllBlogSlugs, getBlogPost, getBlogTranslationVersions, type BlogPost } from '../../lib/blog';
-import { buildBlogAlternatePaths } from '../../lib/blog-routes';
-import { defaultLocale } from '../../lib/localization';
+import BlogArticlePage from '../../../components/blog/BlogArticlePage.astro';
+import { getAllBlogSlugs, getBlogPost, getBlogTranslationVersions, type BlogPost } from '../../../lib/blog';
+import { buildBlogAlternatePaths } from '../../../lib/blog-routes';
 
-const locale = defaultLocale;
+const locale = 'en' as const;
 
 export async function getStaticPaths() {
-  const slugs = await getAllBlogSlugs(defaultLocale);
+  const slugs = await getAllBlogSlugs('en');
 
   return slugs.map(({ slug }) => ({
     params: { slug },

@@ -24,6 +24,7 @@ export function LanguageSwitcher({
             {option.href ? (
               <a
                 href={option.href}
+                data-language-switcher="true"
                 aria-label={option.label}
                 className="inline-flex min-h-8 min-w-9 items-center justify-center rounded-[calc(var(--radius-control)-2px)] px-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
               >

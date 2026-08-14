@@ -91,6 +91,7 @@ describe('SEO sitemap generation', () => {
     expect(buildRobotsTxt('https://tahiti-guest-boat.com')).toBe(`User-agent: *
 Allow: /
 Disallow: /merci/
+Disallow: /en/thank-you/
 
 Sitemap: https://tahiti-guest-boat.com/sitemap_index.xml
 `);
@@ -98,5 +99,26 @@ Sitemap: https://tahiti-guest-boat.com/sitemap_index.xml
 
   it('dates public archive pages from visible content that can change those pages', () => {
     expect(SITEMAP_CONTENT_QUERY).toContain('coalesce(visible, false) == true');
+  });
+
+  it('includes the English cruise archive and English indexable cruise URLs', () => {
+    expect(SITEMAP_CONTENT_QUERY).toContain('"path": "/en/cruises/"');
+    expect(SITEMAP_CONTENT_QUERY).toContain('"path": "/en/cruises/" + slug.current + "/"');
+    expect(SITEMAP_CONTENT_QUERY).toContain('language == "en"');
+  });
+
+  it('includes English Blog articles and legal pages only through English localized filters', () => {
+    expect(SITEMAP_CONTENT_QUERY).toContain('"path": "/en/blog/"');
+    expect(SITEMAP_CONTENT_QUERY).toContain('"path": "/en/blog/" + slug.current + "/"');
+    expect(SITEMAP_CONTENT_QUERY).toContain('"path": "/en/" + slug.current + "/"');
+    expect(SITEMAP_CONTENT_QUERY).toContain('_type == "legalPage"');
+    expect(SITEMAP_CONTENT_QUERY).toContain('language == "en"');
+  });
+
+  it('includes only published English unique-page versions for boat and contact routes', () => {
+    expect(SITEMAP_CONTENT_QUERY).toContain('"path": "/en/our-boat/"');
+    expect(SITEMAP_CONTENT_QUERY).toContain('"path": "/en/contact/"');
+    expect(SITEMAP_CONTENT_QUERY).toContain('references($boatPageId)');
+    expect(SITEMAP_CONTENT_QUERY).toContain('references($contactPageId)');
   });
 });

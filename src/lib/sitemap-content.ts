@@ -11,6 +11,13 @@ const indexableBlogFilter = `_type == "blogPost" && defined(slug.current) && def
 const indexableCruiseFilter = `_type == "cruisePage" && defined(slug.current) && ${publishedDocumentFilter} && seo.indexable == true`;
 const visibleBlogFilter = `_type == "blogPost" && defined(slug.current) && defined(publishedAt) && ${publishedDocumentFilter} && coalesce(visible, false) == true`;
 const visibleCruiseFilter = `_type == "cruisePage" && defined(slug.current) && ${publishedDocumentFilter} && coalesce(visible, false) == true`;
+const englishLocalizedFilter = `(language == "en" || (!defined(language) && locale == "en"))`;
+const indexableEnglishBlogFilter = `_type == "blogPost" && defined(slug.current) && defined(publishedAt) && !(_id in path("drafts.**")) && ${englishLocalizedFilter} && seo.indexable == true`;
+const visibleEnglishBlogFilter = `_type == "blogPost" && defined(slug.current) && defined(publishedAt) && !(_id in path("drafts.**")) && ${englishLocalizedFilter} && coalesce(visible, false) == true`;
+const indexableEnglishLegalFilter = `_type == "legalPage" && defined(slug.current) && !(_id in path("drafts.**")) && ${englishLocalizedFilter} && seo.indexable == true`;
+const englishCruiseDocumentFilter = `_type == "cruisePage" && defined(slug.current) && !(_id in path("drafts.**")) && (language == "en" || (!defined(language) && locale == "en"))`;
+const indexableEnglishCruiseFilter = `${englishCruiseDocumentFilter} && seo.indexable == true`;
+const visibleEnglishCruiseFilter = `${englishCruiseDocumentFilter} && coalesce(visible, false) == true`;
 
 export const SITEMAP_CONTENT_QUERY = `{
   "pages": [
@@ -24,6 +31,22 @@ export const SITEMAP_CONTENT_QUERY = `{
       defined(value->) && value->language == "en" && value->seo.indexable == true
     ][0...1]{
       "path": "/en/",
+      "_updatedAt": value->_updatedAt,
+      "_createdAt": value->_createdAt,
+      "seo": value->seo { indexable }
+    },
+    ...*[_type == "translation.metadata" && !(_id in path("drafts.**")) && references($boatPageId)][0].translations[
+      defined(value->) && value->language == "en" && value->seo.indexable == true
+    ][0...1]{
+      "path": "/en/our-boat/",
+      "_updatedAt": value->_updatedAt,
+      "_createdAt": value->_createdAt,
+      "seo": value->seo { indexable }
+    },
+    ...*[_type == "translation.metadata" && !(_id in path("drafts.**")) && references($contactPageId)][0].translations[
+      defined(value->) && value->language == "en" && value->seo.indexable == true
+    ][0...1]{
+      "path": "/en/contact/",
       "_updatedAt": value->_updatedAt,
       "_createdAt": value->_createdAt,
       "seo": value->seo { indexable }
@@ -50,8 +73,24 @@ export const SITEMAP_CONTENT_QUERY = `{
       "_updatedAt": *[${visibleCruiseFilter}] | order(_updatedAt desc)[0]._updatedAt,
       "seo": { "indexable": count(*[${visibleCruiseFilter}]) > 0 }
     },
+    {
+      "path": "/en/cruises/",
+      "_updatedAt": *[${visibleEnglishCruiseFilter}] | order(_updatedAt desc)[0]._updatedAt,
+      "seo": { "indexable": count(*[${visibleEnglishCruiseFilter}]) > 0 }
+    },
+    {
+      "path": "/en/blog/",
+      "_updatedAt": *[${visibleEnglishBlogFilter}] | order(_updatedAt desc)[0]._updatedAt,
+      "seo": { "indexable": count(*[${visibleEnglishBlogFilter}]) > 0 }
+    },
     ...*[_type == "legalPage" && defined(slug.current) && ${publishedDocumentFilter}] | order(slug.current asc) {
       "path": "/" + slug.current + "/",
+      _updatedAt,
+      _createdAt,
+      seo { indexable }
+    },
+    ...*[${indexableEnglishLegalFilter}] | order(slug.current asc) {
+      "path": "/en/" + slug.current + "/",
       _updatedAt,
       _createdAt,
       seo { indexable }
@@ -64,12 +103,27 @@ export const SITEMAP_CONTENT_QUERY = `{
     _createdAt,
     seo { indexable }
   },
-  "cruises": *[${indexableCruiseFilter}] | order(coalesce(editorialPriority, 0) desc, _createdAt desc) {
-    "path": "/nos-croisieres/" + slug.current + "/",
+  "englishBlog": *[${indexableEnglishBlogFilter}] | order(publishedAt desc) {
+    "path": "/en/blog/" + slug.current + "/",
     _updatedAt,
+    publishedAt,
     _createdAt,
     seo { indexable }
-  }
+  },
+  "cruises": [
+    ...*[${indexableCruiseFilter}] | order(coalesce(editorialPriority, 0) desc, _createdAt desc) {
+      "path": "/nos-croisieres/" + slug.current + "/",
+      _updatedAt,
+      _createdAt,
+      seo { indexable }
+    },
+    ...*[${indexableEnglishCruiseFilter}] | order(coalesce(editorialPriority, 0) desc, _createdAt desc) {
+      "path": "/en/cruises/" + slug.current + "/",
+      _updatedAt,
+      _createdAt,
+      seo { indexable }
+    }
+  ]
 }`;
 
 export type SitemapGroupName = 'pages' | 'blog' | 'cruises';
@@ -83,6 +137,7 @@ export interface SitemapGroup {
 interface SitemapContentResult {
   pages?: SitemapContentDocument[];
   blog?: SitemapContentDocument[];
+  englishBlog?: SitemapContentDocument[];
   cruises?: SitemapContentDocument[];
 }
 
@@ -94,6 +149,8 @@ export async function getSitemapGroups(): Promise<Record<SitemapGroupName, Sitem
   const content = await sanityClient
     .fetch<SitemapContentResult>(SITEMAP_CONTENT_QUERY, {
       homeId: HOME_PAGE_ID,
+      boatPageId: 'boatPage',
+      contactPageId: 'contactPage',
       locale: defaultLocale,
     })
     .catch(() => null);
@@ -111,7 +168,7 @@ export function buildSitemapGroups(content: SitemapContentResult): Record<Sitema
     blog: {
       name: 'blog',
       path: '/post-sitemap.xml',
-      urls: toSitemapUrls(content.blog ?? []),
+      urls: toSitemapUrls([...(content.blog ?? []), ...(content.englishBlog ?? [])]),
     },
     cruises: {
       name: 'cruises',

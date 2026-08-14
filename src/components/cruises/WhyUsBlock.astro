@@ -21,11 +21,7 @@ const titleFallback = copy.blocks.whyUsTitle;
 
 const argumentsList = settings?.whyUsArguments?.length
   ? settings.whyUsArguments
-  : [
-      { body: 'Une croisière privée pensée autour de votre rythme, de vos envies et de la météo.' },
-      { body: 'Une expérience simple et attentive, loin des programmes standardisés.' },
-      { body: 'Une connaissance sensible des lagons, des mouillages et de la vie à bord.' },
-    ];
+  : copy.blocks.whyUsArguments.map((body) => ({ body }));
 ---
 
 <Section padding="lg" class="bg-primary text-primary-foreground">

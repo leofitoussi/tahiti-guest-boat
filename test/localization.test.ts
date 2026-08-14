@@ -13,7 +13,7 @@ describe('localization helpers', () => {
   });
 
   it('prefixes English paths under /en', () => {
-    expect(localizePath('/nos-croisieres/lagon/', 'en')).toBe('/en/nos-croisieres/lagon/');
+    expect(localizePath('/nos-croisieres/lagon/', 'en')).toBe('/en/cruises/lagon/');
   });
 
   it('keeps the English homepage on its canonical trailing-slash path', () => {

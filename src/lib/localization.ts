@@ -89,7 +89,8 @@ export function localizePath(path: string, locale: Locale = defaultLocale) {
     return normalized;
   }
 
-  return `/en${normalized}`;
+  const localizedPath = normalized.replace(/^\/nos-croisieres(?=\/|$)/, '/cruises');
+  return `/en${localizedPath}`;
 }
 
 export function localizeHref(href: string, locale: Locale = defaultLocale) {

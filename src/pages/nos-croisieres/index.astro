@@ -10,13 +10,15 @@ import { urlForImage } from '../../lib/sanity';
 
 const locale = defaultLocale;
 const copy = getSiteCopy(locale);
-const cruises = await getCruisePages(locale);
+const [cruises, englishCruises] = await Promise.all([getCruisePages(locale), getCruisePages('en')]);
+const alternatePaths = englishCruises.length > 0 ? { en: '/en/cruises/' } : {};
 ---
 
 <BaseLayout
   title={copy.pages.cruisesIndex.title}
   description={copy.pages.cruisesIndex.description}
   locale={locale}
+  alternatePaths={alternatePaths}
 >
   <main class="bg-background">
     <Section padding="lg" class="border-b border-border/70 bg-muted/30">

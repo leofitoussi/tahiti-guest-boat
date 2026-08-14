@@ -1,4 +1,5 @@
 import type { CruisePageSummary, SiteSettings } from './cruises';
+import { buildCruisePath } from './cruise-routes';
 import {
   buildLanguageSwitcher,
   defaultLocale,
@@ -54,7 +55,7 @@ export function buildLayoutViewModel(
     return [
       {
         label,
-        href: localizePath(`/nos-croisieres/${cruise.slug}/`, locale),
+        href: buildCruisePath(cruise.slug, locale),
       },
     ];
   });

@@ -2,14 +2,15 @@ import { describe, expect, it } from 'vitest';
 import { readFile } from 'node:fs/promises';
 
 // ── Cycle 5 ──────────────────────────────────────────────────────────────────
-describe('Astro pages — noindex derived from seo.indexable', () => {
+describe('Astro pages and shared renderers — noindex derived from seo.indexable', () => {
   const pageFiles = [
     'src/pages/nos-croisieres/[slug].astro',
-    'src/pages/blog/[slug].astro',
-    'src/pages/[slug].astro',
     'src/pages/index.astro',
     'src/pages/notre-bateau.astro',
-    'src/pages/contact.astro',
+    'src/components/ContactPage.astro',
+    'src/components/blog/BlogArticlePage.astro',
+    'src/components/legal/LegalPageView.astro',
+    'src/pages/en/index.astro',
   ];
 
   for (const file of pageFiles) {

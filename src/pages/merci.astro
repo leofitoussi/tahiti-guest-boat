@@ -1,42 +1,7 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import { getSiteSettings } from '../lib/cruises';
-import { defaultLocale } from '../lib/localization';
+import ConfirmationPage from '../components/ConfirmationPage.astro';
 
-const locale = defaultLocale;
-const settings = await getSiteSettings(locale);
+const locale = 'fr' as const;
 ---
 
-<BaseLayout
-  title="Merci pour votre demande | Tahiti Guest Boat"
-  description="Votre demande de devis a bien été reçue. Notre équipe vous recontactera très prochainement."
-  settings={settings}
-  locale={locale}
-  noindex={true}
->
-  <main class="bg-background flex min-h-[60vh] flex-col items-center justify-center px-6 py-32 text-center">
-    <p class="text-sm font-semibold uppercase tracking-widest text-[#285aaa]">Demande envoyée</p>
-    <h1 class="mt-4 font-[family-name:var(--font-family-heading)] text-4xl md:text-5xl">
-      Merci<span id="merci-prenom"></span>&nbsp;!
-    </h1>
-    <p class="mt-6 max-w-md text-base text-muted-foreground">
-      Votre demande de devis a bien été reçue. Notre équipage la traite avec attention et revient vers vous très
-      prochainement pour préparer votre croisière.
-    </p>
-    <a
-      href="/"
-      class="mt-10 inline-flex items-center justify-center rounded-[var(--radius-control)] bg-[#285aaa] px-8 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-[#1f4a91]"
-    >
-      Retour à l'accueil
-    </a>
-  </main>
-</BaseLayout>
-
-<script>
-  const prenom = new URLSearchParams(window.location.search).get('prenom')?.trim();
-  if (prenom) {
-    const capitalized = prenom.charAt(0).toUpperCase() + prenom.slice(1);
-    const el = document.getElementById('merci-prenom');
-    if (el) el.textContent = ` ${capitalized}`;
-  }
-</script>
+<ConfirmationPage locale={locale} />

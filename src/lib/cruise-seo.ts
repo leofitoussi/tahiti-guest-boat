@@ -1,17 +1,24 @@
 import type { TypedObject } from 'astro-portabletext/types';
 import type { CruisePage, CruisePageSummary } from './cruises';
+import { buildCruisePath } from './cruise-routes';
+import { defaultLocale, type Locale } from './localization';
 import { urlForImage } from './sanity';
 
 interface CruiseSeoOptions {
   canonicalUrl: string;
   relatedCruises?: CruisePageSummary[];
   siteName?: string;
+  locale?: Locale;
 }
 
-export function buildPrimaryCruiseKeyword(destinationLabel?: string, title?: string) {
-  const destination = destinationLabel?.trim() || deriveDestinationFromTitle(title);
+export function buildPrimaryCruiseKeyword(
+  destinationLabel?: string,
+  title?: string,
+  locale: Locale = defaultLocale,
+) {
+  const destination = destinationLabel?.trim() || deriveDestinationFromTitle(title, locale);
 
-  return destination ? `croisière ${destination}` : undefined;
+  return destination ? `${locale === 'en' ? 'cruise' : 'croisière'} ${destination}` : undefined;
 }
 
 export function buildCruiseSeoImage(cruise: CruisePage) {
@@ -22,7 +29,7 @@ export function buildCruiseSeoImage(cruise: CruisePage) {
 
 export function buildCruiseStructuredData(
   cruise: CruisePage,
-  { canonicalUrl, relatedCruises = [], siteName = 'Tahiti Guest Boat' }: CruiseSeoOptions
+  { canonicalUrl, relatedCruises = [], siteName = 'Tahiti Guest Boat', locale = defaultLocale }: CruiseSeoOptions
 ) {
   const touristTrip: Record<string, unknown> = {
     '@type': 'TouristTrip',
@@ -36,7 +43,7 @@ export function buildCruiseStructuredData(
     },
   };
 
-  const keyword = buildPrimaryCruiseKeyword(cruise.destinationLabel, cruise.title);
+  const keyword = buildPrimaryCruiseKeyword(cruise.destinationLabel, cruise.title, locale);
   if (keyword) {
     touristTrip.touristType = keyword;
   }
@@ -52,7 +59,7 @@ export function buildCruiseStructuredData(
   }
 
   const graph: Record<string, unknown>[] = [touristTrip];
-  const itemList = buildRelatedCruisesItemList(relatedCruises, canonicalUrl);
+  const itemList = buildRelatedCruisesItemList(relatedCruises, canonicalUrl, locale);
 
   if (itemList) {
     graph.push(itemList);
@@ -85,7 +92,11 @@ function buildSubTrips(cruise: CruisePage) {
   );
 }
 
-function buildRelatedCruisesItemList(relatedCruises: CruisePageSummary[], canonicalUrl: string) {
+function buildRelatedCruisesItemList(
+  relatedCruises: CruisePageSummary[],
+  canonicalUrl: string,
+  locale: Locale,
+) {
   if (relatedCruises.length === 0) {
     return null;
   }
@@ -97,7 +108,7 @@ function buildRelatedCruisesItemList(relatedCruises: CruisePageSummary[], canoni
       '@type': 'ListItem',
       position: index + 1,
       name: cruise.title,
-      url: new URL(`/nos-croisieres/${cruise.slug}/`, origin).toString(),
+      url: new URL(buildCruisePath(cruise.slug, locale), origin).toString(),
     }));
 
   if (itemListElement.length === 0) {
@@ -106,7 +117,7 @@ function buildRelatedCruisesItemList(relatedCruises: CruisePageSummary[], canoni
 
   return {
     '@type': 'ItemList',
-    name: 'Autres croisières',
+    name: locale === 'en' ? 'Other cruises' : 'Autres croisières',
     itemListElement,
   };
 }
@@ -132,13 +143,15 @@ function portableTextToPlainText(blocks?: TypedObject[] | string) {
   );
 }
 
-function deriveDestinationFromTitle(title?: string) {
+function deriveDestinationFromTitle(title?: string, locale: Locale = defaultLocale) {
   const normalizedTitle = title?.trim();
   if (!normalizedTitle) {
     return undefined;
   }
 
-  const match = normalizedTitle.match(/\b(?:à|au|aux|en|dans les|dans le)\s+(.+)$/i);
+  const match = locale === 'en'
+    ? normalizedTitle.match(/\b(?:in|to|around|of)\s+(.+)$/i)
+    : normalizedTitle.match(/\b(?:à|au|aux|en|dans les|dans le)\s+(.+)$/i);
 
   return match?.[1]?.replace(/\s*\|\s*.+$/, '').trim();
 }

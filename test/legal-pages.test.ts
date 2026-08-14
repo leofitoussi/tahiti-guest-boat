@@ -12,7 +12,7 @@ describe('legal page route template', () => {
   });
 
   it('uses PortableText to render body, not PageBuilder', async () => {
-    const source = await readFile('src/pages/[slug].astro', 'utf8');
+    const source = await readFile('src/components/legal/LegalPageView.astro', 'utf8');
 
     expect(source).toContain('PortableText');
     expect(source).not.toContain('PageBuilder');

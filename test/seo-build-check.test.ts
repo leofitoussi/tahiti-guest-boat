@@ -10,6 +10,7 @@ async function makeDist() {
   const dir = await mkdtemp(join(tmpdir(), 'seo-check-'));
   tempDirs.push(dir);
   await mkdir(join(dir, 'page'), { recursive: true });
+  await mkdir(join(dir, 'en'), { recursive: true });
   return dir;
 }
 
@@ -48,6 +49,7 @@ Sitemap: https://example.com/sitemap_index.xml
 > Summary.
 `
   );
+  await writeFile(join(dir, 'en', 'llms.txt'), '# Example\n\n> English summary.\n');
   await writeFile(
     join(dir, 'page', 'index.html'),
     `<!doctype html><html><head>
@@ -100,6 +102,16 @@ describe('SEO post-build checks', () => {
     );
   });
 
+  it('fails when the English llms.txt is missing', async () => {
+    const distDir = await makeDist();
+    await writeValidDist(distDir);
+    await rm(join(distDir, 'en', 'llms.txt'));
+
+    await expect(checkSeoBuild({ distDir, siteUrl: 'https://example.com' })).rejects.toThrow(
+      'en/llms.txt returned HTTP 404'
+    );
+  });
+
   it('fails when llms.txt does not start with an H1', async () => {
     const distDir = await makeDist();
     await writeValidDist(distDir);
@@ -126,5 +138,123 @@ describe('SEO post-build checks', () => {
     await expect(checkSeoBuild({ distDir, siteUrl: 'https://example.com' })).rejects.toThrow(
       'must be index,follow'
     );
+  });
+
+  it('fails when a sitemap page canonical points to another URL', async () => {
+    const distDir = await makeDist();
+    await writeValidDist(distDir);
+    await writeFile(
+      join(distDir, 'page', 'index.html'),
+      `<!doctype html><html><head>
+<link rel="canonical" href="https://example.com/other/" />
+<meta name="robots" content="index,follow" />
+</head><body>Page</body></html>`
+    );
+
+    await expect(checkSeoBuild({ distDir, siteUrl: 'https://example.com' })).rejects.toThrow(
+      'canonical must match sitemap URL'
+    );
+  });
+
+  it('fails when published language alternates are not reciprocal', async () => {
+    const distDir = await makeDist();
+    await writeValidDist(distDir);
+    await mkdir(join(distDir, 'en', 'page'), { recursive: true });
+    await writeFile(
+      join(distDir, 'page-sitemap.xml'),
+      `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://example.com/page/</loc><lastmod>2026-06-01T10:00:00.000Z</lastmod></url>
+  <url><loc>https://example.com/en/page/</loc><lastmod>2026-06-01T10:00:00.000Z</lastmod></url>
+</urlset>
+`
+    );
+    await writeFile(
+      join(distDir, 'page', 'index.html'),
+      `<!doctype html><html><head>
+<link rel="canonical" href="https://example.com/page/" />
+<link rel="alternate" hreflang="fr" href="https://example.com/page/" />
+<link rel="alternate" hreflang="en" href="https://example.com/en/page/" />
+<meta name="robots" content="index,follow" />
+</head><body>Page</body></html>`
+    );
+    await writeFile(
+      join(distDir, 'en', 'page', 'index.html'),
+      `<!doctype html><html><head>
+<link rel="canonical" href="https://example.com/en/page/" />
+<link rel="alternate" hreflang="en" href="https://example.com/en/page/" />
+<meta name="robots" content="index,follow" />
+</head><body>Page</body></html>`
+    );
+
+    await expect(checkSeoBuild({ distDir, siteUrl: 'https://example.com' })).rejects.toThrow(
+      'hreflang alternate is not reciprocal'
+    );
+  });
+
+  it('fails when an English page links back into the French site', async () => {
+    const distDir = await makeDist();
+    await writeValidDist(distDir);
+    await mkdir(join(distDir, 'en', 'page'), { recursive: true });
+    await writeFile(
+      join(distDir, 'page-sitemap.xml'),
+      `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://example.com/page/</loc><lastmod>2026-06-01T10:00:00.000Z</lastmod></url>
+  <url><loc>https://example.com/en/page/</loc><lastmod>2026-06-01T10:00:00.000Z</lastmod></url>
+</urlset>
+`
+    );
+    await writeFile(
+      join(distDir, 'page', 'index.html'),
+      `<!doctype html><html><head>
+<link rel="canonical" href="https://example.com/page/" />
+<meta name="robots" content="index,follow" />
+</head><body>Page</body></html>`
+    );
+    await writeFile(
+      join(distDir, 'en', 'page', 'index.html'),
+      `<!doctype html><html><head>
+<link rel="canonical" href="https://example.com/en/page/" />
+<meta name="robots" content="index,follow" />
+</head><body><a href="/page/">French page</a></body></html>`
+    );
+
+    await expect(checkSeoBuild({ distDir, siteUrl: 'https://example.com' })).rejects.toThrow(
+      'English page contains a French internal link'
+    );
+  });
+
+  it('allows the language switcher to link to the published French counterpart', async () => {
+    const distDir = await makeDist();
+    await writeValidDist(distDir);
+    await mkdir(join(distDir, 'en', 'page'), { recursive: true });
+    await writeFile(
+      join(distDir, 'page-sitemap.xml'),
+      `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://example.com/page/</loc><lastmod>2026-06-01T10:00:00.000Z</lastmod></url>
+  <url><loc>https://example.com/en/page/</loc><lastmod>2026-06-01T10:00:00.000Z</lastmod></url>
+</urlset>
+`
+    );
+    await writeFile(
+      join(distDir, 'page', 'index.html'),
+      `<!doctype html><html><head>
+<link rel="canonical" href="https://example.com/page/" />
+<meta name="robots" content="index,follow" />
+</head><body>Page</body></html>`
+    );
+    await writeFile(
+      join(distDir, 'en', 'page', 'index.html'),
+      `<!doctype html><html><head>
+<link rel="canonical" href="https://example.com/en/page/" />
+<meta name="robots" content="index,follow" />
+</head><body><a data-language-switcher="true" href="/page/">FR</a></body></html>`
+    );
+
+    await expect(checkSeoBuild({ distDir, siteUrl: 'https://example.com' })).resolves.toMatchObject({
+      checkedUrls: 2,
+    });
   });
 });

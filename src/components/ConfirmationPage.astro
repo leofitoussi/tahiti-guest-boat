@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getSiteSettings } from '../lib/cruises';
+import { localizePath, type Locale } from '../lib/localization';
+import { getSiteCopy } from '../lib/site-copy';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const settings = await getSiteSettings(locale);
+const copy = getSiteCopy(locale).pages.thankYou;
+const firstNameSeparator = locale === 'en' ? ', ' : ' ';
+---
+
+<BaseLayout title={copy.title} description={copy.description} settings={settings} locale={locale} noindex>
+  <main class="flex min-h-[60vh] flex-col items-center justify-center bg-background px-6 py-32 text-center">
+    <p class="text-sm font-semibold uppercase tracking-widest text-[#285aaa]">{copy.eyebrow}</p>
+    <h1 class="mt-4 font-[family-name:var(--font-family-heading)] text-4xl md:text-5xl">
+      {copy.heading}<span id="confirmation-first-name" data-separator={firstNameSeparator}></span>!
+    </h1>
+    <p class="mt-6 max-w-md text-base text-muted-foreground">{copy.body}</p>
+    <a
+      href={localizePath('/', locale)}
+      class="mt-10 inline-flex items-center justify-center rounded-[var(--radius-control)] bg-[#285aaa] px-8 py-3 text-sm font-semibold uppercase tracking-[0.12em] text-white transition hover:bg-[#1f4a91]"
+    >
+      {copy.backHome}
+    </a>
+  </main>
+</BaseLayout>
+
+<script>
+  import { formatConfirmationFirstName, getConfirmationFirstName } from '../lib/confirmation';
+
+  const firstName = formatConfirmationFirstName(getConfirmationFirstName(window.location.search));
+  if (firstName) {
+    const element = document.getElementById('confirmation-first-name');
+    if (element) element.textContent = `${element.dataset.separator ?? ' '}${firstName}`;
+  }
+</script>

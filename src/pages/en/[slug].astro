@@ -1,13 +1,12 @@
 ---
-import LegalPageView from '../components/legal/LegalPageView.astro';
-import { getLegalPage, getLegalPages, getLegalTranslationVersions, type LegalPage } from '../lib/legal-pages';
-import { buildLegalAlternatePaths } from '../lib/legal-routes';
-import { defaultLocale } from '../lib/localization';
+import LegalPageView from '../../components/legal/LegalPageView.astro';
+import { getLegalPage, getLegalPages, getLegalTranslationVersions, type LegalPage } from '../../lib/legal-pages';
+import { buildLegalAlternatePaths } from '../../lib/legal-routes';
 
-const locale = defaultLocale;
+const locale = 'en' as const;
 
 export async function getStaticPaths() {
-  const pages = await getLegalPages(defaultLocale);
+  const pages = await getLegalPages('en');
 
   return pages.map((page) => ({
     params: { slug: page.slug },
@@ -19,7 +18,7 @@ const { slug } = Astro.props;
 const page = (await getLegalPage(slug, locale)) as LegalPage | null;
 
 if (!page) {
-  return Astro.redirect('/404');
+  return;
 }
 
 const translations = await getLegalTranslationVersions(page);

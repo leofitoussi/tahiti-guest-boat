@@ -27,11 +27,19 @@ export interface SiteCopy {
         emptyDescription: string;
         updatedOn: string;
       };
-    contact: {
-      title: string;
-      description: string;
-    };
-    boat: {
+      contact: {
+        title: string;
+        description: string;
+      };
+      thankYou: {
+        title: string;
+        description: string;
+        eyebrow: string;
+        heading: string;
+        body: string;
+        backHome: string;
+      };
+      boat: {
       title: string;
       description: string;
     };
@@ -65,6 +73,10 @@ export interface SiteCopy {
     blocks: {
       relatedCruisesEyebrow: string;
       relatedCruisesTitle: string;
+      cruiseCapacityLabel: string;
+      cruiseDurationLabel: string;
+      cruisePricingLabel: string;
+      cruiseImageAlt: string;
       itineraryEyebrow: string;
       itineraryTitle: string;
       itineraryDisclaimer: string;
@@ -78,6 +90,7 @@ export interface SiteCopy {
       reviewsFallbackDescription: string;
       reviewsLinkLabel: string;
       whyUsTitle: string;
+      whyUsArguments: string[];
     heroEyebrow: string;
     discoverCta: string;
     videoPlayLabel: string;
@@ -118,6 +131,14 @@ const siteCopy: Record<Locale, SiteCopy> = {
         title: 'Contact | Tahiti Guest Boat',
         description: 'Contactez Tahiti Guest Boat pour préparer une croisière en Polynésie française.',
       },
+      thankYou: {
+        title: 'Merci pour votre demande | Tahiti Guest Boat',
+        description: 'Votre demande de devis a bien été reçue. Notre équipe vous recontactera très prochainement.',
+        eyebrow: 'Demande envoyée',
+        heading: 'Merci',
+        body: 'Votre demande de devis a bien été reçue. Notre équipage la traite avec attention et revient vers vous très prochainement pour préparer votre croisière.',
+        backHome: "Retour à l'accueil",
+      },
       boat: {
         title: 'Notre bateau | Tahiti Guest Boat',
         description: 'Découvrez notre bateau, son confort et l’expérience à bord avec Tahiti Guest Boat.',
@@ -155,6 +176,10 @@ const siteCopy: Record<Locale, SiteCopy> = {
     blocks: {
       relatedCruisesEyebrow: 'À découvrir aussi',
       relatedCruisesTitle: 'Autres inspirations de croisière',
+      cruiseCapacityLabel: 'Capacité',
+      cruiseDurationLabel: 'Durée minimum',
+      cruisePricingLabel: 'Tarif',
+      cruiseImageAlt: 'Catamaran Tahiti Guest Boat',
       itineraryEyebrow: 'Itinéraire indicatif',
       itineraryTitle: 'Itinéraire indicatif',
       itineraryDisclaimer: "Cet itinéraire est donné à titre indicatif. Il s'adapte en fonction des conditions météorologiques, des marées et des préférences des passagers.",
@@ -169,6 +194,11 @@ const siteCopy: Record<Locale, SiteCopy> = {
       reviewsFallbackDescription: 'Les avis voyageurs seront affichés ici prochainement.',
       reviewsLinkLabel: 'Voir plus',
       whyUsTitle: 'Pourquoi naviguer avec Tahiti Guest Boat ?',
+      whyUsArguments: [
+        'Une croisière privée pensée autour de votre rythme, de vos envies et de la météo.',
+        'Une expérience simple et attentive, loin des programmes standardisés.',
+        'Une connaissance sensible des lagons, des mouillages et de la vie à bord.',
+      ],
       heroEyebrow: 'Nos croisières',
       discoverCta: 'Découvrir',
       videoPlayLabel: 'Lire la vidéo YouTube',
@@ -207,6 +237,14 @@ const siteCopy: Record<Locale, SiteCopy> = {
         title: 'Contact | Tahiti Guest Boat',
         description: 'Contact Tahiti Guest Boat to plan a cruise in French Polynesia.',
       },
+      thankYou: {
+        title: 'Thank you for your request | Tahiti Guest Boat',
+        description: 'Your request has been received. Our crew will get back to you shortly.',
+        eyebrow: 'Request sent',
+        heading: 'Thank you',
+        body: 'Your request has been received. Our crew is reviewing it carefully and will get back to you shortly to plan your cruise.',
+        backHome: 'Return to the English homepage',
+      },
       boat: {
         title: 'Our boat | Tahiti Guest Boat',
         description: 'Discover our boat, its comfort, and the onboard experience with Tahiti Guest Boat.',
@@ -244,6 +282,10 @@ const siteCopy: Record<Locale, SiteCopy> = {
     blocks: {
       relatedCruisesEyebrow: 'Also worth discovering',
       relatedCruisesTitle: 'More cruise inspiration',
+      cruiseCapacityLabel: 'Capacity',
+      cruiseDurationLabel: 'Minimum duration',
+      cruisePricingLabel: 'Price',
+      cruiseImageAlt: 'Tahiti Guest Boat catamaran',
       itineraryEyebrow: 'Indicative itinerary',
       itineraryTitle: 'Indicative itinerary',
       itineraryDisclaimer: 'This itinerary is provided as a guide only. It adapts according to weather conditions, tides, and passenger preferences.',
@@ -258,6 +300,11 @@ const siteCopy: Record<Locale, SiteCopy> = {
       reviewsFallbackDescription: 'Traveler reviews will appear here soon.',
       reviewsLinkLabel: 'See more',
       whyUsTitle: 'Why sail with Tahiti Guest Boat?',
+      whyUsArguments: [
+        'A private cruise shaped around your pace, your wishes, and the weather.',
+        'A simple, attentive experience, far from standardised programmes.',
+        'A thoughtful knowledge of lagoons, anchorages, and life on board.',
+      ],
       heroEyebrow: 'Our cruises',
       discoverCta: 'Discover',
       videoPlayLabel: 'Play YouTube video',

@@ -185,7 +185,9 @@ describe('English activity data', () => {
   it('enables reference-backed translation management for activities and tags', async () => {
     const config = await readFile('sanity.config.ts', 'utf8');
 
-    expect(config).toContain("schemaTypes: ['homePage', 'siteSettings', 'activity', 'activityTag']");
+    expect(config).toContain(
+      "schemaTypes: ['homePage', 'siteSettings', 'boatPage', 'contactPage', 'cruisePage', 'blogPost', 'legalPage', 'activity', 'activityTag']",
+    );
     expect(config).toContain('callback: remapActivityTranslationReferences');
   });
 });

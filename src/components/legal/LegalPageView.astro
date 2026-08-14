@@ -1,0 +1,59 @@
+---
+import { PortableText } from 'astro-portabletext';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import type { LegalPage } from '../../lib/legal-pages';
+import { defaultLocale, type Locale } from '../../lib/localization';
+
+interface Props {
+  page: LegalPage;
+  locale?: Locale;
+  alternatePaths?: Partial<Record<Locale, string>>;
+}
+
+const { page, locale = defaultLocale, alternatePaths = {} } = Astro.props;
+const title = page.seoTitle || `${page.title} | Tahiti Guest Boat`;
+const description = page.seoDescription || `${page.title} — Tahiti Guest Boat`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  locale={locale}
+  alternatePaths={alternatePaths}
+  noindex={!page.seo?.indexable}
+>
+  <main class="bg-background">
+    <Section padding="lg" class="border-b border-border/70 bg-muted/30">
+      <Container class="max-w-[820px]">
+        <h1 class="font-heading text-4xl font-semibold leading-tight text-foreground">{page.title}</h1>
+      </Container>
+    </Section>
+
+    <Section padding="lg">
+      <Container class="max-w-[820px]">
+        <div class="legal-content">
+          <PortableText value={page.body ?? []} />
+        </div>
+      </Container>
+    </Section>
+  </main>
+</BaseLayout>
+
+<style>
+  .legal-content {
+    color: var(--foreground);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .legal-content :global(p) { margin: 1rem 0; }
+  .legal-content :global(h2) { margin: 2.25rem 0 1rem; font-size: var(--heading-2); color: var(--foreground); }
+  .legal-content :global(h3) { margin: 1.75rem 0 0.75rem; font-size: var(--heading-3); color: var(--foreground); }
+  .legal-content :global(blockquote) { margin: 1.5rem 0; border-left: 4px solid var(--primary); padding-left: 1.25rem; color: var(--muted-foreground); }
+  .legal-content :global(ul),
+  .legal-content :global(ol) { margin: 1.25rem 0; padding-left: 1.5rem; }
+  .legal-content :global(li) { margin: 0.4rem 0; }
+  .legal-content :global(a) { color: var(--primary); text-decoration: underline; text-underline-offset: 3px; }
+</style>

@@ -6,14 +6,14 @@ import * as blogLib from '../src/lib/blog';
 // ── Cycle 4 ─────────────────────────────────────────────────────────────────
 describe('blog article template — cruise relationship links', () => {
   it('links to the primary cruise via /nos-croisieres/[slug]/', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
     expect(source).toContain('primaryCruise');
     const blockSource = await readFile('src/components/cruises/RelatedCruisesBlock.astro', 'utf8');
     expect(blockSource).toContain('/nos-croisieres/');
   });
 
   it('links to secondary cruises via /nos-croisieres/[slug]/', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
     expect(source).toContain('secondaryCruises');
   });
 
@@ -88,33 +88,33 @@ describe('blogPost schema — cruise relationships', () => {
 // ── Cycle 5 ─────────────────────────────────────────────────────────────────
 describe('blog article template — table of contents & reading width', () => {
   it('imports TableOfContents', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
     expect(source).toContain('TableOfContents');
   });
 
   it('uses the primary page heading token for the Article title', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
     expect(source).toContain('font-size: var(--heading-1)');
   });
 
   it('renders TableOfContents with mobile and desktop variants', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
     expect(source).toContain('variant="mobile"');
     expect(source).toContain('variant="desktop"');
   });
 
   it('applies 68ch reading width to the article body column', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
     expect(source).toContain('max-w-[68ch]');
   });
 
   it('uses a 2-column desktop grid', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
     expect(source).toContain('lg:grid-cols-[minmax(0,1fr)_220px]');
   });
 
   it('imports extractHeadings from portable-text-headings', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
     expect(source).toContain('extractHeadings');
   });
 });
@@ -136,7 +136,7 @@ describe('TableOfContents — desktop sticky behavior', () => {
   });
 
   it('applies sticky positioning with a CSS variable on the desktop sidebar grid item', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
     expect(source).toContain('lg:sticky');
     expect(source).toContain('top: var(--toc-sticky-top, 6rem);');
   });
@@ -245,7 +245,7 @@ describe('blog article template — uniform', () => {
   });
 
   it('renders body via BlogContent (not PageBuilder)', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
     expect(source).toContain('BlogContent');
     expect(source).not.toContain('PageBuilder');
   });

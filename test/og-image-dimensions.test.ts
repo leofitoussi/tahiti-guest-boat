@@ -10,7 +10,7 @@ describe('og:image width/height — pages pass the same dimensions used to build
   });
 
   it('blog article passes imageWidth/imageHeight matching mainImageUrl (1440x810)', async () => {
-    const source = await readFile('src/pages/blog/[slug].astro', 'utf8');
+    const source = await readFile('src/components/blog/BlogArticlePage.astro', 'utf8');
 
     expect(source).toContain('imageWidth={1440}');
     expect(source).toContain('imageHeight={810}');

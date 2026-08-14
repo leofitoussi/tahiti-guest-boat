@@ -4,6 +4,7 @@ import Section from '../layout/Section.astro';
 import type { CruisePageSummary } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
 import { defaultLocale, localizePath, type Locale } from '../../lib/localization';
+import { buildCruisePath } from '../../lib/cruise-routes';
 import { getSiteCopy } from '../../lib/site-copy';
 
 interface Props {
@@ -27,7 +28,9 @@ const copy = getSiteCopy(locale);
         <div class="flex overflow-x-auto gap-6 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {cruises.map((cruise) => {
             const imageUrl = cruise.heroImage ? urlForImage(cruise.heroImage)?.width(760).height(500).fit('crop').quality(82).auto('format').url() : undefined;
-            const cruisePath = localizePath(`/nos-croisieres/${cruise.slug}/`, locale);
+            const cruisePath = locale === 'fr'
+              ? localizePath(`/nos-croisieres/${cruise.slug}/`, locale)
+              : buildCruisePath(cruise.slug, locale);
 
             return (
               <article class="min-w-[270px] w-[270px] shrink-0 overflow-hidden rounded-[var(--radius-surface)] border border-border/70 bg-card shadow-xs transition hover:-translate-y-1 hover:shadow-md md:min-w-[320px] md:w-[320px]">

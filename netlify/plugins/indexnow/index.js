@@ -1,5 +1,5 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { SaxesParser } from 'saxes';
 
 const SITE_URL = 'https://tahitiguestboat.com';
@@ -11,20 +11,12 @@ const MAX_URLS_PER_SUBMISSION = 10_000;
 let productionUrls;
 
 export default {
-  async onPreBuild({ constants, utils }) {
+  async onPreBuild({ utils }) {
     if (!isProduction()) return;
 
     const key = process.env.INDEXNOW_KEY;
     if (!key) {
       warn(utils, 'IndexNow is disabled because INDEXNOW_KEY is not configured.');
-      return;
-    }
-
-    try {
-      await materializeVerificationFile(constants, key);
-    } catch (error) {
-      productionUrls = undefined;
-      warn(utils, `IndexNow is disabled because the verification file could not be materialized: ${error.message}`);
       return;
     }
 
@@ -53,15 +45,6 @@ export default {
     }
   },
 };
-
-async function materializeVerificationFile(constants, key) {
-  const staticDirectory = constants.CONFIG_PATH
-    ? join(dirname(constants.CONFIG_PATH), 'public')
-    : join(process.cwd(), 'public');
-
-  await mkdir(staticDirectory, { recursive: true });
-  await writeFile(join(staticDirectory, `${key}.txt`), key, 'utf8');
-}
 
 function isProduction() {
   return process.env.CONTEXT === 'production';

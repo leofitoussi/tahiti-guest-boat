@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -70,6 +70,15 @@ describe('IndexNow production plugin', () => {
     const manifest = await readFile('netlify/plugins/indexnow/manifest.yml', 'utf8');
 
     expect(manifest).toContain('name: tahiti-guest-boat-indexnow');
+  });
+
+  it('ships the IndexNow verification key as a public static asset', async () => {
+    const verificationFile = (await readdir('public')).find((file) => /^[a-f0-9]{32}\.txt$/i.test(file));
+
+    expect(verificationFile).toBeDefined();
+    expect(await readFile(join('public', verificationFile), 'utf8')).toMatch(
+      new RegExp(`^${verificationFile.slice(0, -4)}\\r?\\n?$`)
+    );
   });
 
   it('does not publish or submit anything for a deploy preview', async () => {
@@ -529,10 +538,8 @@ ${urlList.map((url) => `  <url><loc>${url}</loc><lastmod>2026-08-15T00:00:00.000
     }
   });
 
-  it('materializes the verification file before Astro builds the public assets', async () => {
-    const projectDir = await mkdtemp(join(tmpdir(), 'tgb-indexnow-'));
-    const publishDir = join(projectDir, 'dist');
-    await mkdir(publishDir);
+  it('sends a newly deployed public URL once the static verification file is present', async () => {
+    const publishDir = await mkdtemp(join(tmpdir(), 'tgb-indexnow-'));
     process.env.CONTEXT = 'production';
     process.env.INDEXNOW_KEY = key;
 
@@ -551,15 +558,11 @@ ${urlList.map((url) => `  <url><loc>${url}</loc><lastmod>2026-08-15T00:00:00.000
     vi.stubGlobal('fetch', fetch);
 
     try {
-      const event = {
-        constants: { CONFIG_PATH: join(projectDir, 'netlify.toml'), PUBLISH_DIR: publishDir },
-        utils: { status: { show: vi.fn() } },
-      };
+      const event = { constants: { PUBLISH_DIR: publishDir }, utils: { status: { show: vi.fn() } } };
 
       await indexNowPlugin.onPreBuild(event);
       await indexNowPlugin.onSuccess(event);
 
-      expect(await readFile(join(projectDir, 'public', `${key}.txt`), 'utf8')).toBe(key);
       expect(fetch).toHaveBeenLastCalledWith(
         'https://api.indexnow.org/indexnow',
         expect.objectContaining({
@@ -573,7 +576,7 @@ ${urlList.map((url) => `  <url><loc>${url}</loc><lastmod>2026-08-15T00:00:00.000
         })
       );
     } finally {
-      await rm(projectDir, { recursive: true, force: true });
+      await rm(publishDir, { recursive: true, force: true });
     }
   });
 });

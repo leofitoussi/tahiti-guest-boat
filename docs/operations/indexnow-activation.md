@@ -7,15 +7,16 @@ Cette procédure active la notification IndexNow de Tahiti Guest Boat et vérifi
 - La version qui contient le plugin IndexNow est déployée en production.
 - Le domaine canonique répond sur `https://tahitiguestboat.com`.
 - `https://tahitiguestboat.com/sitemap_index.xml` et les sitemaps enfants répondent en HTTP 200.
-- Aucun secret ou clé ne doit être ajouté à `netlify.toml`, au dépôt Git ou à un ticket GitHub.
+- Le fichier de vérification IndexNow est un artefact **public** exigé par le protocole : il est versionné à la racine des assets Astro, sous `public/<INDEXNOW_KEY>.txt`.
 
 ## 1. Configurer IndexNow dans Netlify
 
-1. Générer une clé IndexNow aléatoire de 8 à 128 caractères, composée uniquement de lettres, chiffres et tirets. Conserver sa valeur dans le gestionnaire de mots de passe de l’équipe.
-2. Dans le projet Netlify, ouvrir la configuration des variables d’environnement et créer `INDEXNOW_KEY` avec cette valeur. Restreindre la variable aux builds de production.
-3. Déclencher un déploiement de production après avoir enregistré la variable. Les previews et déploiements de branche ne doivent pas recevoir cette variable ni produire le fichier de vérification.
-4. Après le succès du déploiement, vérifier en navigation privée que `https://tahitiguestboat.com/<INDEXNOW_KEY>.txt` répond en HTTP 200 et contient exactement la clé. Ne jamais copier la clé dans les journaux, tickets ou captures d’écran partagées.
-5. Lors du prochain déploiement qui modifie le sitemap, contrôler dans les journaux Netlify qu’une soumission IndexNow est effectuée ou qu’une erreur actionnable est signalée. Une réponse `200` ou `202` confirme la réception de la notification, pas l’indexation.
+1. Générer une clé IndexNow aléatoire de 8 à 128 caractères, composée uniquement de lettres, chiffres et tirets.
+2. Créer et versionner `public/<INDEXNOW_KEY>.txt` en UTF-8. Son nom, sans l’extension `.txt`, et son contenu doivent correspondre à la clé. Ce fichier doit rester public : IndexNow l’utilise pour vérifier l’hôte.
+3. Dans le projet Netlify, créer `INDEXNOW_KEY` avec la même valeur et le limiter aux builds de production. La variable évite de recopier la valeur dans les journaux de build ; elle ne remplace pas le fichier public exigé par IndexNow.
+4. Déclencher un déploiement de production après avoir enregistré la variable. Les previews et déploiements de branche ne soumettent jamais d’URL à IndexNow.
+5. Après le succès du déploiement, vérifier en navigation privée que `https://tahitiguestboat.com/<INDEXNOW_KEY>.txt` répond en HTTP 200 et contient exactement la clé. Ne jamais copier la valeur dans les journaux, tickets ou captures d’écran partagées.
+6. Lors du prochain déploiement qui modifie le sitemap, contrôler dans les journaux Netlify qu’une soumission IndexNow est effectuée ou qu’une erreur actionnable est signalée. Une réponse `200` ou `202` confirme la réception de la notification, pas l’indexation.
 
 ## 2. Vérifier Google Search Console
 

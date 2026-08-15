@@ -46,7 +46,7 @@ const reviewCountLabel = locale === 'en' ? 'reviews' : 'avis';
                     <img src={authorImageUrl} alt="" width="48" height="48" loading="lazy" decoding="async" class="size-12 rounded-full object-cover" />
                   )}
                   <div>
-                    <h3 class="text-base font-semibold text-foreground">{review.name}</h3>
+                    <h3 class="!text-base font-semibold text-foreground">{review.name}</h3>
                     <p class="text-sm text-muted-foreground">{review.rating || 0}/5{review.source === 'google' ? ' · Google' : ''}{formattedDate ? ` · ${formattedDate}` : ''}</p>
                   </div>
                 </div>

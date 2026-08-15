@@ -25,6 +25,7 @@ export interface LayoutViewModel {
   cruiseLinks: LayoutLink[];
   cruisesNavigationLabel: string;
   footerLinks: LayoutLink[];
+  legalFooterLinks: LayoutLink[];
   footerText?: string;
   logoAlt: string;
   logoUrl?: string;
@@ -48,6 +49,12 @@ export function buildLayoutViewModel(
   alternatePaths: Partial<Record<Locale, string>> = {},
 ): LayoutViewModel {
   const copy = getSiteCopy(locale);
+  const configuredFooterLinks =
+    settings?.footerLinks?.map((link) => ({
+      label: link.label ?? '',
+      href: link.url ? localizeHref(link.url, locale) : '#',
+    })) ?? [];
+  const legalFooterLinks = configuredFooterLinks.filter(isLegalFooterLink);
   const cruiseLinks = cruises.flatMap((cruise) => {
     const label = cruise.title?.trim() || cruise.heroTitle?.trim();
     if (!cruise.slug || !label) return [];
@@ -69,11 +76,8 @@ export function buildLayoutViewModel(
     contactPhone: settings?.contactPhone,
     cruiseLinks,
     cruisesNavigationLabel: copy.pages.cruisesIndex.badge,
-    footerLinks:
-      settings?.footerLinks?.map((link) => ({
-        label: link.label ?? '',
-        href: link.url ? localizeHref(link.url, locale) : '#',
-      })) ?? [],
+    footerLinks: configuredFooterLinks.filter((link) => !isLegalFooterLink(link)),
+    legalFooterLinks,
     footerText: settings?.footerText ?? copy.shell.defaultFooterText,
     logoAlt: settings?.logoAlt ?? 'Logo Tahiti Guest Boat',
     logoUrl,
@@ -89,4 +93,16 @@ export function buildLayoutViewModel(
     footerNavigationLabel: copy.shell.footerNavigationLabel,
     languageOptions: buildLanguageSwitcher(locale, alternatePaths),
   };
+}
+
+const LEGAL_FOOTER_PATHS = new Set([
+  '/politique-de-confidentialite',
+  '/politique-de-cookies-ue',
+  '/en/privacy-policy',
+  '/en/cookie-policy',
+]);
+
+function isLegalFooterLink(link: LayoutLink) {
+  const path = link.href.split(/[?#]/, 1)[0].replace(/\/+$/, '') || '/';
+  return LEGAL_FOOTER_PATHS.has(path);
 }

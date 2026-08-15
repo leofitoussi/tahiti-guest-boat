@@ -53,6 +53,7 @@ describe('buildLayoutViewModel — localized shell fallbacks', () => {
     const french = buildLayoutViewModel(
       {
         footerLinks: [
+          { label: 'Nous contacter', url: '/contact/' },
           { label: 'Politique de confidentialité', url: '/politique-de-confidentialite/' },
           { label: 'Politique de cookies', url: '/politique-de-cookies-ue/' },
         ],
@@ -63,6 +64,7 @@ describe('buildLayoutViewModel — localized shell fallbacks', () => {
     const english = buildLayoutViewModel(
       {
         footerLinks: [
+          { label: 'Contact us', url: '/en/contact/' },
           { label: 'Privacy policy', url: '/en/privacy-policy/' },
           { label: 'Cookie policy', url: '/en/cookie-policy/' },
         ],
@@ -72,10 +74,16 @@ describe('buildLayoutViewModel — localized shell fallbacks', () => {
     );
 
     expect(french.footerLinks).toEqual([
+      { label: 'Nous contacter', href: '/contact/' },
+    ]);
+    expect(french.legalFooterLinks).toEqual([
       { label: 'Politique de confidentialité', href: '/politique-de-confidentialite/' },
       { label: 'Politique de cookies', href: '/politique-de-cookies-ue/' },
     ]);
     expect(english.footerLinks).toEqual([
+      { label: 'Contact us', href: '/en/contact/' },
+    ]);
+    expect(english.legalFooterLinks).toEqual([
       { label: 'Privacy policy', href: '/en/privacy-policy/' },
       { label: 'Cookie policy', href: '/en/cookie-policy/' },
     ]);

@@ -60,6 +60,15 @@ describe('site settings render', () => {
     expect(englishHtml).not.toContain('&quot;closeMenuLabel&quot;:[0,&quot;Fermer le menu&quot;]');
   });
 
+  it('places English legal links in the bottom footer row beside the copyright', async () => {
+    const html = await readFile('dist/en/index.html', 'utf8');
+    const copyrightIndex = html.indexOf('© 2026 Tahiti Guest Boat');
+
+    expect(copyrightIndex).toBeGreaterThan(-1);
+    expect(html.indexOf('Privacy policy')).toBeGreaterThan(copyrightIndex);
+    expect(html.indexOf('Cookie policy')).toBeGreaterThan(copyrightIndex);
+  });
+
   it('builds an English 404 page with an English home link', async () => {
     const englishNotFound = await readFile('dist/en/404/index.html', 'utf8');
 

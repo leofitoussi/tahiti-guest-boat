@@ -13,6 +13,7 @@ interface Props {
   logoUrl?: string;
   logoAlt?: string;
   footerLinks?: FooterLink[];
+  legalFooterLinks?: FooterLink[];
   cruiseLinks?: FooterLink[];
   cruisesNavigationLabel?: string;
   footerText?: string;
@@ -28,6 +29,7 @@ const {
   logoUrl,
   logoAlt = 'Logo Tahiti Guest Boat',
   footerLinks = [],
+  legalFooterLinks = [],
   cruiseLinks = [],
   cruisesNavigationLabel = 'Croisières',
   contactEmail,
@@ -36,6 +38,7 @@ const {
 } = Astro.props;
 const copy = getSiteCopy(locale);
 const navigationLabel = Astro.props.navigationLabel ?? copy.shell.footerNavigationLabel;
+const legalNavigationLabel = copy.shell.legalNavigationLabel;
 
 const year = new Date().getFullYear();
 const phoneHref = contactPhone
@@ -116,8 +119,20 @@ const phoneHref = contactPhone
     </div>
   </div>
   <div class="border-t border-white/10">
-    <div class="mx-auto flex max-w-site px-5 py-6 text-sm text-white/64 md:px-8">
+    <div class="mx-auto flex max-w-site flex-wrap items-center justify-between gap-x-8 gap-y-3 px-5 py-6 text-sm text-white/64 md:px-8">
       <p>© {year} {brandName}</p>
+      {legalFooterLinks.length > 0 && (
+        <nav class="flex flex-wrap items-center gap-x-6 gap-y-2" aria-label={legalNavigationLabel}>
+          {legalFooterLinks.map((item) => (
+            <a
+              href={item.href}
+              class="inline-flex min-h-8 items-center transition hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+      )}
     </div>
   </div>
 </footer>

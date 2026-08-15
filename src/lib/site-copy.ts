@@ -6,6 +6,7 @@ export interface SiteCopy {
     closeMenuLabel: string;
     navigationLabel: string;
     footerNavigationLabel: string;
+    legalNavigationLabel: string;
     languageSwitcherLabel: string;
     reservationLabel: string;
     defaultFooterText: string;
@@ -106,6 +107,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
       closeMenuLabel: 'Fermer le menu',
       navigationLabel: 'Navigation',
       footerNavigationLabel: 'Explorer',
+      legalNavigationLabel: 'Mentions légales',
       languageSwitcherLabel: 'Changer de langue',
       reservationLabel: 'Réserver',
       defaultFooterText: 'Croisieres privees et experiences lagon en Polynesie francaise.',
@@ -212,6 +214,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
       closeMenuLabel: 'Close menu',
       navigationLabel: 'Navigation',
       footerNavigationLabel: 'Explore',
+      legalNavigationLabel: 'Legal',
       languageSwitcherLabel: 'Change language',
       reservationLabel: 'Book your cruise',
       defaultFooterText: 'Private cruises and lagoon experiences in French Polynesia.',

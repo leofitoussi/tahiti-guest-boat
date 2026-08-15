@@ -203,6 +203,31 @@ describe('llms.txt generation', () => {
     }
   });
 
+  it('uses the English structural path for the localized boat page', async () => {
+    const originalFetch = sanityClient.fetch;
+    sanityClient.fetch = (async (query: string) => {
+      if (query.includes('siteSettings')) {
+        return { siteName: 'Tahiti Guest Boat' };
+      }
+      return {
+        homeTranslation: { seoDescription: 'English summary.', seo: { indexable: true } },
+        surfaceAvailability: { home: true, boat: true, contact: true, cruises: true, blog: true },
+        legalPages: [],
+        cruises: [],
+        blog: [],
+      };
+    }) as unknown as typeof sanityClient.fetch;
+
+    try {
+      const markdown = await getLlmsTxtContent('en');
+
+      expect(markdown).toContain('(/en/our-boat/)');
+      expect(markdown).not.toContain('(/en/notre-bateau/)');
+    } finally {
+      sanityClient.fetch = originalFetch;
+    }
+  });
+
   it('prefers the Sanity home summary and site name, falling back to static copy when Sanity has no value', async () => {
     const originalFetch = sanityClient.fetch;
     sanityClient.fetch = (async (query: string) => {

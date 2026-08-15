@@ -88,12 +88,12 @@ export function DesktopNavigation({
           })}
         </NavigationMenuList>
       </NavigationMenu>
+      <LanguageSwitcher locale={locale} options={languageOptions} />
       {ctaLabel ? (
         <a href={localizeHref(ctaHref, locale)} className={buttonVariants({ variant: "primary" })}>
           {ctaLabel}
         </a>
       ) : null}
-      <LanguageSwitcher locale={locale} options={languageOptions} />
     </div>
   )
 }

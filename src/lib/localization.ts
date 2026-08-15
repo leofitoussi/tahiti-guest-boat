@@ -89,7 +89,9 @@ export function localizePath(path: string, locale: Locale = defaultLocale) {
     return normalized;
   }
 
-  const localizedPath = normalized.replace(/^\/nos-croisieres(?=\/|$)/, '/cruises');
+  const localizedPath = normalized
+    .replace(/^\/nos-croisieres(?=\/|$)/, '/cruises')
+    .replace(/^\/notre-bateau(?=\/|$)/, '/our-boat');
   return `/en${localizedPath}`;
 }
 

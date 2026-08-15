@@ -118,8 +118,11 @@ export function MobileDrawer({
           })}
         </nav>
 
+        <div className="shrink-0 border-t border-border/70 px-5 pb-8 pt-5">
+          <LanguageSwitcher locale={locale} options={languageOptions} placement="above" />
+        </div>
         {ctaLabel ? (
-          <div className="shrink-0 px-5 pb-8 pt-4">
+          <div className="shrink-0 border-t border-border/70 px-5 pb-8 pt-4">
             <SheetClose
               nativeButton={false}
               render={
@@ -133,9 +136,6 @@ export function MobileDrawer({
             </SheetClose>
           </div>
         ) : null}
-        <div className="shrink-0 border-t border-border/70 px-5 pb-8 pt-5">
-          <LanguageSwitcher locale={locale} options={languageOptions} />
-        </div>
       </SheetContent>
     </Sheet>
   )

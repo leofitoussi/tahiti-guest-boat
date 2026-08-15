@@ -118,7 +118,7 @@ export function MobileDrawer({
           })}
         </nav>
 
-        <div className="shrink-0 border-t border-border/70 px-5 pb-8 pt-5">
+        <div className="flex shrink-0 justify-end border-t border-border/70 px-5 pb-8 pt-5">
           <LanguageSwitcher locale={locale} options={languageOptions} placement="above" />
         </div>
         {ctaLabel ? (

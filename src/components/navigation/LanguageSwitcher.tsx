@@ -28,11 +28,11 @@ export function LanguageSwitcher({
 
   return (
     <nav className={className} aria-label={copy.shell.languageSwitcherLabel}>
-      <details className="group relative">
+      <details className="group relative w-fit">
         <summary
           aria-haspopup="menu"
           aria-label={`${copy.shell.languageSwitcherLabel}: ${currentOption.label}`}
-          className="flex min-h-9 cursor-pointer list-none items-center gap-1.5 rounded-[var(--radius-control)] border border-border/70 px-2.5 text-xs font-semibold tracking-[0.12em] uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 [&::-webkit-details-marker]:hidden"
+          className="inline-flex min-h-9 cursor-pointer list-none items-center gap-1.5 rounded-[var(--radius-control)] border border-border/70 bg-background px-2.5 text-xs font-semibold tracking-[0.12em] uppercase shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 [&::-webkit-details-marker]:hidden"
         >
           <span className="text-base leading-none" aria-hidden="true">
             {getFlag(currentOption.locale)}

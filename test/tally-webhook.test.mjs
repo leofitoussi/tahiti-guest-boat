@@ -1,17 +1,17 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createHmac } from 'node:crypto';
-import handler from '../netlify/functions/tally-webhook.mjs';
+import handler, { buildResendPayload } from '../netlify/functions/tally-webhook.mjs';
 
 const webhookSecret = 'test-tally-secret';
 const resendApiKey = 're_test_key';
 
-function createPayload() {
+function createPayload(formId = 'eqOGYl') {
   return {
     eventId: 'evt_123',
     eventType: 'FORM_RESPONSE',
     createdAt: '2026-08-14T10:00:00.000Z',
     data: {
-      formId: 'eqOGYl',
+      formId,
       formName: 'Préparer votre croisière',
       responseId: 'response_123',
       submissionId: 'submission_123',
@@ -129,5 +129,34 @@ describe('Tally webhook', () => {
 
     const recipients = fetchMock.mock.calls.map(([, options]) => JSON.parse(options.body).email);
     expect(recipients).toEqual(['leo.fitoussi689@gmail.com', 'tahitiguestboat@gmail.com']);
+  });
+
+  it('accepts both English and French Tally forms and ignores unrelated forms', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('{"object":"event"}', { status: 200 }));
+    vi.stubGlobal('fetch', fetchMock);
+    stubNetlifyEnv({
+      TALLY_FORM_ID: 'eqOGYl',
+      TALLY_FORM_IDS: 'eqOGYl,nPrj8V',
+      RESEND_API_KEY: resendApiKey,
+      RESEND_NOTIFICATION_EMAIL: 'tahitiguestboat@gmail.com',
+    });
+
+    const englishResponse = await handler(createRequest(createPayload('eqOGYl'), { signature: '' }));
+    const frenchResponse = await handler(createRequest(createPayload('nPrj8V'), { signature: '' }));
+    const unrelatedResponse = await handler(createRequest(createPayload('unrelated-form'), { signature: '' }));
+
+    expect(englishResponse.status).toBe(200);
+    expect(frenchResponse.status).toBe(200);
+    expect(await unrelatedResponse.json()).toEqual({ ok: true, ignored: true });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('extracts the respondent first name for a dynamic email subject', () => {
+    const payload = createPayload('nPrj8V');
+    payload.data.fields = [
+      { key: 'first_name', label: 'Prénom', type: 'INPUT_TEXT', value: 'Moana' },
+    ];
+
+    expect(buildResendPayload(payload).respondentFirstName).toBe('Moana');
   });
 });

@@ -29,7 +29,7 @@ function isEmail(value) {
   return typeof value === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
 }
 
-function parseEmailList(value) {
+function parseCommaSeparatedList(value) {
   return value
     ?.split(',')
     .map((email) => email.trim())
@@ -46,6 +46,18 @@ export function findSubmissionEmail(payload) {
     (field) => /email|e-mail|courriel/i.test(String(field?.label ?? '')) && isEmail(field.value),
   );
   return labelledEmailField?.value.trim() ?? null;
+}
+
+export function findSubmissionFirstName(payload) {
+  const fields = Array.isArray(payload?.data?.fields) ? payload.data.fields : [];
+  const firstNameField = fields.find(
+    (field) =>
+      /^(prénom|prenom|first\s*name|given\s*name)$/i.test(String(field?.label ?? '').trim()) &&
+      typeof field.value === 'string' &&
+      field.value.trim(),
+  );
+
+  return firstNameField?.value.trim() ?? null;
 }
 
 function serializeAnswer(field) {
@@ -81,6 +93,7 @@ export function buildResendPayload(payload) {
     submittedAt: payload.data?.createdAt ?? payload.createdAt ?? null,
     submissionPreviewUrl: payload.data?.submissionPreviewUrl ?? null,
     submissionPdfUrl: payload.data?.submissionPdfUrl ?? null,
+    respondentFirstName: findSubmissionFirstName(payload),
     answersText,
     answers,
   };
@@ -120,14 +133,14 @@ export default async function handler(request) {
     return jsonResponse({ ok: true, ignored: true });
   }
 
-  const configuredFormId = getEnv('TALLY_FORM_ID');
-  if (configuredFormId && payload.data?.formId !== configuredFormId) {
+  const configuredFormIds = parseCommaSeparatedList(getEnv('TALLY_FORM_IDS') || getEnv('TALLY_FORM_ID'));
+  if (configuredFormIds.length && !configuredFormIds.includes(payload.data?.formId)) {
     return jsonResponse({ ok: true, ignored: true });
   }
 
   const configuredRecipients = getEnv('RESEND_NOTIFICATION_EMAILS') || getEnv('RESEND_NOTIFICATION_EMAIL');
   const recipientEmails = configuredRecipients
-    ? parseEmailList(configuredRecipients)
+    ? parseCommaSeparatedList(configuredRecipients)
     : [findSubmissionEmail(payload)].filter(Boolean);
 
   if (!recipientEmails.length || recipientEmails.some((email) => !isEmail(email))) {

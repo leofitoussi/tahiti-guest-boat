@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -83,7 +83,6 @@ describe('IndexNow production plugin', () => {
       const event = { constants: { PUBLISH_DIR: publishDir }, utils: { status: { show: vi.fn() } } };
 
       await indexNowPlugin.onPreBuild(event);
-      await indexNowPlugin.onPostBuild(event);
 
       expect(fetch).not.toHaveBeenCalledWith('https://api.indexnow.org/indexnow', expect.anything());
       await indexNowPlugin.onSuccess(event);
@@ -107,7 +106,6 @@ describe('IndexNow production plugin', () => {
       const event = { constants: { PUBLISH_DIR: publishDir }, utils: { status } };
 
       await expect(indexNowPlugin.onPreBuild(event)).resolves.toBeUndefined();
-      await expect(indexNowPlugin.onPostBuild(event)).resolves.toBeUndefined();
       await expect(indexNowPlugin.onSuccess(event)).resolves.toBeUndefined();
 
       expect(fetch).not.toHaveBeenCalled();
@@ -132,7 +130,6 @@ describe('IndexNow production plugin', () => {
       const event = { constants: { PUBLISH_DIR: publishDir }, utils: { status } };
 
       await expect(indexNowPlugin.onPreBuild(event)).resolves.toBeUndefined();
-      await expect(indexNowPlugin.onPostBuild(event)).resolves.toBeUndefined();
       await expect(indexNowPlugin.onSuccess(event)).resolves.toBeUndefined();
 
       expect(fetch).toHaveBeenCalledTimes(1);
@@ -532,8 +529,10 @@ ${urlList.map((url) => `  <url><loc>${url}</loc><lastmod>2026-08-15T00:00:00.000
     }
   });
 
-  it('publishes the verification file and sends a newly deployed public URL', async () => {
-    const publishDir = await mkdtemp(join(tmpdir(), 'tgb-indexnow-'));
+  it('materializes the verification file before Astro builds the public assets', async () => {
+    const projectDir = await mkdtemp(join(tmpdir(), 'tgb-indexnow-'));
+    const publishDir = join(projectDir, 'dist');
+    await mkdir(publishDir);
     process.env.CONTEXT = 'production';
     process.env.INDEXNOW_KEY = key;
 
@@ -552,13 +551,15 @@ ${urlList.map((url) => `  <url><loc>${url}</loc><lastmod>2026-08-15T00:00:00.000
     vi.stubGlobal('fetch', fetch);
 
     try {
-      const event = { constants: { PUBLISH_DIR: publishDir }, utils: { status: { show: vi.fn() } } };
+      const event = {
+        constants: { CONFIG_PATH: join(projectDir, 'netlify.toml'), PUBLISH_DIR: publishDir },
+        utils: { status: { show: vi.fn() } },
+      };
 
       await indexNowPlugin.onPreBuild(event);
-      await indexNowPlugin.onPostBuild(event);
       await indexNowPlugin.onSuccess(event);
 
-      expect(await readFile(join(publishDir, `${key}.txt`), 'utf8')).toBe(key);
+      expect(await readFile(join(projectDir, 'public', `${key}.txt`), 'utf8')).toBe(key);
       expect(fetch).toHaveBeenLastCalledWith(
         'https://api.indexnow.org/indexnow',
         expect.objectContaining({
@@ -572,7 +573,7 @@ ${urlList.map((url) => `  <url><loc>${url}</loc><lastmod>2026-08-15T00:00:00.000
         })
       );
     } finally {
-      await rm(publishDir, { recursive: true, force: true });
+      await rm(projectDir, { recursive: true, force: true });
     }
   });
 });

@@ -1,5 +1,5 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { SaxesParser } from 'saxes';
 
 const SITE_URL = 'https://tahitiguestboat.com';
@@ -11,7 +11,7 @@ const MAX_URLS_PER_SUBMISSION = 10_000;
 let productionUrls;
 
 export default {
-  async onPreBuild({ utils }) {
+  async onPreBuild({ constants, utils }) {
     if (!isProduction()) return;
 
     const key = process.env.INDEXNOW_KEY;
@@ -21,21 +21,18 @@ export default {
     }
 
     try {
+      await materializeVerificationFile(constants, key);
+    } catch (error) {
+      productionUrls = undefined;
+      warn(utils, `IndexNow is disabled because the verification file could not be materialized: ${error.message}`);
+      return;
+    }
+
+    try {
       productionUrls = await readProductionUrls();
     } catch (error) {
       productionUrls = undefined;
       warn(utils, `IndexNow is disabled because the production sitemap could not be read: ${error.message}`);
-    }
-  },
-
-  async onPostBuild({ constants, utils }) {
-    if (!isProduction() || !process.env.INDEXNOW_KEY) return;
-
-    try {
-      await mkdir(constants.PUBLISH_DIR, { recursive: true });
-      await writeFile(join(constants.PUBLISH_DIR, `${process.env.INDEXNOW_KEY}.txt`), process.env.INDEXNOW_KEY, 'utf8');
-    } catch (error) {
-      warn(utils, `IndexNow verification file could not be published: ${error.message}`);
     }
   },
 
@@ -56,6 +53,15 @@ export default {
     }
   },
 };
+
+async function materializeVerificationFile(constants, key) {
+  const staticDirectory = constants.CONFIG_PATH
+    ? join(dirname(constants.CONFIG_PATH), 'public')
+    : join(process.cwd(), 'public');
+
+  await mkdir(staticDirectory, { recursive: true });
+  await writeFile(join(staticDirectory, `${key}.txt`), key, 'utf8');
+}
 
 function isProduction() {
   return process.env.CONTEXT === 'production';

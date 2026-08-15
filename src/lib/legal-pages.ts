@@ -76,8 +76,7 @@ const LEGAL_TRANSLATION_VERSIONS_QUERY = `*[
 ] {
   _id,
   ${localizedDocumentFields},
-  "slug": slug.current,
-  seo { indexable }
+  "slug": slug.current
 }`;
 
 export async function getLegalTranslationVersions(
@@ -96,13 +95,12 @@ export async function getLegalTranslationVersions(
         language?: Locale;
         locale?: Locale;
         slug?: string;
-        seo?: { indexable?: boolean };
       }[]
     >(LEGAL_TRANSLATION_VERSIONS_QUERY, { translationGroup, documentId })
     .catch(() => []);
 
   return (documents ?? []).flatMap((document) => {
-    if (!document.slug || document.seo?.indexable !== true) {
+    if (!document.slug) {
       return [];
     }
 

@@ -57,6 +57,25 @@ describe('SEO sitemap generation', () => {
     ]);
   });
 
+  it('keeps legal sitemap entries gated by seo.indexable', () => {
+    const urls = toSitemapUrls([
+      {
+        path: '/politique-de-confidentialite/',
+        _updatedAt: '2026-06-10T10:00:00.000Z',
+        seo: { indexable: true },
+      },
+      {
+        path: '/en/privacy-policy/',
+        _updatedAt: '2026-06-11T10:00:00.000Z',
+        seo: { indexable: false },
+      },
+    ]);
+
+    expect(urls).toEqual([
+      { path: '/politique-de-confidentialite/', lastmod: '2026-06-10T10:00:00.000Z' },
+    ]);
+  });
+
   it('collects page, blog, and cruise sitemap groups from indexable Sanity content', async () => {
     const originalFetch = sanityClient.fetch;
     sanityClient.fetch = (async () => ({

@@ -48,6 +48,38 @@ describe('buildLayoutViewModel — localized shell fallbacks', () => {
       { locale: 'en', label: 'English', shortLabel: 'EN', isCurrent: false, href: '/en/' },
     ]);
   });
+
+  it('passes localized legal links from Site settings to the footer', () => {
+    const french = buildLayoutViewModel(
+      {
+        footerLinks: [
+          { label: 'Politique de confidentialité', url: '/politique-de-confidentialite/' },
+          { label: 'Politique de cookies', url: '/politique-de-cookies-ue/' },
+        ],
+      },
+      undefined,
+      'fr',
+    );
+    const english = buildLayoutViewModel(
+      {
+        footerLinks: [
+          { label: 'Privacy policy', url: '/en/privacy-policy/' },
+          { label: 'Cookie policy', url: '/en/cookie-policy/' },
+        ],
+      },
+      undefined,
+      'en',
+    );
+
+    expect(french.footerLinks).toEqual([
+      { label: 'Politique de confidentialité', href: '/politique-de-confidentialite/' },
+      { label: 'Politique de cookies', href: '/politique-de-cookies-ue/' },
+    ]);
+    expect(english.footerLinks).toEqual([
+      { label: 'Privacy policy', href: '/en/privacy-policy/' },
+      { label: 'Cookie policy', href: '/en/cookie-policy/' },
+    ]);
+  });
 });
 
 describe('tracking source of truth', () => {

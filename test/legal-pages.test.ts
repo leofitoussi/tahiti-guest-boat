@@ -1,7 +1,9 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { readFile } from 'node:fs/promises';
+import { sanityClient } from 'sanity:client';
 import { schemaTypes } from '../schemas';
 import { legalPage } from '../schemas/legalPage';
+import { buildLegalAlternatePaths } from '../src/lib/legal-routes';
 import * as legalPagesLib from '../src/lib/legal-pages';
 
 describe('legal page route template', () => {
@@ -26,6 +28,48 @@ describe('legal pages lib', () => {
 
   it('exports getLegalPages as a function', () => {
     expect(typeof legalPagesLib.getLegalPages).toBe('function');
+  });
+
+  it('offers a published alternate even when that alternate is not indexable', async () => {
+    const fetch = vi.spyOn(sanityClient, 'fetch').mockResolvedValue([
+      {
+        language: 'fr',
+        slug: 'politique-de-confidentialite',
+        seo: { indexable: true },
+      },
+      {
+        language: 'en',
+        slug: 'privacy-policy',
+        seo: { indexable: false },
+      },
+    ] as never);
+
+    try {
+      const versions = await legalPagesLib.getLegalTranslationVersions({
+        _id: 'legal-privacy-fr',
+        translationGroup: 'privacy-policy',
+      });
+
+      expect(buildLegalAlternatePaths(versions, 'fr')).toEqual({
+        en: '/en/privacy-policy/',
+      });
+    } finally {
+      fetch.mockRestore();
+    }
+  });
+
+  it('builds reciprocal French and English paths for a legal translation group', () => {
+    const versions = [
+      { locale: 'fr' as const, slug: 'politique-de-confidentialite', isPublished: true },
+      { locale: 'en' as const, slug: 'privacy-policy', isPublished: true },
+    ];
+
+    expect(buildLegalAlternatePaths(versions, 'fr')).toEqual({
+      en: '/en/privacy-policy/',
+    });
+    expect(buildLegalAlternatePaths(versions, 'en')).toEqual({
+      fr: '/politique-de-confidentialite/',
+    });
   });
 });
 

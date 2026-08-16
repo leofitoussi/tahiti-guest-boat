@@ -13,7 +13,7 @@ Cette procédure active la notification IndexNow de Tahiti Guest Boat et vérifi
 
 1. Générer une clé IndexNow aléatoire de 8 à 128 caractères, composée uniquement de lettres, chiffres et tirets.
 2. Créer et versionner `public/<INDEXNOW_KEY>.txt` en UTF-8. Son nom, sans l’extension `.txt`, et son contenu doivent correspondre à la clé. Ce fichier doit rester public : IndexNow l’utilise pour vérifier l’hôte.
-3. Dans le projet Netlify, créer `INDEXNOW_KEY` avec la même valeur et le limiter aux builds de production. La variable évite de recopier la valeur dans les journaux de build ; elle ne remplace pas le fichier public exigé par IndexNow.
+3. Dans le projet Netlify, créer `INDEXNOW_KEY` avec la même valeur, **sans** l’étiqueter comme secret, et le limiter aux builds de production. La clé est volontairement publique : le protocole impose qu’elle soit servie dans le fichier de l’étape 2. La marquer comme secret activerait à juste titre le scan Netlify et bloquerait ce fichier public.
 4. Déclencher un déploiement de production après avoir enregistré la variable. Les previews et déploiements de branche ne soumettent jamais d’URL à IndexNow.
 5. Après le succès du déploiement, vérifier en navigation privée que `https://tahitiguestboat.com/<INDEXNOW_KEY>.txt` répond en HTTP 200 et contient exactement la clé. Ne jamais copier la valeur dans les journaux, tickets ou captures d’écran partagées.
 6. Lors du prochain déploiement qui modifie le sitemap, contrôler dans les journaux Netlify qu’une soumission IndexNow est effectuée ou qu’une erreur actionnable est signalée. Une réponse `200` ou `202` confirme la réception de la notification, pas l’indexation.

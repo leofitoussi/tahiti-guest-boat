@@ -11,7 +11,7 @@ const DEFAULT_SITE_NAME = 'Tahiti Guest Boat';
 const indexableLegalPageFilter = `${buildLocalizedSluggedDocumentFilter('legalPage')} && seo.indexable == true`;
 const indexableCruiseFilter = `${buildLocalizedSluggedDocumentFilter('cruisePage')} && seo.indexable == true`;
 const indexableBlogFilter = `${buildLocalizedSluggedDocumentFilter('blogPost')} && defined(publishedAt) && seo.indexable == true`;
-const englishLocalizedFilter = `(language == "en" || (!defined(language) && locale == "en"))`;
+const englishLocalizedFilter = `language == "en"`;
 const indexableEnglishCruiseFilter = `_type == "cruisePage" && defined(slug.current) && defined(publishedAt) && !(_id in path("drafts.**")) && ${englishLocalizedFilter} && seo.indexable == true`;
 const indexableEnglishBlogFilter = `_type == "blogPost" && defined(slug.current) && defined(publishedAt) && !(_id in path("drafts.**")) && ${englishLocalizedFilter} && seo.indexable == true`;
 

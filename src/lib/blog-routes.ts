@@ -1,7 +1,7 @@
 import type { Locale } from './localization';
 
 export interface BlogTranslationVersion {
-  locale: Locale;
+  language: Locale;
   slug: string;
   isPublished?: boolean;
 }
@@ -15,8 +15,8 @@ export function buildBlogAlternatePaths(
   currentLocale: Locale,
 ): Partial<Record<Locale, string>> {
   return versions.reduce<Partial<Record<Locale, string>>>((paths, version) => {
-    if (version.locale !== currentLocale && version.isPublished !== false && version.slug) {
-      paths[version.locale] = buildBlogPath(version.slug, version.locale);
+    if (version.language !== currentLocale && version.isPublished !== false && version.slug) {
+      paths[version.language] = buildBlogPath(version.slug, version.language);
     }
 
     return paths;

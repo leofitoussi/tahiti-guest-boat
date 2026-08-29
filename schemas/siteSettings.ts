@@ -242,7 +242,7 @@ export const siteSettings = defineType({
         'Pixel Facebook, Google Ads…). Ordre = ordre de chargement : la bannière de consentement en premier, ' +
         "puis l'analytics, puis les pixels qu'elle doit gater. À renseigner une seule fois ici (version " +
         'française) : il est appliqué à toutes les langues du site.',
-      hidden: ({ document }) => document?.locale !== 'fr',
+      hidden: ({ document }) => document?.language !== 'fr',
       validation: (rule) =>
         rule.custom((value) =>
           !value || value.includes('<') ? true : 'Cela ne ressemble pas à du HTML/script.'

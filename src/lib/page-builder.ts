@@ -8,8 +8,6 @@ export interface UniquePageDocument {
   _createdAt?: string;
   _updatedAt?: string;
   language?: Locale;
-  locale?: Locale;
-  translationGroup?: string;
   seoTitle?: string;
   seoDescription?: string;
   seo?: { indexable?: boolean };
@@ -279,14 +277,18 @@ export const pageBuilderFields = `pageBuilder[]{
   }
 }`;
 
-type UniquePageDocumentType = 'boatPage' | 'contactPage' | 'componentsTestPage';
+type UniquePageDocumentType = 'boatPage' | 'contactPage';
 
-const uniquePageProjection = `
-  ${localizedDocumentFields},
+const uniquePageContentProjection = `
   seoTitle,
   seoDescription,
   seo { indexable },
   ${pageBuilderFields}
+`;
+
+const uniquePageProjection = `
+  ${localizedDocumentFields},
+  ${uniquePageContentProjection}
 `;
 
 export function buildUniquePageQuery(documentType: UniquePageDocumentType) {
@@ -312,7 +314,7 @@ export function resolveUniquePageVersion(
 ): UniquePageDocument | null {
   return (
     versions
-      .filter((version) => (version.language ?? version.locale ?? defaultLocale) === locale)
+      .filter((version) => version.language === locale)
       .toSorted((left, right) => {
         const leftDate = left._updatedAt ?? left._createdAt ?? '';
         const rightDate = right._updatedAt ?? right._createdAt ?? '';
@@ -344,4 +346,18 @@ export async function getUniquePage(documentType: UniquePageDocumentType, locale
   }
 
   return sanityClient.fetch<UniquePageDocument | null>(buildUniquePageQuery(documentType), { locale }).catch(() => null);
+}
+
+export const COMPONENTS_TEST_PAGE_ID = 'componentsTestPage';
+
+export async function getComponentsTestPage() {
+  if (!isSanityConfigured) {
+    return null;
+  }
+
+  return sanityClient
+    .fetch<UniquePageDocument | null>(`*[_id == $documentId][0]{${uniquePageContentProjection}}`, {
+      documentId: COMPONENTS_TEST_PAGE_ID,
+    })
+    .catch(() => null);
 }

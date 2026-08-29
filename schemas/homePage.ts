@@ -46,12 +46,11 @@ export const homePage = defineType({
       title: 'seoTitle',
       media: 'logo',
       language: 'language',
-      locale: 'locale',
     },
-    prepare({ title, media, language, locale }) {
+    prepare({ title, media, language }) {
       return {
         title: title || 'Homepage',
-        subtitle: `Page d'accueil${(language || locale) ? ` — ${(language || locale).toUpperCase()}` : ''}`,
+        subtitle: `Page d'accueil${language ? ` — ${language.toUpperCase()}` : ''}`,
         media,
       };
     },

@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 describe('English contact conversion journey', () => {
   beforeAll(() => {
-    execFileSync('npm', ['run', 'build'], { stdio: 'ignore', timeout: 600000 });
+    execFileSync('npx', ['astro', 'build'], { stdio: 'ignore', timeout: 600000 });
   }, 600000);
 
   it('publishes an English noindex confirmation page with an English home link', async () => {

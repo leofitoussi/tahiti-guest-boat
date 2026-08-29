@@ -97,8 +97,7 @@ export interface CruisePageSummary {
   _id: string;
   title: string;
   slug: string;
-  locale?: Locale;
-  translationGroup?: string;
+  language?: Locale;
   heroTitle?: string;
   heroImage?: SanityImage;
   excerpt?: string;
@@ -114,8 +113,6 @@ export interface IntroductionDestination {
 }
 
 export interface CruisePage extends CruisePageSummary {
-  locale?: Locale;
-  translationGroup?: string;
   seoTitle?: string;
   seoDescription?: string;
   seo?: { indexable?: boolean };
@@ -129,8 +126,7 @@ export interface CruisePage extends CruisePageSummary {
 }
 
 export interface SiteSettings {
-  locale?: Locale;
-  translationGroup?: string;
+  language?: Locale;
   siteName?: string;
   logo?: SanityImage;
   logoAlt?: string;
@@ -185,8 +181,6 @@ export interface ActivityTag {
   title?: string;
   slug?: string;
   language?: Locale;
-  locale?: Locale;
-  translationGroup?: string;
 }
 
 export interface Activity {
@@ -197,8 +191,6 @@ export interface Activity {
   priority?: 1 | 2 | 3;
   isPublished?: boolean;
   language?: Locale;
-  locale?: Locale;
-  translationGroup?: string;
   tags?: ActivityTag[];
 }
 
@@ -311,10 +303,7 @@ const CRUISE_TRANSLATION_VERSIONS_QUERY = `*[
   _type == "cruisePage" &&
   !(_id in path("drafts.**")) &&
   defined(slug.current) &&
-  (
-    (defined($translationGroup) && translationGroup == $translationGroup) ||
-    (defined($documentId) && _id in *[_type == "translation.metadata" && references($documentId)][0].translations[].value._ref)
-  )
+  _id in *[_type == "translation.metadata" && references($documentId)][0].translations[].value._ref
 ] {
   _id,
   ${localizedDocumentFields},
@@ -432,12 +421,11 @@ export async function getCruisePage(slug: string, locale: Locale = defaultLocale
 }
 
 export async function getCruiseTranslationVersions(
-  source?: string | Pick<CruisePage, '_id' | 'translationGroup'>,
+  source?: string | Pick<CruisePage, '_id'>,
 ): Promise<CruiseTranslationVersion[]> {
-  const translationGroup = typeof source === 'string' ? source : source?.translationGroup;
-  const documentId = typeof source === 'string' ? undefined : source?._id;
+  const documentId = typeof source === 'string' ? source : source?._id;
 
-  if (!isSanityConfigured || (!translationGroup && !documentId)) {
+  if (!isSanityConfigured || !documentId) {
     return [];
   }
 
@@ -446,10 +434,9 @@ export async function getCruiseTranslationVersions(
       {
         _id?: string;
         language?: Locale;
-        locale?: Locale;
         slug?: string;
       }[]
-    >(CRUISE_TRANSLATION_VERSIONS_QUERY, { translationGroup, documentId })
+    >(CRUISE_TRANSLATION_VERSIONS_QUERY, { documentId })
     .catch(() => []);
 
   return documents.flatMap((document) => {
@@ -457,8 +444,11 @@ export async function getCruiseTranslationVersions(
       return [];
     }
 
-    const locale = document.language ?? document.locale ?? defaultLocale;
-    return [{ locale, slug: document.slug, isPublished: !document._id?.startsWith('drafts.') }];
+    if (!document.language) {
+      return [];
+    }
+
+    return [{ language: document.language, slug: document.slug, isPublished: !document._id?.startsWith('drafts.') }];
   });
 }
 
@@ -473,7 +463,7 @@ export async function getSiteSettings(locale: Locale = defaultLocale) {
 // Head tracking scripts are authored once on the French Site settings document and
 // applied to every locale, so they are read independently of the page locale. The
 // result is memoized so the whole static build only hits Sanity once.
-const TRACKING_HEAD_SCRIPTS_QUERY = `*[_type == "siteSettings" && (language == "fr" || (!defined(language) && locale == "fr") || (!defined(language) && !defined(locale)))] | order(_updatedAt desc)[0].headScripts`;
+const TRACKING_HEAD_SCRIPTS_QUERY = `*[_type == "siteSettings" && language == "fr"] | order(_updatedAt desc)[0].headScripts`;
 let cachedHeadScripts: string | null | undefined;
 
 export async function getTrackingHeadScripts(): Promise<string> {

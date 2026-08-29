@@ -4,7 +4,7 @@ import { beforeAll, describe, expect, it } from 'vitest';
 
 describe('Page bateau localized public routes', () => {
   beforeAll(() => {
-    execFileSync('npm', ['run', 'build'], { stdio: 'ignore', timeout: 600000 });
+    execFileSync('npx', ['astro', 'build'], { stdio: 'ignore', timeout: 600000 });
   }, 600000);
 
   it('publishes a reciprocal French/English pair without leaking French page content into English', async () => {

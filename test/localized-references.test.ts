@@ -4,24 +4,24 @@ import { localizeBlogPostReferences, type BlogPost } from '../src/lib/blog';
 
 describe('localized editorial references', () => {
   it('selects the matching published language version even when its slug differs', () => {
-    const french = { _id: 'cruise-fr', language: 'fr' as const, translationGroup: 'bora', title: 'Bora Bora', slug: 'bora-bora-prive' };
-    const english = { _id: 'cruise-en', language: 'en' as const, translationGroup: 'bora', title: 'Bora Bora', slug: 'private-bora-bora' };
+    const french = { _id: 'cruise-fr', language: 'fr' as const, translationIds: ['cruise-fr', 'cruise-en'], title: 'Bora Bora', slug: 'bora-bora-prive' };
+    const english = { _id: 'cruise-en', language: 'en' as const, translationIds: ['cruise-fr', 'cruise-en'], title: 'Bora Bora', slug: 'private-bora-bora' };
 
     expect(selectLocalizedReference(french, [french, english], 'en')).toEqual(english);
   });
 
   it('does not fall back to the source language when the target version is unavailable', () => {
-    const french = { _id: 'cruise-fr', language: 'fr' as const, translationGroup: 'bora', title: 'Bora Bora', slug: 'bora-bora-prive' };
+    const french = { _id: 'cruise-fr', language: 'fr' as const, translationIds: ['cruise-fr'], title: 'Bora Bora', slug: 'bora-bora-prive' };
 
     expect(selectLocalizedReference(french, [french], 'en')).toBeNull();
   });
 
   it('does not expose an unpublished target version as a public relation', () => {
-    const french = { _id: 'cruise-fr', language: 'fr' as const, translationGroup: 'bora', title: 'Bora Bora', slug: 'bora-bora-prive' };
+    const french = { _id: 'cruise-fr', language: 'fr' as const, translationIds: ['cruise-fr', 'cruise-en'], title: 'Bora Bora', slug: 'bora-bora-prive' };
     const englishDraft = {
       _id: 'cruise-en',
       language: 'en' as const,
-      translationGroup: 'bora',
+      translationIds: ['cruise-fr', 'cruise-en'],
       title: 'Bora Bora',
       slug: 'private-bora-bora',
       isPublished: false,
@@ -31,9 +31,9 @@ describe('localized editorial references', () => {
   });
 
   it('remaps an Article primary and secondary cruise relations to the current language', () => {
-    const frenchPrimary = { _id: 'primary-fr', language: 'fr' as const, translationGroup: 'primary', title: 'Bora Bora', slug: 'bora-bora' };
-    const englishPrimary = { _id: 'primary-en', language: 'en' as const, translationGroup: 'primary', title: 'Bora Bora', slug: 'private-bora-bora' };
-    const frenchSecondary = { _id: 'secondary-fr', language: 'fr' as const, translationGroup: 'secondary', title: 'Maupiti', slug: 'maupiti' };
+    const frenchPrimary = { _id: 'primary-fr', language: 'fr' as const, translationIds: ['primary-fr', 'primary-en'], title: 'Bora Bora', slug: 'bora-bora' };
+    const englishPrimary = { _id: 'primary-en', language: 'en' as const, translationIds: ['primary-fr', 'primary-en'], title: 'Bora Bora', slug: 'private-bora-bora' };
+    const frenchSecondary = { _id: 'secondary-fr', language: 'fr' as const, translationIds: ['secondary-fr'], title: 'Maupiti', slug: 'maupiti' };
 
     const post = {
       title: 'English Article',

@@ -69,13 +69,13 @@ export const activity = defineType({
     select: {
       title: 'title',
       priority: 'priority',
-      locale: 'locale',
+      language: 'language',
       media: 'image',
     },
-    prepare({ title, priority, locale, media }) {
+    prepare({ title, priority, language, media }) {
       return {
         title: title || 'Activity',
-        subtitle: `${priority || 1}/3${locale ? ` - ${locale.toUpperCase()}` : ''}`,
+        subtitle: `${priority || 1}/3${language ? ` - ${language.toUpperCase()}` : ''}`,
         media,
       };
     },

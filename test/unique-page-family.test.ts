@@ -36,18 +36,25 @@ describe('unique page family schema', () => {
     expect(pageBuilderSource).toContain('<ReviewsBlock reviews={reviews} locale={locale} />');
   });
 
-  it('adds locale metadata fields to the unique page family documents', () => {
-    for (const page of [homePage, boatPage, contactPage, componentsTestPage]) {
+  it('uses the canonical hidden language field on translated page documents', () => {
+    for (const page of [homePage, boatPage, contactPage]) {
       const fieldNames = page.fields.map((field) => field.name);
 
-      expect(fieldNames).toEqual(expect.arrayContaining(['locale', 'translationGroup']));
+      expect(fieldNames).toContain('language');
+      expect(fieldNames).not.toEqual(expect.arrayContaining(['locale', 'translationGroup']));
     }
+  });
+
+  it('keeps the internal components test page outside the document i18n model', () => {
+    const fieldNames = componentsTestPage.fields.map((field) => field.name);
+
+    expect(fieldNames).not.toEqual(expect.arrayContaining(['language', 'locale', 'translationGroup']));
   });
 });
 
 describe('unique page family routes', () => {
   it('keeps the public /notre-bateau and /contact URLs available in the build', async () => {
-    execFileSync('npm', ['run', 'build'], { stdio: 'ignore', timeout: 600000 });
+    execFileSync('npx', ['astro', 'build'], { stdio: 'ignore', timeout: 600000 });
 
     const boatHtml = await readFile('dist/notre-bateau/index.html', 'utf8');
     const contactHtml = await readFile('dist/contact/index.html', 'utf8');
@@ -57,7 +64,7 @@ describe('unique page family routes', () => {
   }, 600000);
 
   it('keeps /composants available as a noindex test page', async () => {
-    execFileSync('npm', ['run', 'build'], { stdio: 'ignore', timeout: 600000 });
+    execFileSync('npx', ['astro', 'build'], { stdio: 'ignore', timeout: 600000 });
 
     const componentsHtml = await readFile('dist/composants/index.html', 'utf8');
 

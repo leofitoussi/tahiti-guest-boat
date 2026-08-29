@@ -30,12 +30,12 @@ export const activityTag = defineType({
   preview: {
     select: {
       title: 'title',
-      locale: 'locale',
+      language: 'language',
     },
-    prepare({ title, locale }) {
+    prepare({ title, language }) {
       return {
         title: title || 'Activity tag',
-        subtitle: locale ? locale.toUpperCase() : undefined,
+        subtitle: language ? language.toUpperCase() : undefined,
       };
     },
   },

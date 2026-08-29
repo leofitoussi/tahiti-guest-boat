@@ -47,7 +47,6 @@ describe('legal pages lib', () => {
     try {
       const versions = await legalPagesLib.getLegalTranslationVersions({
         _id: 'legal-privacy-fr',
-        translationGroup: 'privacy-policy',
       });
 
       expect(buildLegalAlternatePaths(versions, 'fr')).toEqual({
@@ -58,10 +57,10 @@ describe('legal pages lib', () => {
     }
   });
 
-  it('builds reciprocal French and English paths for a legal translation group', () => {
+  it('builds reciprocal French and English paths from translation metadata versions', () => {
     const versions = [
-      { locale: 'fr' as const, slug: 'politique-de-confidentialite', isPublished: true },
-      { locale: 'en' as const, slug: 'privacy-policy', isPublished: true },
+      { language: 'fr' as const, slug: 'politique-de-confidentialite', isPublished: true },
+      { language: 'en' as const, slug: 'privacy-policy', isPublished: true },
     ];
 
     expect(buildLegalAlternatePaths(versions, 'fr')).toEqual({
@@ -86,7 +85,7 @@ describe('legal page schema', () => {
     const fieldNames = legalPage.fields.map((f) => f.name);
 
     expect(fieldNames).toEqual(
-      expect.arrayContaining(['title', 'slug', 'locale', 'translationGroup', 'body', 'seoTitle', 'seoDescription'])
+      expect.arrayContaining(['title', 'slug', 'language', 'body', 'seoTitle', 'seoDescription'])
     );
   });
 

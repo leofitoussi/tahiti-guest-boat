@@ -1,4 +1,4 @@
-import { defaultLocale, type Locale } from './localization';
+import type { Locale } from './localization';
 import { isSanityConfigured } from './sanity';
 import { pageBuilderFields } from './page-builder';
 import { sanityClient } from 'sanity:client';
@@ -8,7 +8,6 @@ export const HOME_PAGE_ID = 'f512860b-c337-4a81-b057-a93acdc2c961';
 export interface HomePageDocument {
   _id?: string;
   language?: Locale | null;
-  locale?: Locale | null;
   seoTitle?: string;
   seoDescription?: string;
   seo?: { indexable?: boolean };
@@ -27,7 +26,6 @@ export interface HomePagePair {
 const HOME_PAGE_PROJECTION = `{
   _id,
   language,
-  locale,
   seoTitle,
   seoDescription,
   seo { indexable },
@@ -57,6 +55,6 @@ export function resolveHomePageVersion(pair: HomePagePair, locale: Locale): Home
   );
 
   return (
-    versions.find((document) => (document.language ?? document.locale ?? defaultLocale) === locale) ?? null
+    versions.find((document) => document.language === locale) ?? null
   );
 }

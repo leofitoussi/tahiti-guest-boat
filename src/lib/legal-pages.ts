@@ -9,13 +9,10 @@ export interface LegalPageSummary {
   _id?: string;
   title: string;
   slug: string;
-  locale?: Locale;
-  translationGroup?: string;
+  language?: Locale;
 }
 
 export interface LegalPage extends LegalPageSummary {
-  locale?: Locale;
-  translationGroup?: string;
   body: TypedObject[];
   seoTitle?: string;
   seoDescription?: string;
@@ -69,10 +66,7 @@ const LEGAL_TRANSLATION_VERSIONS_QUERY = `*[
   _type == "legalPage" &&
   !(_id in path("drafts.**")) &&
   defined(slug.current) &&
-  (
-    (defined($translationGroup) && translationGroup == $translationGroup) ||
-    (defined($documentId) && _id in *[_type == "translation.metadata" && references($documentId)][0].translations[].value._ref)
-  )
+  _id in *[_type == "translation.metadata" && references($documentId)][0].translations[].value._ref
 ] {
   _id,
   ${localizedDocumentFields},
@@ -80,12 +74,11 @@ const LEGAL_TRANSLATION_VERSIONS_QUERY = `*[
 }`;
 
 export async function getLegalTranslationVersions(
-  source?: string | Pick<LegalPage, '_id' | 'translationGroup'>,
+  source?: string | Pick<LegalPage, '_id'>,
 ): Promise<LegalTranslationVersion[]> {
-  const translationGroup = typeof source === 'string' ? source : source?.translationGroup;
-  const documentId = typeof source === 'string' ? undefined : source?._id;
+  const documentId = typeof source === 'string' ? source : source?._id;
 
-  if (!isSanityConfigured || (!translationGroup && !documentId)) {
+  if (!isSanityConfigured || !documentId) {
     return [];
   }
 
@@ -93,10 +86,9 @@ export async function getLegalTranslationVersions(
     .fetch<
       {
         language?: Locale;
-        locale?: Locale;
         slug?: string;
       }[]
-    >(LEGAL_TRANSLATION_VERSIONS_QUERY, { translationGroup, documentId })
+    >(LEGAL_TRANSLATION_VERSIONS_QUERY, { documentId })
     .catch(() => []);
 
   return (documents ?? []).flatMap((document) => {
@@ -104,6 +96,10 @@ export async function getLegalTranslationVersions(
       return [];
     }
 
-    return [{ locale: document.language ?? document.locale ?? defaultLocale, slug: document.slug, isPublished: true }];
+    if (!document.language) {
+      return [];
+    }
+
+    return [{ language: document.language, slug: document.slug, isPublished: true }];
   });
 }

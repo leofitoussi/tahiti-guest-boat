@@ -3,7 +3,7 @@ import { isDocumentInLocale, type LocalizedDocumentLike } from './sanity-localiz
 
 export interface LocalizedReferenceDocument extends LocalizedDocumentLike {
   _id?: string;
-  translationGroup?: string | null;
+  translationIds?: string[] | null;
   slug?: string;
   isPublished?: boolean;
   visible?: boolean;
@@ -21,7 +21,7 @@ export function selectLocalizedReference<T extends LocalizedReferenceDocument>(
   const relatedVersions = versions.filter(
     (version) =>
       version._id === reference._id ||
-      (Boolean(reference.translationGroup) && version.translationGroup === reference.translationGroup),
+      Boolean(version._id && reference.translationIds?.includes(version._id)),
   );
   const candidates = [reference, ...relatedVersions.filter((version) => version !== reference)];
   const target = candidates.find((candidate) => isDocumentInLocale(candidate, locale));

@@ -2,11 +2,11 @@ import { execFileSync } from 'node:child_process';
 import { readFile, readdir } from 'node:fs/promises';
 import { describe, expect, it, beforeAll } from 'vitest';
 
-const buildArgs = ['run', 'build'];
+const buildArgs = ['astro', 'build'];
 
 describe('site settings render', () => {
   beforeAll(() => {
-    execFileSync('npm', buildArgs, { stdio: 'ignore', timeout: 600000 });
+    execFileSync('npx', buildArgs, { stdio: 'ignore', timeout: 600000 });
   }, 600000);
 
   it('renders the shared site settings into the home page header and footer', async () => {

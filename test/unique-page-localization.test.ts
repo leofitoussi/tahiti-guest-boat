@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { sanityClient } from 'sanity:client';
 import {
+  COMPONENTS_TEST_PAGE_ID,
+  getComponentsTestPage,
   getUniquePageVersions,
   resolveUniquePageVersion,
   type UniquePageDocument,
@@ -29,7 +31,7 @@ describe('unique page language resolution', () => {
       },
       {
         _id: 'boatPage-fr',
-        locale: 'fr',
+        language: 'fr',
         _updatedAt: '2026-08-14T00:00:00Z',
         seoTitle: 'Page bateau française',
       },
@@ -49,7 +51,7 @@ describe('unique page language resolution', () => {
     const versions: UniquePageDocument[] = [
       {
         _id: 'boatPage-fr',
-        locale: 'fr',
+        language: 'fr',
         _updatedAt: '2026-08-14T00:00:00Z',
         seoTitle: 'Page bateau française',
       },
@@ -68,7 +70,7 @@ describe('unique page language resolution', () => {
       },
       {
         _id: 'boatPage-fr',
-        locale: 'fr',
+        language: 'fr',
         _updatedAt: '2026-08-14T00:00:00Z',
         seoTitle: 'Page bateau française',
       },
@@ -85,6 +87,25 @@ describe('unique page language resolution', () => {
         fr: { _id: 'boatPage-fr', seoTitle: 'Page bateau française' },
         en: { _id: 'boatPage-en-newer', seoTitle: 'Current boat page' },
       });
+    } finally {
+      fetch.mockRestore();
+    }
+  });
+
+  it('loads the internal components page by its stable document id', async () => {
+    const fetch = vi.spyOn(sanityClient, 'fetch').mockResolvedValue({
+      seoTitle: 'Composants | Tahiti Guest Boat',
+      pageBuilder: [],
+    } as never);
+
+    try {
+      await expect(getComponentsTestPage()).resolves.toMatchObject({
+        seoTitle: 'Composants | Tahiti Guest Boat',
+      });
+      expect(fetch).toHaveBeenCalledWith(
+        expect.stringContaining('_id == $documentId'),
+        expect.objectContaining({ documentId: COMPONENTS_TEST_PAGE_ID }),
+      );
     } finally {
       fetch.mockRestore();
     }

@@ -38,8 +38,6 @@ function translatePage(source) {
   delete page._updatedAt
   delete page._rev
   delete page._system
-  delete page.locale
-  delete page.translationGroup
   page._id = ENGLISH_ID
   page._type = 'homePage'
   page.language = 'en'

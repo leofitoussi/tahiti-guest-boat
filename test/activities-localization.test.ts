@@ -19,7 +19,7 @@ describe('English activity data', () => {
         title: 'Kayaking',
         tags: [
           { _id: 'tag-en', language: 'en', title: 'Water sports' },
-          { _id: 'tag-fr', locale: 'fr', title: 'Nautique' },
+          { _id: 'tag-fr', language: 'fr', title: 'Nautique' },
         ],
       },
       {
@@ -31,10 +31,10 @@ describe('English activity data', () => {
       },
       {
         _id: 'activity-fr',
-        locale: 'fr',
+        language: 'fr',
         isPublished: true,
         title: 'Kayak',
-        tags: [{ _id: 'tag-fr', locale: 'fr', title: 'Nautique' }],
+        tags: [{ _id: 'tag-fr', language: 'fr', title: 'Nautique' }],
       },
     ] as never);
 
@@ -61,9 +61,9 @@ describe('English activity data', () => {
       },
       {
         _id: 'activity-fr',
-        locale: 'fr',
+        language: 'fr',
         title: 'Kayak',
-        tags: [{ _id: 'tag-fr', locale: 'fr', title: 'Nautique' }],
+        tags: [{ _id: 'tag-fr', language: 'fr', title: 'Nautique' }],
       },
     ];
     const groups: ActivityGroup[] = [
@@ -75,7 +75,7 @@ describe('English activity data', () => {
       {
         _key: 'french-group',
         heading: 'Activités nautiques',
-        tagFilters: [{ _id: 'tag-fr', locale: 'fr', title: 'Nautique' }],
+        tagFilters: [{ _id: 'tag-fr', language: 'fr', title: 'Nautique' }],
       },
     ];
 

@@ -1,5 +1,4 @@
 import { defineField, defineType } from 'sanity';
-import { defineLocalizationFields } from './localization-fields';
 import { defineUniquePageBuilderField } from './pageBuilder';
 
 export const componentsTestPage = defineType({
@@ -24,7 +23,6 @@ export const componentsTestPage = defineType({
       initialValue: 'Page interne de test des composants Tahiti Guest Boat.',
       validation: (rule) => rule.required().max(160),
     }),
-    ...defineLocalizationFields(),
     defineUniquePageBuilderField(),
   ],
   groups: [

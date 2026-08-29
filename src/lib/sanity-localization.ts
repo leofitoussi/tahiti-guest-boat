@@ -2,16 +2,11 @@ import { defaultLocale, type Locale } from './localization';
 
 export interface LocalizedDocumentLike {
   language?: Locale | null;
-  locale?: Locale | null;
 }
 
-export const localizedDocumentFields = `
-  language,
-  locale,
-  translationGroup
-`;
+export const localizedDocumentFields = `language`;
 
-const localizedLanguageFilter = `(language == $locale || (!defined(language) && locale == $locale) || (!defined(language) && !defined(locale) && $locale == "${defaultLocale}"))`;
+const localizedLanguageFilter = `language == $locale`;
 
 export function buildLocalizedSluggedDocumentFilter(documentType: string) {
   return `_type == "${documentType}" && defined(slug.current) && !(_id in path("drafts.**")) && ${localizedLanguageFilter}`;
@@ -26,5 +21,5 @@ export function normalizeLocale(locale: string | undefined): Locale {
 }
 
 export function isDocumentInLocale(document: LocalizedDocumentLike, locale: Locale) {
-  return (document.language ?? document.locale ?? defaultLocale) === locale;
+  return document.language === locale;
 }

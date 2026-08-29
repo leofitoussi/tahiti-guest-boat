@@ -1,7 +1,7 @@
 import type { Locale } from './localization';
 
 export interface CruiseTranslationVersion {
-  locale: Locale;
+  language: Locale;
   slug: string;
   isPublished?: boolean;
 }
@@ -15,8 +15,8 @@ export function buildCruiseAlternatePaths(
   currentLocale: Locale,
 ): Partial<Record<Locale, string>> {
   return versions.reduce<Partial<Record<Locale, string>>>((paths, version) => {
-    if (version.locale !== currentLocale && version.isPublished !== false && version.slug) {
-      paths[version.locale] = buildCruisePath(version.slug, version.locale);
+    if (version.language !== currentLocale && version.isPublished !== false && version.slug) {
+      paths[version.language] = buildCruisePath(version.slug, version.language);
     }
 
     return paths;

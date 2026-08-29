@@ -22,7 +22,7 @@ function DeploySiteTool() {
 
   return (
     <Card padding={4} height="fill">
-      <Stack space={4} style={{maxWidth: 480}}>
+      <Stack gap={4} style={{maxWidth: 480}}>
         <Text size={2} weight="semibold">
           Mettre le site en ligne
         </Text>

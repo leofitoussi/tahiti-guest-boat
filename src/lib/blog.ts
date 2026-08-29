@@ -28,8 +28,7 @@ export interface BlogPostSummary {
   _id?: string;
   title: string;
   slug: string;
-  locale?: Locale;
-  translationGroup?: string;
+  language?: Locale;
   excerpt?: string;
   publishedAt?: string;
   updatedAt?: string;
@@ -39,8 +38,6 @@ export interface BlogPostSummary {
 }
 
 export interface BlogPost extends BlogPostSummary {
-  locale?: Locale;
-  translationGroup?: string;
   body?: TypedObject[];
   seoTitle?: string;
   seoDescription?: string;
@@ -52,8 +49,7 @@ export interface CruiseLinkSummary {
   title: string;
   slug: string;
   language?: Locale;
-  locale?: Locale;
-  translationGroup?: string;
+  translationIds?: string[];
   visible?: boolean;
   isPublished?: boolean;
   heroTitle?: string;
@@ -98,6 +94,7 @@ const imageFields = `{
 const cruiseLinkFields = `{
   _id,
   ${localizedDocumentFields},
+  "translationIds": *[_type == "translation.metadata" && references(^._id)][0].translations[].value._ref,
   title,
   "slug": slug.current,
   visible,
@@ -246,10 +243,7 @@ const BLOG_TRANSLATION_VERSIONS_QUERY = `*[
   _type == "blogPost" &&
   !(_id in path("drafts.**")) &&
   defined(slug.current) &&
-  (
-    (defined($translationGroup) && translationGroup == $translationGroup) ||
-    (defined($documentId) && _id in *[_type == "translation.metadata" && references($documentId)][0].translations[].value._ref)
-  )
+  _id in *[_type == "translation.metadata" && references($documentId)][0].translations[].value._ref
 ] {
   _id,
   ${localizedDocumentFields},
@@ -268,12 +262,11 @@ export async function getAllBlogSlugs(locale: Locale = defaultLocale) {
 }
 
 export async function getBlogTranslationVersions(
-  source?: string | Pick<BlogPost, '_id' | 'translationGroup'>,
+  source?: string | Pick<BlogPost, '_id'>,
 ): Promise<BlogTranslationVersion[]> {
-  const translationGroup = typeof source === 'string' ? source : source?.translationGroup;
-  const documentId = typeof source === 'string' ? undefined : source?._id;
+  const documentId = typeof source === 'string' ? source : source?._id;
 
-  if (!isSanityConfigured || (!translationGroup && !documentId)) {
+  if (!isSanityConfigured || !documentId) {
     return [];
   }
 
@@ -282,11 +275,10 @@ export async function getBlogTranslationVersions(
       {
         _id?: string;
         language?: Locale;
-        locale?: Locale;
         slug?: string;
         isPublished?: boolean;
       }[]
-    >(BLOG_TRANSLATION_VERSIONS_QUERY, { translationGroup, documentId })
+    >(BLOG_TRANSLATION_VERSIONS_QUERY, { documentId })
     .catch(() => []);
 
   return (documents ?? []).flatMap((document) => {
@@ -294,9 +286,13 @@ export async function getBlogTranslationVersions(
       return [];
     }
 
+    if (!document.language) {
+      return [];
+    }
+
     return [
       {
-        locale: document.language ?? document.locale ?? defaultLocale,
+        language: document.language,
         slug: document.slug,
         isPublished: document.isPublished !== false,
       },

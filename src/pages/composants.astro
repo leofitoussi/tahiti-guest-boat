@@ -3,11 +3,11 @@ import PageBuilder from '../components/blocks/PageBuilder.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../lib/cruises';
 import { defaultLocale } from '../lib/localization';
-import { getUniquePage } from '../lib/page-builder';
+import { getComponentsTestPage } from '../lib/page-builder';
 
 const locale = defaultLocale;
 
-const page = await getUniquePage('componentsTestPage', locale);
+const page = await getComponentsTestPage();
 const [settings, reviews, cruises, activities] = await Promise.all([
   getSiteSettings(locale),
   getReviews(),

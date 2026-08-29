@@ -9,7 +9,7 @@ interface Props {
   class?: string;
 }
 
-const { value, as: Tag = 'h2', class: className } = Astro.props;
+const { value, as: Tag = 'h2', class: className }: Props = Astro.props;
 
 const blocks = Array.isArray(value) ? (value as any[]) : [];
 const legacyString = typeof value === 'string' ? value : '';

@@ -5,17 +5,17 @@ import { defaultLocale } from './localization';
 import type { SitemapContentDocument, SitemapReference, SitemapUrl } from './seo-sitemap';
 import { formatSitemapDate, toSitemapUrls } from './seo-sitemap';
 
-const localizedDefaultFilter = `(language == $locale || (!defined(language) && locale == $locale) || (!defined(language) && !defined(locale) && $locale == "${defaultLocale}"))`;
+const localizedDefaultFilter = `language == $locale`;
 const publishedDocumentFilter = `!(_id in path("drafts.**")) && ${localizedDefaultFilter}`;
 const indexableBlogFilter = `_type == "blogPost" && defined(slug.current) && defined(publishedAt) && ${publishedDocumentFilter} && seo.indexable == true`;
 const indexableCruiseFilter = `_type == "cruisePage" && defined(slug.current) && ${publishedDocumentFilter} && seo.indexable == true`;
 const visibleBlogFilter = `_type == "blogPost" && defined(slug.current) && defined(publishedAt) && ${publishedDocumentFilter} && coalesce(visible, false) == true`;
 const visibleCruiseFilter = `_type == "cruisePage" && defined(slug.current) && ${publishedDocumentFilter} && coalesce(visible, false) == true`;
-const englishLocalizedFilter = `(language == "en" || (!defined(language) && locale == "en"))`;
+const englishLocalizedFilter = `language == "en"`;
 const indexableEnglishBlogFilter = `_type == "blogPost" && defined(slug.current) && defined(publishedAt) && !(_id in path("drafts.**")) && ${englishLocalizedFilter} && seo.indexable == true`;
 const visibleEnglishBlogFilter = `_type == "blogPost" && defined(slug.current) && defined(publishedAt) && !(_id in path("drafts.**")) && ${englishLocalizedFilter} && coalesce(visible, false) == true`;
 const indexableEnglishLegalFilter = `_type == "legalPage" && defined(slug.current) && !(_id in path("drafts.**")) && ${englishLocalizedFilter} && seo.indexable == true`;
-const englishCruiseDocumentFilter = `_type == "cruisePage" && defined(slug.current) && !(_id in path("drafts.**")) && (language == "en" || (!defined(language) && locale == "en"))`;
+const englishCruiseDocumentFilter = `_type == "cruisePage" && defined(slug.current) && !(_id in path("drafts.**")) && language == "en"`;
 const indexableEnglishCruiseFilter = `${englishCruiseDocumentFilter} && seo.indexable == true`;
 const visibleEnglishCruiseFilter = `${englishCruiseDocumentFilter} && coalesce(visible, false) == true`;
 

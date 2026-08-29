@@ -159,4 +159,22 @@ describe('Tally webhook', () => {
 
     expect(buildResendPayload(payload).respondentFirstName).toBe('Moana');
   });
+
+  it('exposes the Tally origin page as a full URL for the Resend notification', () => {
+    const payload = createPayload('nPrj8V');
+    payload.data.fields.push({
+      key: 'originPage',
+      label: 'originPage',
+      type: 'HIDDEN_FIELDS',
+      value: '/nos-croisieres/moorea/',
+    });
+
+    expect(buildResendPayload(payload)).toMatchObject({
+      originPage: '/nos-croisieres/moorea/',
+      originPageUrl: 'https://tahitiguestboat.com/nos-croisieres/moorea/',
+    });
+    expect(buildResendPayload(payload).answersText).toContain(
+      "Page d'origine: https://tahitiguestboat.com/nos-croisieres/moorea/",
+    );
+  });
 });

@@ -4,6 +4,10 @@ Vocabulary for the shared UI and brand system used across the site. This file de
 
 ## Language
 
+**Tahiti Guest Boat**:
+The official name of the entity responsible for operating the public website and the cruise activity.
+_Avoid_: brand-only name, informal site name
+
 **Design system**:
 The shared set of tokens, components, and naming conventions used to keep the site visually and structurally consistent.
 _Avoid_: UI kit, style guide, component library
@@ -55,15 +59,122 @@ _Avoid_: content hub, main acquisition channel
 **URL**:
 The public route of a page, treated as stable and preserved when the site is refactored.
 _Avoid_: slug change, path rename
+_Canonical format_: public HTML pages end with a trailing slash; internal links must use that form, while static assets keep their file URLs.
+
+## Carte interactive
+
+**Carte interactive**:
+La surface d’exploration des lieux de croisière de Tahiti Guest Boat, intégrée au site principal et accessible sous `/carte/`.
+_Avoid_: map, application de carte, sous-site
+
+**Vue satellite**:
+Le fond de Carte interactive par défaut, associant l’imagerie satellite à des libellés géographiques discrets et permettant l’exploration libre de la Polynésie française par déplacement et zoom.
+_Avoid_: fond routier, itinéraire de navigation
+
+**Surface de carte immersive**:
+La Carte interactive affichée sur toute la largeur et la hauteur disponibles, sans que le défilement de la page concurrence son déplacement ou son zoom.
+_Avoid_: section de page, carte intégrée, zone défilante
+
+**Pin groupé**:
+Le regroupement visuel temporaire de plusieurs Lieux de carte proches lorsque le niveau de zoom ne permet pas de les distinguer, avant leur séparation au zoom ou au clic.
+_Avoid_: lieu unique, itinéraire regroupé
+
+**Pin de lieu**:
+Le repère visuel unique d’un Lieu de carte, dont l’apparence varie seulement lorsqu’il est sélectionné ou regroupé.
+_Avoid_: icône de tag, code couleur par catégorie
+
+**Lieu de carte**:
+Un point géographique éditorial affiché sur la Carte interactive, tel qu’un mouillage, un village, une balade, un site de snorkeling ou un lieu naturel.
+_Avoid_: spot, hotspot, point d’intérêt, activité
+
+**Fiche de lieu**:
+La présentation d’un Lieu de carte ouverte dans la Carte interactive, avec son titre, ses Tags de lieu, sa description, sa Galerie de fiche et son Lien de fiche partageable, sans appel commercial.
+_Avoid_: page SEO, article de destination
+
+**Page de lieu**:
+L’URL indexable d’un Lieu de carte qui ouvre la Carte interactive centrée sur ce lieu, avec la même Fiche de lieu déjà ouverte.
+_Avoid_: article distinct, seconde fiche, page générée sans valeur éditoriale
+
+**Description de lieu**:
+Le texte riche limité aux paragraphes, au gras, à l’italique et aux liens qui présente un Lieu de carte dans sa Fiche de lieu et sa Page de lieu.
+_Avoid_: page builder, article à sections, texte brut limité à une ligne
+
+**Panneau de carte**:
+La surface responsive qui présente l’introduction de la Carte interactive et la Liste de lieux publiés au repos, puis une Fiche de lieu après sélection, tout en laissant la Carte interactive visible : à gauche sur ordinateur et depuis le bas sur mobile.
+_Avoid_: page dédiée, modal plein écran
+
+**Galerie de fiche**:
+La zone visuelle stable d’une Fiche de lieu, qui présente une à trois photos et signale discrètement la présence de photos supplémentaires sans rupture de mise en page.
+_Avoid_: image isolée sans repère, carrousel discontinu
+
+**Identifiant de lieu**:
+Le libellé unique qui distingue un Lieu de carte des autres lieux, même lorsqu’ils appartiennent au même atoll ou à la même île, prérempli à partir de son titre et de son Île ou atoll puis stable après publication.
+_Avoid_: nom d’atoll, coordonnées GPS, tag
+
+**Lien de fiche**:
+L’URL unique d’une Page de lieu, copiée depuis la Fiche de lieu et utilisée pour la partager ou l’indexer.
+_Avoid_: paramètre de recherche, URL secondaire, URL canonique de contenu
+
+**Lien filtré**:
+Une URL partageable mais non indexable qui ouvre la Carte interactive avec une sélection de Tags de lieu ou de zones géographiques déjà appliquée.
+_Avoid_: lien de fiche, page de résultats
+
+**Tag de lieu**:
+Un libellé réutilisable, librement enrichi par les éditeurs et décliné en Versions linguistiques liées, qui décrit la nature ou l’intérêt d’un Lieu de carte et permet de le filtrer dans la Carte interactive.
+_Avoid_: tag d’activité, catégorie imposée
+
+**Filtre de Tags de lieu**:
+Une sélection de Tags de lieu qui affiche tout Lieu de carte portant au moins l’un des tags choisis.
+_Avoid_: filtre cumulatif, intersection de tags
+
+**Combinaison de filtres**:
+L’application simultanée de filtres de natures différentes, tels qu’un Archipel, une Île ou atoll et des Tags de lieu, qui restreint les Lieux de carte aux critères communs.
+_Avoid_: union de tous les filtres, filtre global élargissant
+
+**Archipel**:
+Le groupe géographique obligatoire d’un Lieu de carte, choisi parmi les cinq archipels de Polynésie française : Îles de la Société, Tuamotu, Gambier, Marquises et Australes.
+_Avoid_: tag de lieu, destination marketing
+
+**Île ou atoll**:
+Le nom géographique libre mais obligatoire auquel appartient un Lieu de carte, à l’intérieur de son Archipel.
+_Avoid_: Lieu de carte, tag de lieu, liste géographique dédiée
+
+**Recherche de carte**:
+La recherche unique de la Carte interactive, qui propose des suggestions et trouve les Lieux de carte par leur titre, leur Archipel, leur Île ou atoll, et leurs Tags de lieu.
+_Avoid_: recherche de lieux uniquement, filtre séparé
+
+**Cadrage de résultat**:
+Le recadrage unique de la Carte interactive sur les Lieux de carte correspondant à une Recherche de carte ou à un Lien filtré, avant de redonner la main au visiteur.
+_Avoid_: suivi automatique permanent, recadrage répété
+
+**Lieu de carte publié**:
+Un Lieu de carte prêt à apparaître dans la Carte interactive, ses recherches et ses liens partageables pour une Version linguistique donnée.
+_Avoid_: brouillon de lieu, lieu en préparation
+
+**Couverture éditoriale progressive**:
+La Carte interactive couvre visuellement toute la Polynésie française, tout en affichant uniquement les Lieux de carte déjà publiés.
+_Avoid_: couverture exhaustive, pins de remplissage
+
+**Liste de lieux publiés**:
+La liste HTML discrète des liens vers les Pages de lieu publiées, présentée dans le Panneau de carte et ordonnée par Archipel, Île ou atoll, puis titre, pour permettre leur découverte sans interaction avec la carte.
+_Avoid_: second affichage de carte, liste de résultats filtrés indexable
+
+**Coordonnée GPS**:
+La position géographique précise d’un Lieu de carte, utilisée pour placer son pin sans constituer une instruction de navigation, une promesse de mouillage ou une escale garantie.
+_Avoid_: itinéraire, instruction nautique, mouillage garanti
 
 ## Localization
 
+**Version de repli (`x-default`)**:
+The English version of a published Groupe de traduction, selected for visitors whose language is neither French nor English. This does not change the French version's existing URL or its role as Langue source.
+_Avoid_: default language version, redirect target
+
 **French version**:
-The default language version of a page, kept on the existing site URLs.
+The default language version of a page, kept on the existing site URLs and eligible for publication before an English version exists.
 _Avoid_: main locale, source page
 
 **English version**:
-The translated language version of a page, published under the `/en/` path prefix.
+The translated language version of a page, published under the `/en/` path prefix only once it is ready to be public and indexable.
 _Avoid_: alternate page, mirror page
 
 **Translation group**:
@@ -115,6 +226,12 @@ _Avoid_: croisières similaires, manual selection, related cruises
 A listing page that primarily reflects a collection of entries and may include limited page-specific content.
 _Avoid_: landing page, editorial page
 
+**Requête principale de l’Archive Croisières**:
+The primary French search phrase targeted by the Archive de page at `/nos-croisieres/`: « croisière catamaran Polynésie française ».
+_Avoid_: Mot-clé principal croisière, which applies to an individual Page croisière
+_English version_: `Catamaran cruises in French Polynesia`; describe the experience as tailor-made in the supporting copy rather than treating it as the primary query.
+_Ownership_: this query belongs to the Archive Croisières only; the homepage does not target it, to avoid competing with the archive in search.
+
 **Page légale**:
 A policy or compliance page such as privacy or cookies, treated as a unique editable page.
 _Avoid_: legal notice, static boilerplate
@@ -157,6 +274,10 @@ _Avoid_: page title, H1, slug
 **Mot-clé principal croisière**:
 The primary search phrase for a Page croisière, derived from "croisière" plus the page's Libellé destination.
 _Avoid_: editable keyword, SEO tag, manual query
+
+**Croisière sur mesure**:
+An experience shaped around the travellers' wishes, the conditions and the destination, with an accessible and human tone for people curious about authentic Polynesia.
+_Avoid_: croisière privée, private cruise, luxury cruise, exclusive cruise, VIP experience
 
 **Accroche croisière**:
 The opening section of a Page croisière that states the cruise promise, presents short practical markers, and establishes the destination visually.

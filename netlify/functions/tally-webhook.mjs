@@ -2,6 +2,8 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 
 const RESEND_EVENTS_URL = 'https://api.resend.com/events/send';
 const DEFAULT_EVENT_NAME = 'tally_webhook';
+const DEFAULT_SITE_URL = 'https://tahitiguestboat.com';
+const ORIGIN_PAGE_FIELD_NAMES = new Set(['originpage', 'origin_page', 'origin-page']);
 
 function getEnv(name) {
   const value = globalThis.Netlify?.env?.get(name) || process.env[name];
@@ -60,6 +62,39 @@ export function findSubmissionFirstName(payload) {
   return firstNameField?.value.trim() ?? null;
 }
 
+function isOriginPageField(field) {
+  return [field?.key, field?.label, field?.title].some((value) => {
+    const name = String(value ?? '').trim().toLowerCase();
+    return ORIGIN_PAGE_FIELD_NAMES.has(name) || /^(page d['’]origine|url de la page)$/i.test(name);
+  });
+}
+
+export function findSubmissionOriginPage(payload) {
+  const fields = Array.isArray(payload?.data?.fields) ? payload.data.fields : [];
+  const originPageField = fields.find(
+    (field) => isOriginPageField(field) && typeof field.value === 'string' && field.value.trim(),
+  );
+
+  return originPageField?.value.trim() ?? null;
+}
+
+function buildOriginPageUrl(originPage, siteUrl = DEFAULT_SITE_URL) {
+  if (!originPage) return null;
+
+  try {
+    const baseUrl = new URL(siteUrl || DEFAULT_SITE_URL);
+    const pageUrl = new URL(originPage, baseUrl);
+
+    // Keep the notification link on the Tahiti Guest Boat site even if a
+    // visitor tampers with the hidden field before submitting the form.
+    if (pageUrl.origin !== baseUrl.origin) return null;
+
+    return pageUrl.toString();
+  } catch {
+    return null;
+  }
+}
+
 function serializeAnswer(field) {
   if (Array.isArray(field.value) && Array.isArray(field.options)) {
     const labels = new Map(field.options.map((option) => [option.id, option.text]));
@@ -69,14 +104,17 @@ function serializeAnswer(field) {
   return field.value;
 }
 
-export function buildResendPayload(payload) {
+export function buildResendPayload(payload, options = {}) {
   const fields = Array.isArray(payload?.data?.fields) ? payload.data.fields : [];
+  const originPage = findSubmissionOriginPage(payload);
+  const originPageUrl = buildOriginPageUrl(originPage, options.siteUrl);
   const answers = {};
 
   for (const field of fields) {
     if (!field || field.value === undefined) continue;
-    const label = String(field.label || field.key || 'Réponse');
-    answers[label in answers ? `${label} (${field.key})` : label] = serializeAnswer(field);
+    const label = isOriginPageField(field) ? "Page d'origine" : String(field.label || field.key || 'Réponse');
+    const value = isOriginPageField(field) ? originPageUrl || serializeAnswer(field) : serializeAnswer(field);
+    answers[label in answers ? `${label} (${field.key})` : label] = value;
   }
 
   const answersText = Object.entries(answers)
@@ -94,6 +132,8 @@ export function buildResendPayload(payload) {
     submissionPreviewUrl: payload.data?.submissionPreviewUrl ?? null,
     submissionPdfUrl: payload.data?.submissionPdfUrl ?? null,
     respondentFirstName: findSubmissionFirstName(payload),
+    originPage,
+    originPageUrl,
     answersText,
     answers,
   };
@@ -160,7 +200,7 @@ export default async function handler(request) {
         body: JSON.stringify({
           event: eventName,
           email: recipientEmail,
-          payload: buildResendPayload(payload),
+          payload: buildResendPayload(payload, { siteUrl: getEnv('PUBLIC_SITE_URL') }),
         }),
         signal: AbortSignal.timeout(8000),
       }),

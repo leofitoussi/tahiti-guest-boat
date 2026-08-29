@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 import { defineLocalizationFields } from './localization-fields';
-import { activityDescriptionText, inlineText, richText } from './portableText';
+import { activityDescriptionText, h2HeadingText, inlineText, richText } from './portableText';
 import { seo as seoType } from './seo';
 
 export const cruisePage = defineType({
@@ -163,7 +163,7 @@ export const cruisePage = defineType({
           name: 'heading',
           title: 'Titre',
           type: 'array',
-          of: inlineText,
+          of: h2HeadingText,
           description: 'Titre du bloc (gras / italique possibles).',
         }),
         defineField({ name: 'body', title: 'Texte', type: 'array', of: richText }),

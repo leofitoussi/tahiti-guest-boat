@@ -421,6 +421,15 @@ describe('sections éditoriales — schema fields', () => {
     expect(sub.images).toMatchObject({ type: 'array' });
   });
 
+  it('allows the Introduction destination heading to use the rendered h2 style', () => {
+    const fields = Object.fromEntries(cruisePage.fields.map((f) => [f.name, f as any]));
+    const introductionFields = Object.fromEntries(
+      fields.introductionDestination.fields.map((field: any) => [field.name, field]),
+    );
+
+    expect(introductionFields.heading.of[0].styles).toEqual([{ title: 'Heading 2', value: 'h2' }]);
+  });
+
   it('cruisePage has a boat block (Na Maka) with heading, body, image, and CTA', () => {
     const fields = Object.fromEntries(cruisePage.fields.map((f) => [f.name, f as any]));
     expect(fields.boat).toMatchObject({ type: 'boatBlock' });

@@ -1,5 +1,3 @@
-import type { Review } from './cruises';
-
 export interface OrganizationSeoOptions {
   siteUrl: string;
   siteName?: string;
@@ -7,7 +5,6 @@ export interface OrganizationSeoOptions {
   sameAs?: string[];
   contactEmail?: string;
   contactPhone?: string;
-  reviews?: Review[];
 }
 
 export function buildOrganizationStructuredData({
@@ -17,7 +14,6 @@ export function buildOrganizationStructuredData({
   sameAs,
   contactEmail,
   contactPhone,
-  reviews = [],
 }: OrganizationSeoOptions) {
   const organization: Record<string, unknown> = {
     '@type': 'Organization',
@@ -37,25 +33,6 @@ export function buildOrganizationStructuredData({
   const contactPoint = buildContactPoint(contactEmail, contactPhone);
   if (contactPoint) {
     organization.contactPoint = contactPoint;
-  }
-
-  const ratedReviews = reviews.filter((review): review is Review & { rating: number } =>
-    typeof review.rating === 'number',
-  );
-
-  if (ratedReviews.length > 0) {
-    const total = ratedReviews.reduce((sum, review) => sum + review.rating, 0);
-    organization.aggregateRating = {
-      '@type': 'AggregateRating',
-      ratingValue: (total / ratedReviews.length).toFixed(1),
-      reviewCount: ratedReviews.length,
-    };
-    organization.review = ratedReviews.map((review) => ({
-      '@type': 'Review',
-      author: { '@type': 'Person', name: review.name },
-      reviewRating: { '@type': 'Rating', ratingValue: review.rating },
-      reviewBody: review.body,
-    }));
   }
 
   return organization;

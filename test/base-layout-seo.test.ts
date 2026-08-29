@@ -2,12 +2,12 @@ import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 
 describe('BaseLayout — sitewide Organization/WebSite JSON-LD and Open Graph tags', () => {
-  it('imports the site-seo builders and fetches reviews to feed the Organization node', async () => {
+  it('builds sitewide Organization and WebSite nodes without fetching reviews for JSON-LD', async () => {
     const source = await readFile('src/layouts/BaseLayout.astro', 'utf8');
 
     expect(source).toContain('buildOrganizationStructuredData');
     expect(source).toContain('buildWebsiteStructuredData');
-    expect(source).toContain('getReviews');
+    expect(source).not.toContain('getReviews');
   });
 
   it('merges the Organization and WebSite nodes with the page-specific structuredData, without dropping it', async () => {

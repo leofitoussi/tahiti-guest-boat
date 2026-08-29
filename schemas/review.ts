@@ -1,6 +1,13 @@
 import { StarIcon } from '@sanity/icons';
 import { defineField, defineType } from 'sanity';
 
+function isLegacyReview(document: unknown) {
+  if (!document || typeof document !== 'object') return false;
+
+  const record = document as Record<string, unknown>;
+  return typeof record.body === 'string' && !record.bodyFr && !record.bodyEn;
+}
+
 export const review = defineType({
   name: 'review',
   title: 'Review',
@@ -20,11 +27,51 @@ export const review = defineType({
       validation: (rule) => rule.required().min(0).max(5),
     }),
     defineField({
+      name: 'originalLanguage',
+      title: 'Original language',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'French', value: 'fr' },
+          { title: 'English', value: 'en' },
+        ],
+        layout: 'radio',
+      },
+      description: 'Language of the original testimonial. Choose it explicitly for each new review.',
+      validation: (rule) =>
+        rule.custom((value, context) =>
+          value || isLegacyReview(context.document) ? true : 'Choose the original language before publishing this review.',
+        ),
+    }),
+    defineField({
       name: 'body',
-      title: 'Body',
+      title: 'Body (legacy)',
       type: 'text',
       rows: 4,
-      validation: (rule) => rule.required(),
+      hidden: true,
+      deprecated: {
+        reason: 'Kept temporarily while existing reviews are migrated to the French and English text fields.',
+      },
+    }),
+    defineField({
+      name: 'bodyFr',
+      title: 'French text',
+      type: 'text',
+      rows: 4,
+      validation: (rule) =>
+        rule.custom((value, context) =>
+          value || isLegacyReview(context.document) ? true : 'Add the French version before publishing this review.',
+        ),
+    }),
+    defineField({
+      name: 'bodyEn',
+      title: 'English text',
+      type: 'text',
+      rows: 4,
+      validation: (rule) =>
+        rule.custom((value, context) =>
+          value || isLegacyReview(context.document) ? true : 'Add the English version before publishing this review.',
+        ),
     }),
     defineField({
       name: 'date',

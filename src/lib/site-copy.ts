@@ -86,10 +86,12 @@ export interface SiteCopy {
       bookingProviderPrefix: string;
       bookingFallbackDescription: string;
       bookingFallbackCta: string;
-    reviewsEyebrow: string;
-    reviewsTitle: string;
+      reviewsEyebrow: string;
+      reviewsTitle: string;
       reviewsFallbackDescription: string;
       reviewsLinkLabel: string;
+      reviewsOriginalLabel: string;
+      reviewsTranslationLabel: string;
       whyUsTitle: string;
       whyUsArguments: string[];
     heroEyebrow: string;
@@ -195,6 +197,8 @@ const siteCopy: Record<Locale, SiteCopy> = {
       reviewsTitle: 'Ils ont vécu l’expérience',
       reviewsFallbackDescription: 'Les avis voyageurs seront affichés ici prochainement.',
       reviewsLinkLabel: 'Voir plus',
+      reviewsOriginalLabel: 'Voir l’original',
+      reviewsTranslationLabel: 'Voir la traduction',
       whyUsTitle: 'Pourquoi naviguer avec Tahiti Guest Boat ?',
       whyUsArguments: [
         'Une croisière privée pensée autour de votre rythme, de vos envies et de la météo.',
@@ -302,6 +306,8 @@ const siteCopy: Record<Locale, SiteCopy> = {
       reviewsTitle: 'They lived the experience',
       reviewsFallbackDescription: 'Traveler reviews will appear here soon.',
       reviewsLinkLabel: 'See more',
+      reviewsOriginalLabel: 'View original',
+      reviewsTranslationLabel: 'View translation',
       whyUsTitle: 'Why sail with Tahiti Guest Boat?',
       whyUsArguments: [
         'A private cruise shaped around your pace, your wishes, and the weather.',

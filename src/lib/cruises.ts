@@ -169,7 +169,11 @@ export interface Review {
   _id: string;
   name?: string;
   rating?: number;
+  // Legacy field retained while existing Sanity reviews are migrated.
   body?: string;
+  originalLanguage?: Locale;
+  bodyFr?: string;
+  bodyEn?: string;
   date?: string;
   source?: 'google' | 'manual';
   sourceUrl?: string;
@@ -352,6 +356,9 @@ const REVIEWS_QUERY = `*[
   name,
   rating,
   body,
+  originalLanguage,
+  bodyFr,
+  bodyEn,
   date,
   source,
   sourceUrl,

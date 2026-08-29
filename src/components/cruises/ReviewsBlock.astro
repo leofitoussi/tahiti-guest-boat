@@ -4,7 +4,7 @@ import Section from '../layout/Section.astro';
 import type { Review } from '../../lib/cruises';
 import { urlForImage } from '../../lib/sanity';
 import { defaultLocale, type Locale } from '../../lib/localization';
-import { formatReviewDate } from '../../lib/reviews';
+import { formatReviewDate, getLocalizedReviewContent } from '../../lib/reviews';
 import { getSiteCopy } from '../../lib/site-copy';
 
 interface Props {
@@ -33,14 +33,16 @@ const reviewCountLabel = locale === 'en' ? 'reviews' : 'avis';
     {
       reviews.length > 0 ? (
         <div class="-mr-5 md:-mr-8 flex snap-x snap-mandatory overflow-x-auto scroll-smooth gap-4 pb-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {reviews.map((review) => {
+          {reviews.map((review, index) => {
             const authorImageUrl = review.authorImage
               ? urlForImage(review.authorImage)?.width(96).height(96).fit('crop').auto('format').url()
               : undefined;
             const formattedDate = formatReviewDate(review.date, locale);
+            const reviewContent = getLocalizedReviewContent(review, locale);
+            const reviewBodyId = `review-body-${index}`;
 
             return (
-              <article class="snap-start shrink-0 self-start w-[300px] sm:w-[320px] lg:w-[340px] rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
+              <article data-review-card class="snap-start shrink-0 self-start w-[300px] sm:w-[320px] lg:w-[340px] rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
                 <div class="mb-5 flex items-center gap-3">
                   {authorImageUrl && (
                     <img src={authorImageUrl} alt="" width="48" height="48" loading="lazy" decoding="async" class="size-12 rounded-full object-cover" />
@@ -50,7 +52,27 @@ const reviewCountLabel = locale === 'en' ? 'reviews' : 'avis';
                     <p class="text-sm text-muted-foreground">{review.rating || 0}/5{review.source === 'google' ? ' · Google' : ''}{formattedDate ? ` · ${formattedDate}` : ''}</p>
                   </div>
                 </div>
-                <p class="text-base leading-relaxed text-muted-foreground line-clamp-6">{review.body}</p>
+                {reviewContent.displayBody && (
+                  <p id={reviewBodyId} data-review-body aria-live="polite" class="text-base leading-relaxed text-muted-foreground line-clamp-6">
+                    {reviewContent.displayBody}
+                  </p>
+                )}
+                {reviewContent.canToggle && reviewContent.originalBody && reviewContent.displayBody && (
+                  <button
+                    type="button"
+                    hidden
+                    data-review-translation-toggle="true"
+                    data-original-body={reviewContent.originalBody}
+                    data-translated-body={reviewContent.displayBody}
+                    data-original-label={copy.blocks.reviewsOriginalLabel}
+                    data-translation-label={copy.blocks.reviewsTranslationLabel}
+                    aria-controls={reviewBodyId}
+                    aria-pressed="false"
+                    class="mt-5 inline-flex w-fit cursor-pointer border-0 bg-transparent p-0 text-sm font-bold text-primary underline underline-offset-4 transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+                  >
+                    {copy.blocks.reviewsOriginalLabel}
+                  </button>
+                )}
                 {review.sourceUrl && <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer" class="mt-5 inline-block text-sm font-bold text-primary underline underline-offset-4">{copy.blocks.reviewsLinkLabel}</a>}
               </article>
             );
@@ -65,3 +87,34 @@ const reviewCountLabel = locale === 'en' ? 'reviews' : 'avis';
     }
   </Container>
 </Section>
+
+<script>
+  const initializeReviewTranslationToggles = () => {
+    document.querySelectorAll<HTMLButtonElement>('[data-review-translation-toggle]').forEach((button) => {
+      if (button.dataset.reviewToggleBound === 'true') return;
+
+      button.dataset.reviewToggleBound = 'true';
+      button.hidden = false;
+      button.addEventListener('click', () => {
+        const bodyId = button.getAttribute('aria-controls');
+        const body = bodyId ? document.getElementById(bodyId) : null;
+        if (!body) return;
+
+        const showingOriginal = button.getAttribute('aria-pressed') === 'true';
+        const shouldShowOriginal = !showingOriginal;
+        const nextBody = shouldShowOriginal ? button.dataset.originalBody : button.dataset.translatedBody;
+
+        if (!nextBody) return;
+
+        body.textContent = nextBody;
+        button.setAttribute('aria-pressed', String(shouldShowOriginal));
+        button.textContent = shouldShowOriginal
+          ? button.dataset.translationLabel ?? ''
+          : button.dataset.originalLabel ?? '';
+      });
+    });
+  };
+
+  initializeReviewTranslationToggles();
+  document.addEventListener('astro:page-load', initializeReviewTranslationToggles);
+</script>

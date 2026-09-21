@@ -22,6 +22,15 @@ const baseTitle = booking?.title || copy.blocks.bookingTitle;
 const title = destinationLabel ? `${baseTitle} ${destinationLabel}` : baseTitle;
 const ctaLabel = booking?.fallbackCtaLabel || copy.blocks.bookingFallbackCta;
 const ctaUrl = booking?.fallbackCtaUrl || '/contact';
+const tallyFormId = (() => {
+  if (!booking?.embedUrl) return null;
+
+  try {
+    return new URL(booking.embedUrl).pathname.split('/').filter(Boolean).at(-1) ?? null;
+  } catch {
+    return null;
+  }
+})();
 ---
 
 <Section id="booking" padding="lg" class="bg-background">
@@ -37,6 +46,7 @@ const ctaUrl = booking?.fallbackCtaUrl || '/contact';
           <div>
             <iframe
               data-tally-src={booking.embedUrl}
+              data-tally-form-id={tallyFormId}
               loading="lazy"
               width="100%"
               height="500"
@@ -56,3 +66,23 @@ const ctaUrl = booking?.fallbackCtaUrl || '/contact';
     </div>
   </Container>
 </Section>
+
+<script>
+  import { getTallySubmissionFromMessage, rememberTallySubmission } from '../../lib/tally-submission';
+
+  const form = document.querySelector<HTMLIFrameElement>('[data-tally-form-id]');
+  const formId = form?.dataset.tallyFormId;
+
+  if (formId) {
+    window.addEventListener('message', (event) => {
+      const submission = getTallySubmissionFromMessage(event.origin, event.data, formId);
+      if (!submission) return;
+
+      try {
+        rememberTallySubmission(window.sessionStorage, submission, Date.now());
+      } catch {
+        // Without session storage, a confirmation page cannot prove the form submission.
+      }
+    });
+  }
+</script>

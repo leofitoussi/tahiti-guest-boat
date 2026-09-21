@@ -1,0 +1,211 @@
+---
+import {
+  CONSENT_STORAGE_KEY,
+} from '../../lib/cookie-consent';
+import { defaultLocale, localizePath, type Locale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
+
+interface Props {
+  locale?: Locale;
+}
+
+const { locale = defaultLocale } = Astro.props;
+const copy = getSiteCopy(locale).cookies;
+const policyHref = locale === 'en' ? '/en/cookie-policy/' : localizePath('/politique-de-cookies-ue', locale);
+---
+
+<div
+  id="cookie-consent"
+  data-cookie-consent
+  data-cookie-consent-key={CONSENT_STORAGE_KEY}
+  class="fixed inset-x-4 bottom-4 z-50 hidden max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[var(--radius-panel)] border border-border bg-background p-6 text-foreground shadow-lg sm:inset-x-auto sm:left-6 sm:max-w-xl sm:p-8 md:max-w-2xl"
+  role="dialog"
+  aria-labelledby="cookie-consent-title"
+  aria-describedby="cookie-consent-description"
+  aria-modal="false"
+  hidden
+>
+  <h2
+    id="cookie-consent-title"
+    tabindex="-1"
+    class="font-semibold leading-tight"
+    style="font-size: clamp(var(--font-size-xl), 2.4vw, var(--font-size-3xl))"
+  >
+    {copy.title}
+  </h2>
+
+  <p id="cookie-consent-description" class="mt-4 text-sm leading-relaxed text-muted-foreground">
+    {copy.description}
+    <a href={policyHref} class="font-semibold text-primary underline underline-offset-4">{copy.policyLabel}</a>.
+  </p>
+
+  <div class="mt-6 flex flex-col gap-3 md:flex-row md:flex-nowrap" data-cookie-consent-actions>
+    <button
+      type="button"
+      data-cookie-consent-action="accept"
+      class="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-control)] bg-primary px-5 text-sm font-semibold tracking-[0.1em] text-primary-foreground uppercase transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 md:w-auto md:flex-1"
+    >
+      {copy.acceptAll}
+    </button>
+    <button
+      type="button"
+      data-cookie-consent-action="reject"
+      class="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-control)] border border-border bg-background px-5 text-sm font-semibold tracking-[0.1em] text-foreground uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 md:w-auto md:flex-1"
+    >
+      {copy.rejectAll}
+    </button>
+    <button
+      type="button"
+      data-cookie-consent-action="customize"
+      aria-expanded="false"
+      aria-controls="cookie-consent-preferences"
+      class="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-control)] border border-border bg-background px-5 text-sm font-semibold tracking-[0.1em] text-foreground uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 md:w-auto md:flex-1"
+    >
+      {copy.customize}
+    </button>
+  </div>
+
+  <form id="cookie-consent-preferences" data-cookie-consent-preferences class="mt-6 hidden border-t border-border pt-6" hidden>
+    <fieldset>
+      <legend class="text-base font-semibold">{copy.preferencesTitle}</legend>
+      <div class="mt-4 grid gap-4">
+        <label class="flex gap-3 text-sm">
+          <input
+            type="checkbox"
+            data-cookie-consent-analytics
+            class="mt-1 size-4 accent-[var(--brand-primary)]"
+          />
+          <span>
+            <span class="block font-semibold">{copy.analyticsLabel}</span>
+            <span class="mt-1 block leading-relaxed text-muted-foreground">{copy.analyticsDescription}</span>
+          </span>
+        </label>
+        <label class="flex gap-3 text-sm">
+          <input
+            type="checkbox"
+            data-cookie-consent-advertising
+            class="mt-1 size-4 accent-[var(--brand-primary)]"
+          />
+          <span>
+            <span class="block font-semibold">{copy.advertisingLabel}</span>
+            <span class="mt-1 block leading-relaxed text-muted-foreground">{copy.advertisingDescription}</span>
+          </span>
+        </label>
+      </div>
+    </fieldset>
+    <button
+      type="submit"
+      data-cookie-consent-action="save"
+      class="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-control)] bg-primary px-5 text-sm font-semibold tracking-[0.1em] text-primary-foreground uppercase transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 sm:w-auto"
+    >
+      {copy.save}
+    </button>
+  </form>
+</div>
+
+<script>
+  import {
+    applyConsentMode,
+    readStoredConsent,
+    saveStoredConsent,
+    type ConsentModeWriter,
+    type ConsentPreferences,
+  } from '../../lib/cookie-consent';
+
+  const root = document.querySelector<HTMLElement>('[data-cookie-consent]');
+
+  if (root) {
+    const storage = (() => {
+      try {
+        return window.localStorage;
+      } catch {
+        return null;
+      }
+    })();
+    const preferencesForm = root.querySelector<HTMLFormElement>('[data-cookie-consent-preferences]');
+    const analyticsInput = root.querySelector<HTMLInputElement>('[data-cookie-consent-analytics]');
+    const advertisingInput = root.querySelector<HTMLInputElement>('[data-cookie-consent-advertising]');
+    const customizeButton = root.querySelector<HTMLButtonElement>('[data-cookie-consent-action="customize"]');
+    const heading = root.querySelector<HTMLElement>('#cookie-consent-title');
+
+    const writeConsent: ConsentModeWriter = (command, action, state) => {
+      const gtag = (window as Window & { gtag?: (...args: unknown[]) => void }).gtag;
+      if (gtag) gtag(command, action, state);
+    };
+
+    const setPreferences = (preferences: ConsentPreferences) => {
+      if (analyticsInput) analyticsInput.checked = preferences.analytics;
+      if (advertisingInput) advertisingInput.checked = preferences.advertising;
+    };
+
+    const hide = () => {
+      root.hidden = true;
+      root.classList.add('hidden');
+      root.removeAttribute('data-open');
+    };
+
+    const show = (focus = false) => {
+      const stored = storage ? readStoredConsent(storage, Date.now()) : null;
+      setPreferences(stored ?? { analytics: false, advertising: false });
+      customizeButton?.setAttribute('aria-expanded', 'false');
+      if (preferencesForm) {
+        preferencesForm.hidden = true;
+        preferencesForm.classList.add('hidden');
+      }
+      root.hidden = false;
+      root.classList.remove('hidden');
+      root.dataset.open = 'true';
+      if (focus) heading?.focus({ preventScroll: true });
+    };
+
+    const save = (preferences: ConsentPreferences) => {
+      if (storage) {
+        try {
+          saveStoredConsent(storage, preferences, Date.now());
+        } catch {
+          // Consent still applies for this page when browser storage is unavailable.
+        }
+      }
+      applyConsentMode(writeConsent, preferences);
+      hide();
+    };
+
+    if (storage && readStoredConsent(storage, Date.now())) {
+      hide();
+    } else {
+      show();
+    }
+
+    root.querySelector<HTMLButtonElement>('[data-cookie-consent-action="accept"]')?.addEventListener('click', () => {
+      save({ analytics: true, advertising: true });
+    });
+
+    root.querySelector<HTMLButtonElement>('[data-cookie-consent-action="reject"]')?.addEventListener('click', () => {
+      save({ analytics: false, advertising: false });
+    });
+
+    customizeButton?.addEventListener('click', () => {
+      const expanded = customizeButton.getAttribute('aria-expanded') === 'true';
+      customizeButton.setAttribute('aria-expanded', String(!expanded));
+      if (preferencesForm) {
+        preferencesForm.hidden = expanded;
+        preferencesForm.classList.toggle('hidden', expanded);
+      }
+    });
+
+    preferencesForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      save({
+        analytics: analyticsInput?.checked === true,
+        advertising: advertisingInput?.checked === true,
+      });
+    });
+
+    document.querySelectorAll<HTMLAnchorElement>('[data-cookie-consent-open]').forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        show(true);
+      });
+    });
+  }
+</script>

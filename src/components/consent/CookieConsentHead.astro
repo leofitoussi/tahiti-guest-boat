@@ -1,0 +1,40 @@
+---
+---
+
+<script is:inline>
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function () {
+    window.dataLayer.push(arguments);
+  };
+
+  window.gtag('consent', 'default', {
+    ad_storage: 'denied',
+    analytics_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    wait_for_update: 500,
+  });
+  window.gtag('set', 'ads_data_redaction', true);
+
+  try {
+    const rawConsent = window.localStorage.getItem('tgb_cookie_consent');
+    const storedConsent = rawConsent ? JSON.parse(rawConsent) : null;
+    const expiresAt = storedConsent ? new Date(storedConsent.savedAt) : null;
+
+    if (expiresAt && typeof storedConsent.analytics === 'boolean' && typeof storedConsent.advertising === 'boolean') {
+      expiresAt.setMonth(expiresAt.getMonth() + 6);
+
+      if (Date.now() < expiresAt.getTime()) {
+        window.gtag('set', 'ads_data_redaction', storedConsent.advertising !== true);
+        window.gtag('consent', 'update', {
+          ad_storage: storedConsent.advertising ? 'granted' : 'denied',
+          analytics_storage: storedConsent.analytics ? 'granted' : 'denied',
+          ad_user_data: storedConsent.advertising ? 'granted' : 'denied',
+          ad_personalization: storedConsent.advertising ? 'granted' : 'denied',
+        });
+      }
+    }
+  } catch {
+    // Consent remains denied when browser storage is unavailable or malformed.
+  }
+</script>

@@ -1,0 +1,20 @@
+---
+import { getGoogleAdsConfiguration } from '../../lib/google-ads';
+
+const config = getGoogleAdsConfiguration(
+  import.meta.env.PUBLIC_GOOGLE_ADS_ID,
+  import.meta.env.PUBLIC_GOOGLE_ADS_CONVERSION_LABEL,
+);
+---
+
+{
+  config && (
+    <>
+      <script is:inline async src={`https://www.googletagmanager.com/gtag/js?id=${config.tagId}`}></script>
+      <script is:inline define:vars={{ tagId: config.tagId }}>
+        window.gtag('js', new Date());
+        window.gtag('config', tagId);
+      </script>
+    </>
+  )
+}

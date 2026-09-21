@@ -12,6 +12,21 @@ export interface SiteCopy {
     defaultFooterText: string;
     defaultDescription: string;
   };
+  cookies: {
+    title: string;
+    description: string;
+    acceptAll: string;
+    rejectAll: string;
+    customize: string;
+    manage: string;
+    policyLabel: string;
+    preferencesTitle: string;
+    analyticsLabel: string;
+    analyticsDescription: string;
+    advertisingLabel: string;
+    advertisingDescription: string;
+    save: string;
+  };
     pages: {
       home: {
         title: string;
@@ -114,6 +129,23 @@ const siteCopy: Record<Locale, SiteCopy> = {
       reservationLabel: 'Réserver',
       defaultFooterText: 'Croisieres privees et experiences lagon en Polynesie francaise.',
       defaultDescription: 'Croisieres privees et experiences lagon en Polynesie francaise avec Tahiti Guest Boat.',
+    },
+    cookies: {
+      title: 'Vos choix de confidentialité',
+      description:
+        'Vous pouvez choisir si vous acceptez les technologies de mesure et de publicité qui nécessitent votre accord. Le formulaire de demande Tally reste accessible directement. Consultez notre',
+      acceptAll: 'Tout accepter',
+      rejectAll: 'Tout refuser',
+      customize: 'Personnaliser',
+      manage: 'Gérer mes cookies',
+      policyLabel: 'politique de cookies',
+      preferencesTitle: 'Vos préférences de mesure et de publicité',
+      analyticsLabel: 'Mesure d’audience soumise au consentement',
+      analyticsDescription: 'Autoriser les technologies de mesure qui nécessitent votre accord.',
+      advertisingLabel: 'Publicité personnalisée',
+      advertisingDescription:
+        'Autoriser les technologies nécessaires à la mesure et à la personnalisation publicitaires lorsqu’elles sont activées.',
+      save: 'Enregistrer mes choix',
     },
     pages: {
       home: {
@@ -223,6 +255,23 @@ const siteCopy: Record<Locale, SiteCopy> = {
       reservationLabel: 'Book your cruise',
       defaultFooterText: 'Private cruises and lagoon experiences in French Polynesia.',
       defaultDescription: 'Private cruises and lagoon experiences in French Polynesia with Tahiti Guest Boat.',
+    },
+    cookies: {
+      title: 'Your privacy choices',
+      description:
+        'You can choose whether to allow measurement and advertising technologies that require your consent. The Tally enquiry form remains directly accessible. Read our',
+      acceptAll: 'Accept all',
+      rejectAll: 'Reject all',
+      customize: 'Customize',
+      manage: 'Manage cookies',
+      policyLabel: 'cookie policy',
+      preferencesTitle: 'Your measurement and advertising preferences',
+      analyticsLabel: 'Consent-based audience measurement',
+      analyticsDescription: 'Allow measurement technologies that require your consent.',
+      advertisingLabel: 'Personalized advertising',
+      advertisingDescription:
+        'Allow the technologies needed for advertising measurement and personalization when they are enabled.',
+      save: 'Save my choices',
     },
     pages: {
       home: {

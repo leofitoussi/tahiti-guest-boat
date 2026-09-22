@@ -18,51 +18,45 @@ const policyHref = locale === 'en' ? '/en/cookie-policy/' : localizePath('/polit
   id="cookie-consent"
   data-cookie-consent
   data-cookie-consent-key={CONSENT_STORAGE_KEY}
-  class="fixed inset-x-4 bottom-4 z-50 hidden max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[var(--radius-panel)] border border-border bg-background p-6 text-foreground shadow-lg sm:inset-x-auto sm:left-6 sm:max-w-xl sm:p-8 md:max-w-2xl"
+  class="fixed inset-x-4 bottom-4 z-50 hidden max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[var(--radius-panel)] border border-border bg-background p-6 text-foreground shadow-lg lg:left-1/2 lg:right-auto lg:w-[calc(100%-3rem)] lg:max-w-6xl lg:-translate-x-1/2"
   role="dialog"
-  aria-labelledby="cookie-consent-title"
+  aria-label={copy.title}
   aria-describedby="cookie-consent-description"
   aria-modal="false"
+  tabindex="-1"
   hidden
 >
-  <h2
-    id="cookie-consent-title"
-    tabindex="-1"
-    class="font-semibold leading-tight"
-    style="font-size: clamp(var(--font-size-xl), 2.4vw, var(--font-size-3xl))"
-  >
-    {copy.title}
-  </h2>
+  <div class="lg:flex lg:items-center lg:gap-8">
+    <p id="cookie-consent-description" class="text-sm leading-relaxed text-muted-foreground lg:min-w-0 lg:flex-1">
+      {copy.description} {copy.policyPrefix}{' '}
+      <a href={policyHref} class="font-semibold text-primary underline underline-offset-4">{copy.policyLabel}</a>.
+    </p>
 
-  <p id="cookie-consent-description" class="mt-4 text-sm leading-relaxed text-muted-foreground">
-    {copy.description}
-    <a href={policyHref} class="font-semibold text-primary underline underline-offset-4">{copy.policyLabel}</a>.
-  </p>
-
-  <div class="mt-6 flex flex-col gap-3 md:flex-row md:flex-nowrap" data-cookie-consent-actions>
-    <button
-      type="button"
-      data-cookie-consent-action="accept"
-      class="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-control)] bg-primary px-5 text-sm font-semibold tracking-[0.1em] text-primary-foreground uppercase transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 md:w-auto md:flex-1"
-    >
-      {copy.acceptAll}
-    </button>
-    <button
-      type="button"
-      data-cookie-consent-action="reject"
-      class="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-control)] border border-border bg-background px-5 text-sm font-semibold tracking-[0.1em] text-foreground uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 md:w-auto md:flex-1"
-    >
-      {copy.rejectAll}
-    </button>
-    <button
-      type="button"
-      data-cookie-consent-action="customize"
-      aria-expanded="false"
-      aria-controls="cookie-consent-preferences"
-      class="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-control)] border border-border bg-background px-5 text-sm font-semibold tracking-[0.1em] text-foreground uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 md:w-auto md:flex-1"
-    >
-      {copy.customize}
-    </button>
+    <div class="mt-6 flex flex-col gap-3 lg:mt-0 lg:flex-none lg:flex-row lg:flex-nowrap" data-cookie-consent-actions>
+      <button
+        type="button"
+        data-cookie-consent-action="reject"
+        class="inline-flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] border border-border bg-background px-5 text-sm font-semibold tracking-[0.1em] text-foreground uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 lg:w-auto lg:min-w-[10.5rem]"
+      >
+        {copy.rejectAll}
+      </button>
+      <button
+        type="button"
+        data-cookie-consent-action="customize"
+        aria-expanded="false"
+        aria-controls="cookie-consent-preferences"
+        class="inline-flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] border border-border bg-background px-5 text-sm font-semibold tracking-[0.1em] text-foreground uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 lg:w-auto lg:min-w-[10.5rem]"
+      >
+        {copy.customize}
+      </button>
+      <button
+        type="button"
+        data-cookie-consent-action="accept"
+        class="inline-flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-primary px-5 text-sm font-semibold tracking-[0.1em] text-primary-foreground uppercase transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 lg:w-auto lg:min-w-[10.5rem]"
+      >
+        {copy.acceptAll}
+      </button>
+    </div>
   </div>
 
   <form id="cookie-consent-preferences" data-cookie-consent-preferences class="mt-6 hidden border-t border-border pt-6" hidden>
@@ -126,7 +120,6 @@ const policyHref = locale === 'en' ? '/en/cookie-policy/' : localizePath('/polit
     const analyticsInput = root.querySelector<HTMLInputElement>('[data-cookie-consent-analytics]');
     const advertisingInput = root.querySelector<HTMLInputElement>('[data-cookie-consent-advertising]');
     const customizeButton = root.querySelector<HTMLButtonElement>('[data-cookie-consent-action="customize"]');
-    const heading = root.querySelector<HTMLElement>('#cookie-consent-title');
 
     const writeConsent: ConsentModeWriter = (command, action, state) => {
       const gtag = (window as Window & { gtag?: (...args: unknown[]) => void }).gtag;
@@ -155,7 +148,7 @@ const policyHref = locale === 'en' ? '/en/cookie-policy/' : localizePath('/polit
       root.hidden = false;
       root.classList.remove('hidden');
       root.dataset.open = 'true';
-      if (focus) heading?.focus({ preventScroll: true });
+      if (focus) root.focus({ preventScroll: true });
     };
 
     const save = (preferences: ConsentPreferences) => {

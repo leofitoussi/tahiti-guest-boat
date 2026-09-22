@@ -19,6 +19,7 @@ export interface SiteCopy {
     rejectAll: string;
     customize: string;
     manage: string;
+    policyPrefix: string;
     policyLabel: string;
     preferencesTitle: string;
     analyticsLabel: string;
@@ -132,12 +133,12 @@ const siteCopy: Record<Locale, SiteCopy> = {
     },
     cookies: {
       title: 'Vos choix de confidentialité',
-      description:
-        'Vous pouvez choisir si vous acceptez les technologies de mesure et de publicité qui nécessitent votre accord. Le formulaire de demande Tally reste accessible directement. Consultez notre',
+      description: 'Nous mesurons les visites, les demandes de croisière et l’efficacité de nos publicités.',
       acceptAll: 'Tout accepter',
       rejectAll: 'Tout refuser',
       customize: 'Personnaliser',
       manage: 'Gérer mes cookies',
+      policyPrefix: 'Consultez notre',
       policyLabel: 'politique de cookies',
       preferencesTitle: 'Vos préférences de mesure et de publicité',
       analyticsLabel: 'Mesure d’audience soumise au consentement',
@@ -258,12 +259,12 @@ const siteCopy: Record<Locale, SiteCopy> = {
     },
     cookies: {
       title: 'Your privacy choices',
-      description:
-        'You can choose whether to allow measurement and advertising technologies that require your consent. The Tally enquiry form remains directly accessible. Read our',
+      description: 'We measure visits, cruise enquiries, and the effectiveness of our advertising.',
       acceptAll: 'Accept all',
       rejectAll: 'Reject all',
       customize: 'Customize',
       manage: 'Manage cookies',
+      policyPrefix: 'Read our',
       policyLabel: 'cookie policy',
       preferencesTitle: 'Your measurement and advertising preferences',
       analyticsLabel: 'Consent-based audience measurement',

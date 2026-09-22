@@ -105,15 +105,16 @@ describe('cookie consent', () => {
       'Personnaliser',
       'Gérer mes cookies',
     ]);
-    expect(french.description).toBe(
-      'Nous mesurons les visites, les demandes de croisière et l’efficacité de nos publicités. Ce n’est pas obligatoire : vous pouvez changer d’avis à tout moment. Consultez notre',
-    );
+    expect(french.description).toBe('Nous mesurons les visites, les demandes de croisière et l’efficacité de nos publicités.');
+    expect(french.policyPrefix).toBe('Consultez notre');
     expect([english.acceptAll, english.rejectAll, english.customize, english.manage]).toEqual([
       'Accept all',
       'Reject all',
       'Customize',
       'Manage cookies',
     ]);
+    expect(english.description).toBe('We measure visits, cruise enquiries, and the effectiveness of our advertising.');
+    expect(english.policyPrefix).toBe('Read our');
   });
 
   it('initializes denied consent before restoring a previously accepted choice', () => {
@@ -161,10 +162,17 @@ describe('cookie consent', () => {
     expect(banner).toContain('data-cookie-consent-action="reject"');
     expect(banner).toContain('data-cookie-consent-action="customize"');
     expect(banner).not.toContain('Tahiti Guest Boat</p>');
-    expect(banner).toContain('font-size: clamp(var(--font-size-xl), 2.4vw, var(--font-size-3xl))');
-    expect(banner).toContain('md:max-w-2xl');
-    expect(banner).toContain('flex flex-col gap-3 md:flex-row md:flex-nowrap');
-    expect(banner.match(/md:w-auto md:flex-1/g)).toHaveLength(3);
+    expect(banner).not.toContain('cookie-consent-title');
+    expect(banner).toContain('aria-label={copy.title}');
+    expect(banner).toContain('lg:max-w-6xl');
+    expect(banner).toContain('lg:flex-none lg:flex-row lg:flex-nowrap');
+    expect(banner.match(/lg:min-w-\[10\.5rem\]/g)).toHaveLength(3);
+    expect(banner.indexOf('data-cookie-consent-action="reject"')).toBeLessThan(
+      banner.indexOf('data-cookie-consent-action="customize"'),
+    );
+    expect(banner.indexOf('data-cookie-consent-action="customize"')).toBeLessThan(
+      banner.indexOf('data-cookie-consent-action="accept"'),
+    );
     expect(footer).toContain('data-cookie-consent-open');
   });
 });

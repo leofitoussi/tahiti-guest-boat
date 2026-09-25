@@ -15,6 +15,18 @@ publish = "dist"
   package = "./netlify/plugins/indexnow"
 
 [[redirects]]
+  from = "/prototype/language-notification"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
+  from = "/prototype/language-notification/*"
+  to = "/404.html"
+  status = 404
+  force = true
+
+[[redirects]]
   from = "/category/blog/"
   to = "/blog/"
   status = 301

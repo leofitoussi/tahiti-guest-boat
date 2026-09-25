@@ -43,7 +43,7 @@ describe('English contact conversion journey', () => {
   it('keeps the English contact journey localized while preserving contact channels', async () => {
     const html = await readFile('dist/en/contact/index.html', 'utf8');
 
-    expect(html).toContain('Let’s talk about your cruise in French Polynesia');
+    expect(html).toContain('Let’s talk about your catamaran cruise in French Polynesia');
     expect(html).toContain('Would you rather speak with us?');
     expect(html).toContain('href="/en/our-boat"');
     expect(html).toContain('href="/en/cruises"');
@@ -70,7 +70,7 @@ describe('English contact conversion journey', () => {
     const html = await readFile('dist/contact/index.html', 'utf8');
 
     expect(html).toContain('<h1');
-    expect(html).toContain('Parlons de votre croisière en Polynésie');
+    expect(html).toContain('Parlons de votre croisière en catamaran en Polynésie');
     expect(html).toContain('id="demande-de-devis"');
     expect(html).toContain('data-tally-form-id="nPrj8V"');
     expect(html).toContain('dynamicHeight=1');

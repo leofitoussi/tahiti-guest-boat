@@ -1,0 +1,74 @@
+---
+interface Props {
+  embedUrl: string;
+  title: string;
+  analyticsScope?: 'contact';
+}
+
+const { embedUrl, title, analyticsScope } = Astro.props;
+const formId = (() => {
+  try {
+    return new URL(embedUrl).pathname.split('/').filter(Boolean).at(-1) ?? undefined;
+  } catch {
+    return undefined;
+  }
+})();
+---
+
+<iframe
+  data-tally-src={embedUrl}
+  data-tally-form-id={formId}
+  data-tally-analytics-scope={analyticsScope}
+  loading="lazy"
+  width="100%"
+  height="500"
+  title={title}
+  class="w-full"
+  style="border:0;margin:0"
+></iframe>
+
+<script is:inline defer src="https://tally.so/widgets/embed.js"></script>
+
+<script>
+  import { getTallyFormEventFromMessage, getTallySubmissionFromMessage, rememberTallySubmission } from '../lib/tally-submission';
+
+  type UmamiTracker = {
+    track: (event: string, data?: Record<string, string>) => void;
+  };
+
+  const forms = Array.from(document.querySelectorAll<HTMLIFrameElement>('[data-tally-form-id]'));
+  const startedForms = new Set<string>();
+
+  window.addEventListener('message', (event) => {
+    for (const form of forms) {
+      const formId = form.dataset.tallyFormId;
+      if (!formId) continue;
+
+      const formEvent = getTallyFormEventFromMessage(event.origin, event.data, formId);
+      if (!formEvent) continue;
+
+      const analyticsScope = form.dataset.tallyAnalyticsScope;
+      const umami = (window as Window & { umami?: UmamiTracker }).umami;
+
+      if (analyticsScope === 'contact' && formEvent === 'started' && !startedForms.has(formId)) {
+        startedForms.add(formId);
+        umami?.track('contact_form_started', { form_id: formId });
+      }
+
+      if (formEvent !== 'submitted') continue;
+
+      const submission = getTallySubmissionFromMessage(event.origin, event.data, formId);
+      if (!submission) continue;
+
+      try {
+        rememberTallySubmission(window.sessionStorage, submission, Date.now());
+      } catch {
+        // Without session storage, the confirmation page cannot prove the submission.
+      }
+
+      if (analyticsScope === 'contact') {
+        umami?.track('contact_form_submitted', { form_id: formId });
+      }
+    }
+  });
+</script>

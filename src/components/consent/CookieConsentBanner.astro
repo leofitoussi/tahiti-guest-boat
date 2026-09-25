@@ -18,7 +18,7 @@ const policyHref = locale === 'en' ? '/en/cookie-policy/' : localizePath('/polit
   id="cookie-consent"
   data-cookie-consent
   data-cookie-consent-key={CONSENT_STORAGE_KEY}
-  class="fixed inset-x-4 bottom-4 z-50 hidden max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[var(--radius-panel)] border border-border bg-background p-6 text-foreground shadow-lg lg:left-1/2 lg:right-auto lg:w-[calc(100%-3rem)] lg:max-w-6xl lg:-translate-x-1/2"
+  class="fixed inset-x-4 bottom-4 z-50 hidden max-h-[calc(100vh-2rem)] overflow-y-auto rounded-[var(--radius-panel)] border border-border bg-background p-4 text-foreground shadow-lg sm:p-6 lg:left-1/2 lg:right-auto lg:w-[calc(100%-3rem)] lg:max-w-6xl lg:-translate-x-1/2"
   role="dialog"
   aria-label={copy.title}
   aria-describedby="cookie-consent-description"
@@ -32,11 +32,11 @@ const policyHref = locale === 'en' ? '/en/cookie-policy/' : localizePath('/polit
       <a href={policyHref} class="font-semibold text-primary underline underline-offset-4">{copy.policyLabel}</a>.
     </p>
 
-    <div class="mt-6 flex flex-col gap-3 lg:mt-0 lg:flex-none lg:flex-row lg:flex-nowrap" data-cookie-consent-actions>
+    <div class="mt-4 grid grid-cols-3 gap-2 sm:mt-6 sm:flex sm:flex-col sm:gap-3 lg:mt-0 lg:flex-none lg:flex-row lg:flex-nowrap" data-cookie-consent-actions>
       <button
         type="button"
         data-cookie-consent-action="reject"
-        class="inline-flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] border border-border bg-background px-5 text-sm font-semibold tracking-[0.1em] text-foreground uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 lg:w-auto lg:min-w-[10.5rem]"
+        class="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-control)] border border-border bg-background px-2 text-xs leading-tight font-semibold tracking-[0.05em] text-foreground uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 sm:whitespace-nowrap sm:px-5 sm:text-sm sm:tracking-[0.1em] lg:w-auto lg:min-w-[10.5rem]"
       >
         {copy.rejectAll}
       </button>
@@ -45,14 +45,14 @@ const policyHref = locale === 'en' ? '/en/cookie-policy/' : localizePath('/polit
         data-cookie-consent-action="customize"
         aria-expanded="false"
         aria-controls="cookie-consent-preferences"
-        class="inline-flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] border border-border bg-background px-5 text-sm font-semibold tracking-[0.1em] text-foreground uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 lg:w-auto lg:min-w-[10.5rem]"
+        class="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-control)] border border-border bg-background px-2 text-xs leading-tight font-semibold tracking-[0.05em] text-foreground uppercase transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 sm:whitespace-nowrap sm:px-5 sm:text-sm sm:tracking-[0.1em] lg:w-auto lg:min-w-[10.5rem]"
       >
         {copy.customize}
       </button>
       <button
         type="button"
         data-cookie-consent-action="accept"
-        class="inline-flex min-h-11 w-full items-center justify-center whitespace-nowrap rounded-[var(--radius-control)] bg-primary px-5 text-sm font-semibold tracking-[0.1em] text-primary-foreground uppercase transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 lg:w-auto lg:min-w-[10.5rem]"
+        class="inline-flex min-h-11 w-full items-center justify-center rounded-[var(--radius-control)] bg-primary px-2 text-xs leading-tight font-semibold tracking-[0.05em] text-primary-foreground uppercase transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 sm:whitespace-nowrap sm:px-5 sm:text-sm sm:tracking-[0.1em] lg:w-auto lg:min-w-[10.5rem]"
       >
         {copy.acceptAll}
       </button>

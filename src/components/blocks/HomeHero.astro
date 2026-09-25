@@ -39,13 +39,19 @@ const {
   image,
   locale = defaultLocale,
 } = Astro.props;
+const primaryCtaHref =
+  primaryCtaLink === '#contact'
+    ? locale === 'en'
+      ? '/en/contact/#demande-de-devis'
+      : '/contact/#demande-de-devis'
+    : primaryCtaLink;
 ---
 
 <HeroHeader
   keywords={keywords}
   title={title}
   body={body}
-  primaryCta={primaryCtaLabel && primaryCtaLink ? { label: primaryCtaLabel, href: primaryCtaLink } : undefined}
+  primaryCta={primaryCtaLabel && primaryCtaHref ? { label: primaryCtaLabel, href: primaryCtaHref } : undefined}
   secondaryCta={secondaryCtaLabel && secondaryCtaLink ? { label: secondaryCtaLabel, href: secondaryCtaLink } : undefined}
   image={image}
   locale={locale}

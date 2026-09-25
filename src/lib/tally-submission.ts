@@ -16,6 +16,28 @@ interface StoredTallySubmission extends TallySubmission {
   submittedAt: number;
 }
 
+export type TallyFormEvent = 'started' | 'submitted';
+
+export function getTallyFormEventFromMessage(
+  origin: string,
+  data: unknown,
+  expectedFormId: string,
+): TallyFormEvent | null {
+  if (origin !== 'https://tally.so' || typeof data !== 'string') return null;
+
+  try {
+    const message = JSON.parse(data) as { eventName?: unknown; payload?: { formId?: unknown } };
+
+    if (message.payload?.formId !== expectedFormId) return null;
+    if (message.eventName === 'Tally.FormPageView') return 'started';
+    if (message.eventName === 'Tally.FormSubmitted') return 'submitted';
+  } catch {
+    // Tally messages that are not JSON cannot represent a form event.
+  }
+
+  return null;
+}
+
 export function getTallySubmissionFromMessage(
   origin: string,
   data: unknown,

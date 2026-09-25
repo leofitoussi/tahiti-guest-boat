@@ -64,4 +64,72 @@ describe('English contact conversion journey', () => {
     expect(sitemaps).not.toContain('/merci/');
     expect(sitemaps).not.toContain('/en/thank-you/');
   });
+
+  it('gives French visitors an immediately available cruise quote form', async () => {
+    const html = await readFile('dist/contact/index.html', 'utf8');
+
+    expect(html).toContain('<h1');
+    expect(html).toContain('Parlons de votre croisière en Polynésie');
+    expect(html).toContain('id="demande-de-devis"');
+    expect(html).toContain('data-tally-form-id="nPrj8V"');
+    expect(html).toContain('dynamicHeight=1');
+  });
+
+  it('explains the private cruise offer before the quote form', async () => {
+    const html = await readFile('dist/contact/index.html', 'utf8');
+
+    expect(html).toContain('Croisière privée et personnalisée');
+    expect(html).toContain('Jusqu’à 5 personnes');
+    expect(html).toContain('À partir de 250 € par personne et par jour');
+    expect(html).toContain('5/5 sur Google avec 26 avis');
+  });
+
+  it('offers direct WhatsApp and email contact actions after the form', async () => {
+    const html = await readFile('dist/contact/index.html', 'utf8');
+
+    expect(html).toContain('href="https://wa.me/68989341434"');
+    expect(html).toContain('href="mailto:tahitiguestboat@gmail.com"');
+    expect(html).not.toContain('data-contact-action="phone"');
+    expect(html.indexOf('data-tally-form-id="nPrj8V"')).toBeLessThan(html.indexOf('https://wa.me/68989341434'));
+  });
+
+  it('sends homepage and header conversion calls to the quote form', async () => {
+    const [homeHtml, contactHtml, englishHomeHtml, englishContactHtml] = await Promise.all([
+      readFile('dist/index.html', 'utf8'),
+      readFile('dist/contact/index.html', 'utf8'),
+      readFile('dist/en/index.html', 'utf8'),
+      readFile('dist/en/contact/index.html', 'utf8'),
+    ]);
+
+    expect(homeHtml).toMatch(/href="\/contact\/#demande-de-devis"[^>]*>\s*Discutez avec nous\s*<\/a>/);
+    expect(contactHtml).toMatch(/href="\/contact\/#demande-de-devis"[^>]*>Réserver<\/a>/);
+    expect(englishHomeHtml).toMatch(/href="\/en\/contact\/#demande-de-devis"[^>]*>\s*Talk to us\s*<\/a>/);
+    expect(englishContactHtml).toMatch(/href="\/en\/contact\/#demande-de-devis"[^>]*>Book your cruise<\/a>/);
+  });
+
+  it('exposes the quote funnel to the existing analytics tracker', async () => {
+    const html = await readFile('dist/contact/index.html', 'utf8');
+
+    expect(html).toContain('data-tally-analytics-scope="contact"');
+    expect(html).toContain('data-umami-event="contact_whatsapp_clicked"');
+    expect(html).toContain('data-umami-event="contact_email_clicked"');
+  });
+
+  it('explains the included experience, the three next steps, and common questions', async () => {
+    const html = await readFile('dist/contact/index.html', 'utf8');
+
+    expect(html).toContain('Ce qui est inclus');
+    expect(html).toContain('Skipper, hôtesse, repas et activités inclus');
+    expect(html).toContain('1. Vous nous transmettez votre projet');
+    expect(html).toContain('2. Nous échangeons avec vous');
+    expect(html).toContain('3. Nous vous envoyons une proposition personnalisée');
+    expect(html).toContain('Questions fréquentes');
+  });
+
+  it('keeps the first-visit cookie choices stacked on mobile', async () => {
+    const banner = await readFile('src/components/consent/CookieConsentBanner.astro', 'utf8');
+
+    expect(banner).toContain('mt-6 flex flex-col gap-3');
+    expect(banner).not.toContain('grid grid-cols-3');
+  });
 });

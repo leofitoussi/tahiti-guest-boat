@@ -1,5 +1,6 @@
 ---
 import PageBuilder from './blocks/PageBuilder.astro';
+import ContactConversionPage from './ContactConversionPage.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../lib/cruises';
 import { getUniquePageVersions } from '../lib/page-builder';
@@ -43,6 +44,7 @@ const alternatePaths =
   noindex={!page?.seo?.indexable}
 >
   <main class="bg-background">
+    <ContactConversionPage locale={locale} settings={settings} reviews={reviews} />
     <PageBuilder
       blocks={pageBuilder}
       settings={settings}

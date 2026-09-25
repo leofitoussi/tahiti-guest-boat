@@ -66,12 +66,15 @@ export function buildLayoutViewModel(
       },
     ];
   });
+  const reservationHref = settings?.reservationLink
+    ? localizeHref(settings.reservationLink, locale)
+    : localizePath('/reservation', locale);
 
   return {
     brandName: settings?.siteName ?? 'Tahiti Guest Boat',
     homeHref: localizePath('/', locale),
     ctaLabel: settings?.reservationText ?? copy.shell.reservationLabel,
-    ctaHref: settings?.reservationLink ? localizeHref(settings.reservationLink, locale) : localizePath('/reservation', locale),
+    ctaHref: contactQuoteHref(reservationHref, locale),
     contactEmail: settings?.contactEmail,
     contactPhone: settings?.contactPhone,
     cruiseLinks,
@@ -93,6 +96,13 @@ export function buildLayoutViewModel(
     footerNavigationLabel: copy.shell.footerNavigationLabel,
     languageOptions: buildLanguageSwitcher(locale, alternatePaths),
   };
+}
+
+function contactQuoteHref(href: string, locale: Locale) {
+  const path = href.split('#', 1)[0].replace(/\/+$/, '') || '/';
+  const contactPath = localizePath('/contact', locale).replace(/\/+$/, '');
+
+  return path === contactPath ? `${contactPath}/#demande-de-devis` : href;
 }
 
 const LEGAL_FOOTER_PATHS = new Set([

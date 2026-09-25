@@ -32,6 +32,13 @@ interface ResolveLanguageSuggestionOptions {
   preference?: LanguageSuggestionPreference | null;
 }
 
+export function getPrimaryBrowserLanguage(
+  browserLanguage: string | undefined,
+  browserLanguages: readonly string[] | undefined,
+) {
+  return browserLanguage || browserLanguages?.[0];
+}
+
 export function resolveLanguageSuggestion({
   currentLocale,
   primaryBrowserLanguage,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  getPrimaryBrowserLanguage,
   readLanguageSuggestionPreference,
   resolveLanguageSuggestion,
   saveLanguageSuggestionLocale,
@@ -7,6 +8,14 @@ import {
 } from '../src/lib/language-suggestion';
 
 describe('language suggestion', () => {
+  it('uses the browser primary language over an inconsistently ordered language list', () => {
+    expect(getPrimaryBrowserLanguage('fr-FR', ['en-US', 'fr-FR'])).toBe('fr-FR');
+  });
+
+  it('falls back to the first browser language when the primary value is unavailable', () => {
+    expect(getPrimaryBrowserLanguage(undefined, ['fr-CA', 'en-US'])).toBe('fr-CA');
+  });
+
   it('offers the directly published English version to an English browser on a French version', () => {
     expect(
       resolveLanguageSuggestion({

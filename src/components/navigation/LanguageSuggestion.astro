@@ -41,6 +41,7 @@ const suggestionLabel = locale === 'en' ? 'Language suggestion' : 'Suggestion de
 </aside>
 
 <script>
+  import { getPrimaryBrowserLanguage } from '../../lib/language-suggestion';
   import { mountLanguageSuggestion, mountLanguageSwitcherPreference } from '../../lib/language-suggestion-client';
   import type { Locale } from '../../lib/localization';
 
@@ -67,7 +68,7 @@ const suggestionLabel = locale === 'en' ? 'Language suggestion' : 'Suggestion de
     mountLanguageSuggestion({
       root,
       currentLocale: root.dataset.languageSuggestionLocale === 'en' ? 'en' : 'fr',
-      primaryBrowserLanguage: navigator.languages?.[0] ?? navigator.language,
+      primaryBrowserLanguage: getPrimaryBrowserLanguage(navigator.language, navigator.languages),
       alternatePaths,
       storage,
     });

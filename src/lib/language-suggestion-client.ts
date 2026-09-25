@@ -67,9 +67,17 @@ export function mountLanguageSuggestion({
     resolve();
   });
 
-  window.setTimeout(() => {
-    resolve();
-  }, 4_000);
+  const scheduleTimeout = () => {
+    window.setTimeout(resolve, 4_000);
+  };
+
+  if (typeof window.requestAnimationFrame === 'function') {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(scheduleTimeout);
+    });
+  } else {
+    scheduleTimeout();
+  }
 }
 
 export function mountLanguageSwitcherPreference(

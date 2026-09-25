@@ -23,6 +23,7 @@ describe('language suggestion client', () => {
 
   afterEach(() => {
     vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it('shows one English CTA with the directly published counterpart URL', () => {
@@ -76,6 +77,10 @@ describe('language suggestion client', () => {
 
   it('hides after four seconds without persisting a refusal', () => {
     vi.useFakeTimers();
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      callback(0);
+      return 1;
+    });
     const root = document.querySelector<HTMLElement>('[data-language-suggestion]')!;
 
     mountLanguageSuggestion({
@@ -91,8 +96,41 @@ describe('language suggestion client', () => {
     expect(readLanguageSuggestionPreference(window.localStorage, Date.now())).toBeNull();
   });
 
+  it('starts its four-second countdown after the suggestion has had a chance to paint', () => {
+    vi.useFakeTimers();
+    const root = document.querySelector<HTMLElement>('[data-language-suggestion]')!;
+    const frames: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      frames.push(callback);
+      return frames.length;
+    });
+
+    mountLanguageSuggestion({
+      root,
+      currentLocale: 'fr',
+      primaryBrowserLanguage: 'en',
+      alternatePaths: { en: '/en/' },
+      storage: window.localStorage,
+    });
+
+    expect(frames).toHaveLength(1);
+    frames.shift()!(0);
+    expect(frames).toHaveLength(1);
+    frames.shift()!(16);
+
+    vi.advanceTimersByTime(3_999);
+    expect(root.hidden).toBe(false);
+
+    vi.advanceTimersByTime(1);
+    expect(root.hidden).toBe(true);
+  });
+
   it('marks the consent flow pending, then releases it when the suggestion times out', () => {
     vi.useFakeTimers();
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      callback(0);
+      return 1;
+    });
     const root = document.querySelector<HTMLElement>('[data-language-suggestion]')!;
     const releases: Event[] = [];
     window.addEventListener('language-suggestion-resolved', (event) => releases.push(event));

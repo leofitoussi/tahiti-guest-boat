@@ -105,7 +105,7 @@ describe('cookie consent', () => {
       'Personnaliser',
       'Gérer mes cookies',
     ]);
-    expect(french.description).toBe('Nous mesurons les visites, les demandes de croisière et l’efficacité de nos publicités.');
+    expect(french.description).toBe('Nous utilisons des cookies pour améliorer l’efficacité de notre publicité.');
     expect(french.policyPrefix).toBe('Consultez notre');
     expect([english.acceptAll, english.rejectAll, english.customize, english.manage]).toEqual([
       'Accept all',
@@ -113,7 +113,7 @@ describe('cookie consent', () => {
       'Customize',
       'Manage cookies',
     ]);
-    expect(english.description).toBe('We measure visits, cruise enquiries, and the effectiveness of our advertising.');
+    expect(english.description).toBe('We uses cookies to improve the effectiveness of our advertising.');
     expect(english.policyPrefix).toBe('Read our');
   });
 

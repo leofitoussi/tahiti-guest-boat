@@ -133,7 +133,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
     },
     cookies: {
       title: 'Vos choix de confidentialité',
-      description: 'Nous mesurons les visites, les demandes de croisière et l’efficacité de nos publicités.',
+      description: 'Nous utilisons des cookies pour améliorer l’efficacité de notre publicité.',
       acceptAll: 'Tout accepter',
       rejectAll: 'Tout refuser',
       customize: 'Personnaliser',
@@ -259,7 +259,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
     },
     cookies: {
       title: 'Your privacy choices',
-      description: 'We measure visits, cruise enquiries, and the effectiveness of our advertising.',
+      description: 'We uses cookies to improve the effectiveness of our advertising.',
       acceptAll: 'Accept all',
       rejectAll: 'Reject all',
       customize: 'Customize',

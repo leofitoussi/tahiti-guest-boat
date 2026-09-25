@@ -41,23 +41,14 @@ const averageRating =
 <section class="bg-background pt-14 md:pt-20" aria-labelledby="contact-conversion-heading">
   <Container>
     <div class="mx-auto max-w-3xl text-center">
-      <h1 id="contact-conversion-heading" class="font-heading text-4xl font-semibold leading-tight text-foreground md:text-5xl">
-        {copy.heading}
-      </h1>
-      <p class="mt-6 text-base leading-relaxed text-muted-foreground md:text-lg">{copy.introduction}</p>
-      <ul class="mt-7 flex flex-wrap justify-center gap-x-5 gap-y-3 text-sm font-semibold text-foreground" aria-label={locale === 'en' ? 'Cruise highlights' : 'Les points forts de la croisière'}>
-        <li>{locale === 'en' ? 'Private, personalised cruise' : 'Croisière privée et personnalisée'}</li>
+      <p class="contact-eyebrow">{locale === 'en' ? 'Private cruises in French Polynesia' : 'Croisières privées en Polynésie'}</p>
+      <h1 id="contact-conversion-heading" class="contact-title mt-4">{copy.heading}</h1>
+      <p class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">{copy.introduction}</p>
+      <ul class="contact-highlights" aria-label={locale === 'en' ? 'Cruise highlights' : 'Les points forts de la croisière'}>
+        <li>{locale === 'en' ? 'A fully tailor-made cruise' : 'Croisière 100 % sur mesure'}</li>
         <li>{locale === 'en' ? 'Up to 5 guests' : 'Jusqu’à 5 personnes'}</li>
         <li>{locale === 'en' ? 'From €250 per person, per day' : 'À partir de 250 € par personne et par jour'}</li>
-        {
-          averageRating !== null && (
-            <li>
-              {locale === 'en'
-                ? `${averageRating.toFixed(0)}/5 on Google from ${displayedReviews.length} reviews`
-                : `${averageRating.toFixed(0)}/5 sur Google avec ${displayedReviews.length} avis`}
-            </li>
-          )
-        }
+        {averageRating !== null && <li>{locale === 'en' ? `${averageRating.toFixed(0)}/5 on Google from ${displayedReviews.length} reviews` : `${averageRating.toFixed(0)}/5 sur Google avec ${displayedReviews.length} avis`}</li>}
       </ul>
     </div>
   </Container>
@@ -65,79 +56,73 @@ const averageRating =
 
 <Section id="demande-de-devis" padding="lg" class="scroll-mt-6 bg-background !pt-10 md:!pt-14">
   <Container>
-    <div class="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
-      <section class="order-2 rounded-[var(--radius-surface)] bg-muted p-6 lg:order-1 md:p-8" aria-labelledby="experience-heading">
-        <p class="text-sm font-bold uppercase tracking-[0.16em] text-primary">{locale === 'en' ? 'Your private cruise' : 'Votre croisière privée'}</p>
-        <h2 id="experience-heading" class="mt-3 font-heading text-3xl font-semibold leading-tight text-foreground">
-          {locale === 'en' ? 'A first idea is enough' : 'Une première idée suffit'}
-        </h2>
-        <p class="mt-4 leading-relaxed text-muted-foreground">
-          {
-            locale === 'en'
-              ? 'Whether you already have dates or simply want to explore the islands, we will shape the itinerary around your group.'
-              : 'Que vous ayez déjà des dates ou simplement l’envie de découvrir les îles, nous construisons l’itinéraire autour de votre groupe.'
-          }
-        </p>
-        <h3 class="mt-7 font-heading text-xl font-semibold text-foreground">{locale === 'en' ? 'What is included' : 'Ce qui est inclus'}</h3>
-        <ul class="mt-4 grid gap-3 text-sm leading-relaxed text-foreground">
-          <li>{locale === 'en' ? 'Skipper, host, meals and activities included' : 'Skipper, hôtesse, repas et activités inclus'}</li>
-          <li>{locale === 'en' ? 'A tailor-made itinerary, at your pace' : 'Un itinéraire personnalisé, à votre rythme'}</li>
-          <li>{locale === 'en' ? 'A private boat for your group of up to five guests' : 'Un bateau privé pour votre groupe de cinq personnes maximum'}</li>
-        </ul>
+    <div class="mx-auto grid max-w-5xl gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+      <section class="order-2 border-t border-border pt-8 lg:order-1 lg:border-t-0 lg:border-r lg:pt-0 lg:pr-12" aria-labelledby="experience-heading">
+        <p class="contact-eyebrow">{locale === 'en' ? 'Your tailor-made cruise' : 'Votre croisière sur mesure'}</p>
+        <h2 id="experience-heading" class="contact-section-title mt-4">{locale === 'en' ? 'A first idea is enough' : 'Une première idée suffit'}</h2>
+        <p class="mt-5 leading-relaxed text-muted-foreground">{locale === 'en' ? 'Whether you already have dates or simply want to explore the islands, we will shape the itinerary around your group.' : 'Que vous ayez déjà des dates ou simplement l’envie de découvrir les îles, nous construisons l’itinéraire autour de votre groupe.'}</p>
+        <ol class="contact-steps contact-steps--context">
+          <li><span class="contact-step-number">01</span><strong>{locale === 'en' ? 'Tell us about your project' : 'Vous nous transmettez votre projet'}</strong><span>{locale === 'en' ? 'Share your dates, your group and the first ideas you have in mind.' : 'Partagez vos dates, votre groupe et vos premières envies.'}</span></li>
+          <li><span class="contact-step-number">02</span><strong>{locale === 'en' ? 'We talk through your wishes' : 'Nous échangeons avec vous'}</strong><span>{locale === 'en' ? 'Together, we clarify the experience and route that suit you.' : 'Nous précisons ensemble l’expérience et le parcours qui vous correspondent.'}</span></li>
+          <li><span class="contact-step-number">03</span><strong>{locale === 'en' ? 'Receive your personalised proposal' : 'Nous vous envoyons une proposition personnalisée'}</strong><span>{locale === 'en' ? 'You receive a clear, tailored proposal' : 'Vous recevez une proposition claire et sur mesure.'}</span></li>
+        </ol>
       </section>
-
-      <div class="order-1 rounded-[var(--radius-surface)] border border-border bg-card p-4 shadow-sm lg:order-2 sm:p-6 md:p-8">
-        <TallyEmbed embedUrl={embedUrl} title={copy.formTitle} analyticsScope="contact" />
-        <div class="mt-6 grid gap-3 sm:grid-cols-2">
-          <a
-            href="https://wa.me/68989341434"
-            target="_blank"
-            rel="noreferrer"
-            data-contact-action="whatsapp"
-            data-umami-event="contact_whatsapp_clicked"
-            class="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-control)] bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-          >
-            WhatsApp
-          </a>
-          <a
-            href={`mailto:${email}`}
-            data-contact-action="email"
-            data-umami-event="contact_email_clicked"
-            class="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-control)] border border-border px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50"
-          >
-            E-mail
-          </a>
-        </div>
-      </div>
+      <section class="order-1 lg:order-2" aria-labelledby="quote-form-heading">
+        <p class="contact-eyebrow">{locale === 'en' ? 'Your request' : 'Votre demande'}</p>
+        <h2 id="quote-form-heading" class="contact-section-title mt-4">{locale === 'en' ? 'Tell us about your project' : 'Parlez-nous de votre projet'}</h2>
+        <p class="mt-4 max-w-xl leading-relaxed text-muted-foreground">{locale === 'en' ? 'We will get back to you with a personalised proposal, with no obligation.' : 'Nous vous répondons avec une proposition personnalisée, sans engagement.'}</p>
+        <div class="contact-form mt-7"><TallyEmbed embedUrl={embedUrl} title={copy.formTitle} analyticsScope="contact" /></div>
+      </section>
     </div>
 
-    <ol class="mx-auto mt-12 grid max-w-5xl gap-4 md:grid-cols-3">
-      <li class="rounded-[var(--radius-surface)] bg-muted p-5 text-sm leading-relaxed text-muted-foreground">
-        <strong class="block text-foreground">{locale === 'en' ? '1. Tell us about your project' : '1. Vous nous transmettez votre projet'}</strong>
-        <span class="mt-2 block">{locale === 'en' ? 'Share your dates, your group and the first ideas you have in mind.' : 'Partagez vos dates, votre groupe et vos premières envies.'}</span>
-      </li>
-      <li class="rounded-[var(--radius-surface)] bg-muted p-5 text-sm leading-relaxed text-muted-foreground">
-        <strong class="block text-foreground">{locale === 'en' ? '2. We talk through your wishes' : '2. Nous échangeons avec vous'}</strong>
-        <span class="mt-2 block">{locale === 'en' ? 'Together, we clarify the experience and route that suit you.' : 'Nous précisons ensemble l’expérience et le parcours qui vous correspondent.'}</span>
-      </li>
-      <li class="rounded-[var(--radius-surface)] bg-muted p-5 text-sm leading-relaxed text-muted-foreground">
-        <strong class="block text-foreground">{locale === 'en' ? '3. Receive your personalised proposal' : '3. Nous vous envoyons une proposition personnalisée'}</strong>
-        <span class="mt-2 block">{locale === 'en' ? 'You receive a clear, tailored proposal with no obligation.' : 'Vous recevez une proposition claire et sur mesure, sans engagement.'}</span>
-      </li>
-    </ol>
+    <section class="contact-channels mx-auto mt-20 max-w-5xl" aria-labelledby="direct-contact-heading">
+      <div class="max-w-2xl">
+        <p class="contact-eyebrow">{locale === 'en' ? 'Direct contact' : 'Contact direct'}</p>
+        <h2 id="direct-contact-heading" class="contact-section-title mt-4">{locale === 'en' ? 'Would you rather speak with us?' : 'Vous préférez échanger avec nous ?'}</h2>
+        <p class="mt-4 leading-relaxed text-muted-foreground">{locale === 'en' ? 'Choose the channel that suits you. We speak French, English and Spanish.' : 'Choisissez le canal qui vous convient. Nous parlons français, anglais et espagnol.'}</p>
+      </div>
+      <div class="mt-8 grid gap-px overflow-hidden border border-border bg-border md:grid-cols-2">
+        <a href="https://wa.me/68989341434" target="_blank" rel="noreferrer" data-contact-action="whatsapp" data-umami-event="contact_whatsapp_clicked" class="contact-channel">
+          <span class="contact-channel-label">WhatsApp</span><span class="contact-channel-value">+689 89 34 14 34</span><span class="contact-channel-action">{locale === 'en' ? 'Send a message' : 'Nous écrire'}</span>
+        </a>
+        <a href={`mailto:${email}`} data-contact-action="email" data-umami-event="contact_email_clicked" class="contact-channel">
+          <span class="contact-channel-label">E-mail</span><span class="contact-channel-value break-all">{email}</span><span class="contact-channel-action">{locale === 'en' ? 'Write to us' : 'Nous écrire'}</span>
+        </a>
+      </div>
+      <p class="mt-5 text-sm leading-relaxed text-muted-foreground">{locale === 'en' ? 'Because Tahiti is UTC−10, we recommend reaching out between 18:00 and 21:00 in Europe, or 12:00 and 22:00 in the USA.' : 'Tahiti étant à UTC−10, nous vous recommandons de nous contacter entre 18 h et 21 h depuis l’Europe, ou entre 12 h et 22 h depuis les États-Unis.'}</p>
+    </section>
 
-    <section class="mx-auto mt-12 max-w-5xl" aria-labelledby="contact-faq-heading">
-      <h2 id="contact-faq-heading" class="font-heading text-3xl font-semibold text-foreground">{locale === 'en' ? 'Frequently asked questions' : 'Questions fréquentes'}</h2>
-      <div class="mt-5 grid gap-3">
-        <details class="rounded-[var(--radius-surface)] border border-border bg-card p-5">
-          <summary class="cursor-pointer font-semibold text-foreground">{locale === 'en' ? 'What is included in the price?' : 'Que comprend le tarif ?'}</summary>
-          <p class="mt-3 leading-relaxed text-muted-foreground">{locale === 'en' ? 'The cruise includes the boat, skipper, host, meals, drinks and on-board activities, except alcohol and external providers.' : 'Le tarif comprend le bateau, le skipper, l’hôtesse, les repas, les boissons et les activités à bord, hors alcool et activités de prestataires.'}</p>
-        </details>
-        <details class="rounded-[var(--radius-surface)] border border-border bg-card p-5">
-          <summary class="cursor-pointer font-semibold text-foreground">{locale === 'en' ? 'Can we personalise the itinerary?' : 'Peut-on personnaliser l’itinéraire ?'}</summary>
-          <p class="mt-3 leading-relaxed text-muted-foreground">{locale === 'en' ? 'Yes. Your dates, interests and preferred pace are the starting point for building your cruise together.' : 'Oui. Vos dates, vos centres d’intérêt et votre rythme sont le point de départ pour construire votre croisière ensemble.'}</p>
-        </details>
+    <section class="mx-auto mt-20 max-w-5xl" aria-labelledby="contact-faq-heading">
+      <p class="contact-eyebrow">FAQ</p>
+      <h2 id="contact-faq-heading" class="contact-section-title mt-4">{locale === 'en' ? 'Frequently asked questions' : 'Questions fréquentes'}</h2>
+      <div class="mt-7 divide-y divide-border border-y border-border">
+        <details class="py-5"><summary class="cursor-pointer list-none font-semibold text-foreground marker:content-none">{locale === 'en' ? 'What is included in the price?' : 'Que comprend le tarif ?'}</summary><p class="mt-3 leading-relaxed text-muted-foreground">{locale === 'en' ? 'The cruise includes the boat, skipper, host, meals, drinks and on-board activities, except alcohol and external providers.' : 'Le tarif comprend le bateau, le skipper, l’hôtesse, les repas, les boissons et les activités à bord, hors alcool et activités de prestataires.'}</p></details>
+        <details class="py-5"><summary class="cursor-pointer list-none font-semibold text-foreground marker:content-none">{locale === 'en' ? 'Can we personalise the itinerary?' : 'Peut-on personnaliser l’itinéraire ?'}</summary><p class="mt-3 leading-relaxed text-muted-foreground">{locale === 'en' ? 'Yes. Your dates, interests and preferred pace are the starting point for building your cruise together.' : 'Oui. Vos dates, vos centres d’intérêt et votre rythme sont le point de départ pour construire votre croisière ensemble.'}</p></details>
       </div>
     </section>
   </Container>
 </Section>
+
+<style>
+  .contact-eyebrow { color: var(--brand-primary); font-size: var(--font-size-xs); font-weight: 800; letter-spacing: 0.14em; line-height: 1.35; text-transform: uppercase; }
+  .contact-title, .contact-section-title { font-family: var(--font-family-heading); font-weight: 500; letter-spacing: -0.015em; line-height: var(--line-height-tight); }
+  .contact-title { font-size: clamp(2.75rem, 5vw, 4.5rem); }
+  .contact-section-title { font-size: clamp(2.25rem, 3vw, 3.25rem); }
+  .contact-highlights { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem 1.5rem; margin-top: 2rem; color: var(--foreground); font-size: var(--font-size-sm); font-weight: 700; line-height: 1.5; }
+  .contact-highlights li { display: flex; align-items: center; gap: 0.5rem; }
+  .contact-highlights li::before { width: 0.3rem; height: 0.3rem; flex: none; border-radius: 999px; background: var(--brand-primary); content: ''; }
+  .contact-form { min-height: 500px; }
+  .contact-channels { border-top: 1px solid var(--border); padding-top: clamp(3.5rem, 8vw, 6rem); }
+  .contact-channel { display: flex; min-height: 12.5rem; flex-direction: column; justify-content: space-between; background: var(--background); padding: 1.5rem; color: var(--foreground); text-decoration: none; transition: background-color 180ms ease, color 180ms ease; }
+  .contact-channel:hover { background: var(--brand-primary); color: #fff; }
+  .contact-channel:focus-visible { outline: 3px solid var(--brand-primary); outline-offset: -3px; }
+  .contact-channel-label, .contact-channel-action { font-size: var(--font-size-xs); font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; }
+  .contact-channel-value { font-family: var(--font-family-heading); font-size: clamp(1.5rem, 2vw, 2rem); font-weight: 500; line-height: 1.08; }
+  .contact-channel-value.break-all { font-size: clamp(1.25rem, 4.5vw, 1.75rem); }
+  .contact-steps { display: grid; gap: 1.5rem; }
+  .contact-steps--context { margin-top: 2.25rem; }
+  .contact-steps li { display: grid; gap: 0.75rem; border-top: 1px solid var(--border); padding-top: 1.25rem; color: var(--muted-foreground); font-size: var(--font-size-sm); line-height: var(--line-height-body); }
+  .contact-steps strong { color: var(--foreground); font-size: var(--font-size-base); }
+  .contact-step-number { color: var(--brand-primary); font-size: var(--font-size-xs); font-weight: 800; letter-spacing: 0.13em; }
+  @media (prefers-reduced-motion: reduce) { .contact-channel { transition: none; } }
+</style>

@@ -1,8 +1,7 @@
 ---
-import PageBuilder from './blocks/PageBuilder.astro';
 import ContactConversionPage from './ContactConversionPage.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../lib/cruises';
+import { getReviews, getSiteSettings } from '../lib/cruises';
 import { getUniquePageVersions } from '../lib/page-builder';
 import { type Locale } from '../lib/localization';
 import { getSiteCopy } from '../lib/site-copy';
@@ -13,18 +12,15 @@ interface Props {
 
 const { locale } = Astro.props;
 const copy = getSiteCopy(locale);
-const [pageVersions, settings, reviews, cruises, activities] = await Promise.all([
+const [pageVersions, settings, reviews] = await Promise.all([
   getUniquePageVersions('contactPage'),
   getSiteSettings(locale),
   getReviews(),
-  getCruisePages(locale),
-  getActivities(locale),
 ]);
 
 const page = pageVersions[locale];
 const title = page?.seoTitle ?? copy.pages.contact.title;
 const description = page?.seoDescription ?? copy.pages.contact.description;
-const pageBuilder = (page?.pageBuilder as Record<string, unknown>[] | undefined) ?? [];
 const alternatePaths =
   locale === 'en'
     ? pageVersions.fr
@@ -45,13 +41,5 @@ const alternatePaths =
 >
   <main class="bg-background">
     <ContactConversionPage locale={locale} settings={settings} reviews={reviews} />
-    <PageBuilder
-      blocks={pageBuilder}
-      settings={settings}
-      reviews={reviews}
-      cruises={cruises.slice(0, 3)}
-      activities={activities}
-      locale={locale}
-    />
   </main>
 </BaseLayout>

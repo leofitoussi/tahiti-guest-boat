@@ -43,7 +43,8 @@ describe('English contact conversion journey', () => {
   it('keeps the English contact journey localized while preserving contact channels', async () => {
     const html = await readFile('dist/en/contact/index.html', 'utf8');
 
-    expect(html).toContain('Practical information and contact');
+    expect(html).toContain('Let’s talk about your cruise in French Polynesia');
+    expect(html).toContain('Would you rather speak with us?');
     expect(html).toContain('href="/en/our-boat"');
     expect(html).toContain('href="/en/cruises"');
     expect(html).toContain('href="/en/blog"');
@@ -78,19 +79,20 @@ describe('English contact conversion journey', () => {
   it('explains the private cruise offer before the quote form', async () => {
     const html = await readFile('dist/contact/index.html', 'utf8');
 
-    expect(html).toContain('Croisière privée et personnalisée');
+    expect(html).toContain('Croisière 100 % sur mesure');
     expect(html).toContain('Jusqu’à 5 personnes');
     expect(html).toContain('À partir de 250 € par personne et par jour');
     expect(html).toContain('5/5 sur Google avec 26 avis');
   });
 
-  it('offers direct WhatsApp and email contact actions after the form', async () => {
+  it('offers WhatsApp and email in a dedicated contact section after the form', async () => {
     const html = await readFile('dist/contact/index.html', 'utf8');
 
     expect(html).toContain('href="https://wa.me/68989341434"');
     expect(html).toContain('href="mailto:tahitiguestboat@gmail.com"');
     expect(html).not.toContain('data-contact-action="phone"');
     expect(html.indexOf('data-tally-form-id="nPrj8V"')).toBeLessThan(html.indexOf('https://wa.me/68989341434'));
+    expect(html).toContain('contact-channels');
   });
 
   it('sends homepage and header conversion calls to the quote form', async () => {
@@ -115,21 +117,22 @@ describe('English contact conversion journey', () => {
     expect(html).toContain('data-umami-event="contact_email_clicked"');
   });
 
-  it('explains the included experience, the three next steps, and common questions', async () => {
+  it('places the three next steps with the initial project guidance and keeps inclusions in the FAQ', async () => {
     const html = await readFile('dist/contact/index.html', 'utf8');
 
-    expect(html).toContain('Ce qui est inclus');
-    expect(html).toContain('Skipper, hôtesse, repas et activités inclus');
-    expect(html).toContain('1. Vous nous transmettez votre projet');
-    expect(html).toContain('2. Nous échangeons avec vous');
-    expect(html).toContain('3. Nous vous envoyons une proposition personnalisée');
+    expect(html).toContain('Le tarif comprend le bateau, le skipper, l’hôtesse, les repas, les boissons et les activités à bord');
+    expect(html).toContain('01</span><strong');
+    expect(html).toContain('Vous nous transmettez votre projet');
+    expect(html).toContain('Nous échangeons avec vous');
+    expect(html).toContain('Nous vous envoyons une proposition personnalisée');
     expect(html).toContain('Questions fréquentes');
+    expect(html.indexOf('Une première idée suffit')).toBeLessThan(html.indexOf('01</span><strong'));
+    expect(html.indexOf('01</span><strong')).toBeLessThan(html.indexOf('Parlez-nous de votre projet'));
   });
 
-  it('keeps the first-visit cookie choices stacked on mobile', async () => {
+  it('keeps the first-visit cookie choices compact on mobile', async () => {
     const banner = await readFile('src/components/consent/CookieConsentBanner.astro', 'utf8');
 
-    expect(banner).toContain('mt-6 flex flex-col gap-3');
-    expect(banner).not.toContain('grid grid-cols-3');
+    expect(banner).toContain('mt-4 grid grid-cols-3 gap-2');
   });
 });

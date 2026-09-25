@@ -54,6 +54,7 @@ export function LanguageSwitcher({
                 <a
                   href={option.href}
                   data-language-switcher="true"
+                  data-language-switcher-locale={option.locale}
                   aria-label={option.label}
                   title={option.label}
                   className="flex min-h-9 items-center justify-center gap-2 rounded-[var(--radius-control)] px-2.5 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"

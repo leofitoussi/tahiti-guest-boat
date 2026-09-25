@@ -1,0 +1,75 @@
+---
+import { defaultLocale, type Locale } from '../../lib/localization';
+
+interface Props {
+  locale?: Locale;
+  alternatePaths?: Partial<Record<Locale, string>>;
+}
+
+const { locale = defaultLocale, alternatePaths = {} } = Astro.props;
+const closeLabel = locale === 'en' ? 'Close language suggestion' : 'Fermer la suggestion de langue';
+const suggestionLabel = locale === 'en' ? 'Language suggestion' : 'Suggestion de langue';
+---
+
+<aside
+  id="language-suggestion"
+  data-language-suggestion
+  data-language-suggestion-locale={locale}
+  data-language-suggestion-alternate-paths={JSON.stringify(alternatePaths)}
+  class="fixed inset-x-4 bottom-4 z-50 mx-auto w-auto max-w-lg rounded-[var(--radius-panel)] bg-foreground p-3 text-background shadow-lg sm:left-auto sm:right-6 sm:mx-0 sm:w-[min(32rem,calc(100vw-3rem))]"
+  aria-label={suggestionLabel}
+  hidden
+>
+  <div class="flex items-center gap-3">
+    <a
+      data-language-suggestion-action
+      class="inline-flex min-h-12 min-w-0 flex-1 items-center justify-center gap-2 rounded-[var(--radius-control)] bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+    >
+      <span data-language-suggestion-flag aria-hidden="true"></span>
+      <span data-language-suggestion-label></span>
+      <span aria-hidden="true">↗</span>
+    </a>
+    <button
+      type="button"
+      data-language-suggestion-close
+      aria-label={closeLabel}
+      class="inline-flex size-12 shrink-0 items-center justify-center rounded-[var(--radius-control)] text-xl text-background transition-colors hover:bg-background/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-background"
+    >
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+</aside>
+
+<script>
+  import { mountLanguageSuggestion, mountLanguageSwitcherPreference } from '../../lib/language-suggestion-client';
+  import type { Locale } from '../../lib/localization';
+
+  const root = document.querySelector<HTMLElement>('[data-language-suggestion]');
+
+  if (root) {
+    const storage = (() => {
+      try {
+        return window.localStorage;
+      } catch {
+        return { getItem: () => null, setItem: () => {} };
+      }
+    })();
+
+    mountLanguageSwitcherPreference(storage);
+
+    let alternatePaths: Partial<Record<Locale, string>> = {};
+    try {
+      alternatePaths = JSON.parse(root.dataset.languageSuggestionAlternatePaths ?? '{}');
+    } catch {
+      // An invalid embedded value makes the page ineligible rather than guessing a URL.
+    }
+
+    mountLanguageSuggestion({
+      root,
+      currentLocale: root.dataset.languageSuggestionLocale === 'en' ? 'en' : 'fr',
+      primaryBrowserLanguage: navigator.languages?.[0] ?? navigator.language,
+      alternatePaths,
+      storage,
+    });
+  }
+</script>

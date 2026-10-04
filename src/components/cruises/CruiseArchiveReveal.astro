@@ -1,0 +1,511 @@
+---
+import { Badge } from '../ui/badge';
+import Container from '../layout/Container.astro';
+import Section from '../layout/Section.astro';
+import type { CruisePageSummary } from '../../lib/cruises';
+import type { Locale } from '../../lib/localization';
+import CruiseArchiveCard from './CruiseArchiveCard.astro';
+
+interface Props {
+  cruises: CruisePageSummary[];
+  locale: Locale;
+  discoverLabel: string;
+  heroBadge: string;
+  heroHeading: string;
+  heroLead: string;
+  heroBody: string;
+  heroTail: string;
+}
+
+const { cruises, locale, discoverLabel, heroBadge, heroHeading, heroLead, heroBody, heroTail } = Astro.props;
+---
+
+<div class="cruise-reveal">
+  <div class="cruise-reveal__story" data-cruise-story>
+    <div class="cruise-reveal__stage" data-cruise-stage>
+      <div class="cruise-reveal__intro" data-cruise-intro>
+        <h2>Découvrez les croisières<br class="cruise-reveal__desktop-break" /> sur Na Maka avec<br /> <em>Tahiti Guest Boat</em></h2>
+      </div>
+
+      <div class="cruise-reveal__hero" data-cruise-hero>
+        <Container>
+          <div class="cruise-reveal__hero-copy">
+            <Badge>{heroBadge}</Badge>
+            <h1>{heroHeading}</h1>
+            <div class="cruise-reveal__hero-description">
+              <p class="cruise-reveal__hero-lead">{heroLead}</p>
+              <p>{heroBody}</p>
+              <p>{heroTail}</p>
+            </div>
+          </div>
+        </Container>
+      </div>
+
+      <div class="cruise-reveal__boat" data-cruise-boat aria-hidden="true">
+        <img
+          class="cruise-reveal__boat-art"
+          src="/images/cruise-intro/namaka.svg"
+          alt=""
+          width="1010"
+          height="1201"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div class="cruise-reveal__wave" data-cruise-wave aria-hidden="true">
+        <img
+          class="cruise-reveal__wave-art"
+          src="/images/cruise-intro/vague.svg"
+          alt=""
+          width="3112"
+          height="216"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+    </div>
+  </div>
+
+  <Section padding="lg" class="cruise-reveal__archive">
+    <Container>
+      <h2 class="cruise-reveal__archive-heading">Nos croisières</h2>
+      <div class="cruise-reveal__grid">
+        {cruises.map((cruise) => (
+          <CruiseArchiveCard cruise={cruise} locale={locale} discoverLabel={discoverLabel} />
+        ))}
+      </div>
+    </Container>
+  </Section>
+</div>
+
+<style>
+  .cruise-reveal {
+    --scene-height: clamp(500px, 78svh, 820px);
+    --scroll-distance: 180svh;
+    color: var(--foreground);
+    background: var(--background);
+  }
+
+  .cruise-reveal__story {
+    position: relative;
+    z-index: 0;
+  }
+
+  .cruise-reveal__stage {
+    position: relative;
+    min-height: var(--scene-height);
+    overflow: hidden;
+    background: var(--background);
+  }
+
+  .cruise-reveal__intro {
+    display: grid;
+    min-height: var(--scene-height);
+    place-content: center;
+    padding: var(--space-6);
+    text-align: center;
+  }
+
+  .cruise-reveal__intro h2 {
+    color: var(--brand-primary);
+    font-size: clamp(2rem, 4.6vw, 4.25rem);
+    line-height: 1.12;
+  }
+
+  .cruise-reveal__intro em {
+    font-weight: 600;
+  }
+
+  .cruise-reveal__hero {
+    position: relative;
+    padding-block: var(--space-12);
+    background: color-mix(in oklab, var(--muted) 30%, var(--background));
+    border-block: 1px solid color-mix(in oklab, var(--border) 70%, transparent);
+  }
+
+  .cruise-reveal__hero-copy {
+    display: flex;
+    max-width: 56rem;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+
+  .cruise-reveal__hero-copy h1 {
+    max-width: 17ch;
+    font-size: var(--heading-2);
+    font-weight: 600;
+    line-height: var(--line-height-tight);
+  }
+
+  .cruise-reveal__hero-description {
+    color: var(--muted-foreground);
+    font-size: var(--font-size-lg);
+    line-height: var(--line-height-body);
+  }
+
+  .cruise-reveal__hero-description p + p {
+    margin-top: var(--space-4);
+  }
+
+  .cruise-reveal__hero-lead {
+    margin-bottom: var(--space-4);
+    color: var(--foreground);
+    font-weight: 700;
+  }
+
+  .cruise-reveal__boat,
+  .cruise-reveal__wave {
+    display: none;
+    pointer-events: none;
+  }
+
+  .cruise-reveal__boat-art,
+  .cruise-reveal__wave-art {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .cruise-reveal__archive-heading {
+    margin-bottom: var(--space-8);
+    font-size: var(--heading-2);
+  }
+
+  .cruise-reveal__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-8);
+  }
+
+  .cruise-reveal.is-enhanced .cruise-reveal__story {
+    height: calc(var(--scene-height) + var(--scroll-distance));
+  }
+
+  .cruise-reveal.is-enhanced .cruise-reveal__stage {
+    position: sticky;
+    top: 0;
+    height: var(--scene-height);
+    min-height: 0;
+  }
+
+  .cruise-reveal.is-enhanced .cruise-reveal__intro {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .cruise-reveal.is-enhanced .cruise-reveal__hero {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    align-items: center;
+    padding-block: var(--space-6);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cruise-reveal.is-enhanced .cruise-reveal__boat {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 3;
+    display: block;
+    width: 50vw;
+    height: auto;
+    opacity: 0;
+  }
+
+  .cruise-reveal.is-enhanced .cruise-reveal__wave {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 4;
+    display: block;
+    width: 154vw;
+    height: auto;
+    opacity: 0;
+  }
+
+  .cruise-reveal.is-enhanced.is-active .cruise-reveal__intro,
+  .cruise-reveal.is-enhanced.is-active .cruise-reveal__hero,
+  .cruise-reveal.is-enhanced.is-active .cruise-reveal__boat,
+  .cruise-reveal.is-enhanced.is-active .cruise-reveal__wave {
+    will-change: transform, opacity;
+  }
+
+  .cruise-reveal.is-enhanced .cruise-reveal__boat-art[data-floating] {
+    transform-origin: 50% 96.6%;
+    animation: cruise-float-hull 7.6s ease-in-out infinite paused;
+  }
+
+  .cruise-reveal.is-enhanced .cruise-reveal__wave-art[data-floating] {
+    animation: cruise-drift-wave 6.4s ease-in-out infinite paused;
+  }
+
+  .cruise-reveal.is-enhanced.is-water-moving .cruise-reveal__boat-art[data-floating],
+  .cruise-reveal.is-enhanced.is-water-moving .cruise-reveal__wave-art[data-floating] {
+    animation-play-state: running;
+  }
+
+  @keyframes cruise-float-hull {
+    0%, 100% { transform: translate3d(0, .6px, 0) rotate(-.08deg); }
+    28% { transform: translate3d(0, -1.5px, 0) rotate(.055deg); }
+    58% { transform: translate3d(0, 1.2px, 0) rotate(.09deg); }
+    80% { transform: translate3d(0, -.4px, 0) rotate(-.045deg); }
+  }
+
+  @keyframes cruise-drift-wave {
+    0%, 100% { transform: translate3d(-.5%, .7px, 0); }
+    50% { transform: translate3d(-1.5%, -1.2px, 0); }
+  }
+
+  @media (max-width: 767px) {
+    .cruise-reveal {
+      --scene-height: clamp(650px, 84svh, 760px);
+      --scroll-distance: 180svh;
+    }
+
+    .cruise-reveal__intro h2 {
+      font-size: clamp(1.85rem, 7.5vw, 2.55rem);
+    }
+
+    .cruise-reveal__desktop-break {
+      display: none;
+    }
+
+    .cruise-reveal__hero {
+      padding-block: var(--space-6);
+    }
+
+    .cruise-reveal__hero-copy {
+      gap: var(--space-4);
+    }
+
+    .cruise-reveal__hero-copy h1 {
+      font-size: clamp(2rem, 8vw, 2.55rem);
+    }
+
+    .cruise-reveal__hero-description {
+      font-size: var(--font-size-base);
+      line-height: 1.5;
+    }
+
+    .cruise-reveal__grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-12);
+    }
+
+    .cruise-reveal.is-enhanced .cruise-reveal__boat {
+      width: 72vw;
+    }
+  }
+
+  @media (max-width: 767px) and (max-height: 680px) {
+    .cruise-reveal {
+      --scene-height: 620px;
+      --scroll-distance: 190svh;
+    }
+
+    .cruise-reveal__hero {
+      padding-block: var(--space-4);
+    }
+
+    .cruise-reveal__hero-copy {
+      gap: var(--space-3);
+    }
+
+    .cruise-reveal__hero-description {
+      font-size: var(--font-size-sm);
+    }
+
+    .cruise-reveal__hero-description p + p {
+      margin-top: var(--space-2);
+    }
+
+    .cruise-reveal__hero-lead {
+      margin-bottom: var(--space-2);
+    }
+  }
+
+  @media (min-width: 768px) and (max-height: 520px) {
+    .cruise-reveal {
+      --scene-height: 460px;
+      --scroll-distance: 200svh;
+    }
+
+    .cruise-reveal__hero {
+      padding-block: var(--space-4);
+    }
+
+    .cruise-reveal__hero-copy {
+      gap: var(--space-3);
+    }
+
+    .cruise-reveal__hero-description {
+      font-size: var(--font-size-base);
+    }
+
+    .cruise-reveal__hero-description p + p {
+      margin-top: var(--space-2);
+    }
+
+    .cruise-reveal__hero-lead {
+      margin-bottom: var(--space-2);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cruise-reveal.is-enhanced .cruise-reveal__story {
+      height: auto;
+    }
+
+    .cruise-reveal.is-enhanced .cruise-reveal__stage {
+      position: relative;
+      height: auto;
+      overflow: visible;
+    }
+
+    .cruise-reveal.is-enhanced .cruise-reveal__intro {
+      position: relative;
+      min-height: var(--scene-height);
+    }
+
+    .cruise-reveal.is-enhanced .cruise-reveal__hero {
+      position: relative;
+      opacity: 1 !important;
+      pointer-events: auto;
+    }
+
+    .cruise-reveal.is-enhanced .cruise-reveal__boat,
+    .cruise-reveal.is-enhanced .cruise-reveal__wave {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+const clamp = (value: number) => Math.max(0, Math.min(1, value));
+const ease = (value: number) => value * value * (3 - 2 * value);
+const interval = (value: number, start: number, end: number) => clamp((value - start) / (end - start));
+
+document.querySelectorAll<HTMLElement>('[data-cruise-story]').forEach((story) => {
+  const root = story.closest<HTMLElement>('.cruise-reveal');
+  const stage = story.querySelector<HTMLElement>('[data-cruise-stage]');
+  const intro = story.querySelector<HTMLElement>('[data-cruise-intro]');
+  const hero = story.querySelector<HTMLElement>('[data-cruise-hero]');
+  const boat = story.querySelector<HTMLElement>('[data-cruise-boat]');
+  const wave = story.querySelector<HTMLElement>('[data-cruise-wave]');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  if (!root || !stage || !intro || !hero || !boat || !wave || reducedMotion.matches || !('IntersectionObserver' in window)) return;
+
+  let width = 1;
+  let height = 1;
+  let boatWidth = 1;
+  let waveTravel = 0;
+  let wavePadding = 0;
+  let start = 0;
+  let travel = 1;
+  let progress = 0;
+  let scrollFrame = 0;
+  let active = false;
+  let previousScrollY = window.scrollY;
+
+  const measure = () => {
+    width = stage.clientWidth;
+    height = stage.clientHeight;
+    const mobile = width < 768;
+    const boatHeight = Math.min(height * (mobile ? 0.78 : 0.84), width * (mobile ? 0.96 : 0.52) * (1201 / 1010));
+    boatWidth = boatHeight * (1010 / 1201);
+    const boatTop = (height - boatHeight) / 2 + (mobile ? height * 0.04 : 0);
+    const waveWidth = Math.max(3112 * (boatWidth / 1010), width * 1.35 + 48);
+    wavePadding = waveWidth * 0.025 + 12;
+    waveTravel = Math.max(0, waveWidth - width - wavePadding * 2);
+
+    boat.style.width = `${boatWidth}px`;
+    boat.style.top = `${boatTop}px`;
+    wave.style.width = `${waveWidth}px`;
+    wave.style.top = `${boatTop + boatHeight * (1160 / 1201) - waveWidth * (17 / 3112)}px`;
+
+    start = window.scrollY + story.getBoundingClientRect().top;
+    travel = Math.max(1, story.offsetHeight - stage.offsetHeight);
+    draw(progressForScroll());
+  };
+
+  const progressForScroll = () => clamp((window.scrollY - start) / travel);
+
+  const setWaterMotion = () => {
+    root.classList.toggle('is-water-moving', active && !document.hidden && progress > 0.08 && progress < 0.98);
+  };
+
+  const draw = (value: number) => {
+    progress = value;
+    const passage = interval(value, 0.08, 0.96);
+    const x = -boatWidth + (width + boatWidth + 16) * passage;
+    const textOpacity = 1 - ease(interval(value, 0.1, 0.28));
+    const heroOpacity = ease(interval(value, 0.62, 0.84));
+
+    intro.style.opacity = String(textOpacity);
+    intro.style.transform = `translate3d(${-18 * (1 - textOpacity)}px, 0, 0)`;
+    intro.setAttribute('aria-hidden', String(textOpacity === 0));
+    boat.style.transform = `translate3d(${x}px, 0, 0)`;
+    boat.style.opacity = String(interval(value, 0.08, 0.15) * (1 - interval(value, 0.96, 1)));
+    wave.style.transform = `translate3d(${-wavePadding - waveTravel * passage}px, 0, 0)`;
+    wave.style.opacity = String(ease(interval(value, 0.1, 0.22)) * (1 - ease(interval(value, 0.86, 1))));
+    hero.style.opacity = String(heroOpacity);
+    hero.setAttribute('aria-hidden', String(heroOpacity < 0.99));
+    hero.inert = heroOpacity < 0.99;
+
+    root.classList.toggle('is-active', active);
+    boat.querySelector('img')?.toggleAttribute('data-floating', active);
+    wave.querySelector('img')?.toggleAttribute('data-floating', active);
+    setWaterMotion();
+  };
+
+  const onScroll = () => {
+    if (window.scrollY === previousScrollY) return;
+    previousScrollY = window.scrollY;
+    if (!active || scrollFrame) return;
+    scrollFrame = requestAnimationFrame(() => {
+      scrollFrame = 0;
+      draw(progressForScroll());
+    });
+  };
+
+  const observer = new IntersectionObserver(([entry]) => {
+    active = entry.isIntersecting;
+    root.classList.toggle('is-active', active);
+    if (active) draw(progressForScroll());
+    setWaterMotion();
+  }, { rootMargin: '100px 0px' });
+
+  const onMotionPreferenceChange = (event: MediaQueryListEvent) => {
+    if (!event.matches) return;
+    observer.disconnect();
+    if (scrollFrame) cancelAnimationFrame(scrollFrame);
+    scrollFrame = 0;
+    window.removeEventListener('scroll', onScroll);
+    window.removeEventListener('resize', measure);
+    document.removeEventListener('visibilitychange', setWaterMotion);
+    root.classList.remove('is-enhanced', 'is-active', 'is-water-moving');
+    [intro, hero, boat, wave].forEach((element) => element.removeAttribute('style'));
+    intro.removeAttribute('aria-hidden');
+    hero.removeAttribute('aria-hidden');
+    hero.inert = false;
+    reducedMotion.removeEventListener('change', onMotionPreferenceChange);
+  };
+
+  hero.setAttribute('aria-hidden', 'true');
+  hero.inert = true;
+  root.classList.add('is-enhanced');
+  measure();
+  observer.observe(stage);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', measure, { passive: true });
+  document.addEventListener('visibilitychange', setWaterMotion);
+  reducedMotion.addEventListener('change', onMotionPreferenceChange);
+});
+</script>

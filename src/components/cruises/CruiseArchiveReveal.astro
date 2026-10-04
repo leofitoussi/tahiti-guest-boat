@@ -12,19 +12,36 @@ interface Props {
   discoverLabel: string;
   heroBadge: string;
   heroHeading: string;
+  revealFirstLine: string;
+  revealSecondLine: string;
+  revealBrand: string;
+  archiveHeading: string;
   heroLead: string;
   heroBody: string;
   heroTail: string;
 }
 
-const { cruises, locale, discoverLabel, heroBadge, heroHeading, heroLead, heroBody, heroTail } = Astro.props;
+const {
+  cruises,
+  locale,
+  discoverLabel,
+  heroBadge,
+  heroHeading,
+  revealFirstLine,
+  revealSecondLine,
+  revealBrand,
+  archiveHeading,
+  heroLead,
+  heroBody,
+  heroTail,
+} = Astro.props;
 ---
 
 <div class="cruise-reveal">
   <div class="cruise-reveal__story" data-cruise-story>
     <div class="cruise-reveal__stage" data-cruise-stage>
       <div class="cruise-reveal__intro" data-cruise-intro>
-        <h2>Découvrez les croisières<br class="cruise-reveal__desktop-break" /> sur Na Maka avec<br /> <em>Tahiti Guest Boat</em></h2>
+        <h2>{revealFirstLine}<br class="cruise-reveal__desktop-break" /> {revealSecondLine}<br /> <em>{revealBrand}</em></h2>
       </div>
 
       <div class="cruise-reveal__hero" data-cruise-hero>
@@ -68,7 +85,7 @@ const { cruises, locale, discoverLabel, heroBadge, heroHeading, heroLead, heroBo
 
   <Section padding="lg" class="cruise-reveal__archive">
     <Container>
-      <h2 class="cruise-reveal__archive-heading">Nos croisières</h2>
+      <h2 class="cruise-reveal__archive-heading">{archiveHeading}</h2>
       <div class="cruise-reveal__grid">
         {cruises.map((cruise) => (
           <CruiseArchiveCard cruise={cruise} locale={locale} discoverLabel={discoverLabel} />
@@ -93,13 +110,13 @@ const { cruises, locale, discoverLabel, heroBadge, heroHeading, heroLead, heroBo
 
   .cruise-reveal__stage {
     position: relative;
-    min-height: var(--scene-height);
+    min-height: 0;
     overflow: hidden;
     background: var(--background);
   }
 
   .cruise-reveal__intro {
-    display: grid;
+    display: none;
     min-height: var(--scene-height);
     place-content: center;
     padding: var(--space-6);
@@ -185,12 +202,13 @@ const { cruises, locale, discoverLabel, heroBadge, heroHeading, heroLead, heroBo
     position: sticky;
     top: 0;
     height: var(--scene-height);
-    min-height: 0;
+    min-height: var(--scene-height);
   }
 
   .cruise-reveal.is-enhanced .cruise-reveal__intro {
     position: absolute;
     inset: 0;
+    display: grid;
     min-height: 0;
     z-index: 2;
     pointer-events: none;

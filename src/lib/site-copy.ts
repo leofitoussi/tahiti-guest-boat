@@ -65,6 +65,10 @@ export interface SiteCopy {
       description: string;
       badge: string;
       heading: string;
+      revealFirstLine: string;
+      revealSecondLine: string;
+      revealBrand: string;
+      archiveHeading: string;
       introLead: string;
       introBody: string;
       introTail: string;
@@ -185,6 +189,10 @@ const siteCopy: Record<Locale, SiteCopy> = {
         description: 'Des croisières privées en catamaran en Polynésie, pensées sur mesure selon vos envies, votre rythme et vos escales.',
         badge: 'Nos croisières',
         heading: 'Les croisières en catamaran de Tahiti Guest Boat',
+        revealFirstLine: 'Découvrez les croisières',
+        revealSecondLine: 'sur Na Maka avec',
+        revealBrand: 'Tahiti Guest Boat',
+        archiveHeading: 'Nos croisières',
         introLead: '100% personnalisées',
         introBody:
           "Chaque croisière est une aventure unique, pensée sur mesure selon vos envies. Ici, pas d'itinéraires figés ni de programmes rigides : vous choisissez le rythme, les escales et les expériences qui vous ressemblent.",
@@ -311,6 +319,10 @@ const siteCopy: Record<Locale, SiteCopy> = {
         description: 'Private catamaran cruises in Polynesia, tailored to your wishes, pace, and stops.',
         badge: 'Our cruises',
         heading: 'Tahiti Guest Boat catamaran cruises',
+        revealFirstLine: 'Discover cruises',
+        revealSecondLine: 'aboard Na Maka with',
+        revealBrand: 'Tahiti Guest Boat',
+        archiveHeading: 'Our cruises',
         introLead: '100% tailored',
         introBody:
           'Every cruise is a unique adventure, tailored to your wishes. There are no fixed itineraries or rigid programs: you choose the pace, the stops, and the experiences that feel like you.',

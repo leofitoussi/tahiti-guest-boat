@@ -168,9 +168,14 @@ describe('cruise archive — /nos-croisieres/', () => {
     expect(source).toContain('getCruisePages');
   });
 
-  it('links each cruise card to /nos-croisieres/[slug]/', async () => {
-    const source = await readFile('src/pages/nos-croisieres/index.astro', 'utf8');
-    expect(source).toContain('/nos-croisieres/${cruise.slug}/');
+  it('delegates localized card links to the shared archive card', async () => {
+    const page = await readFile('src/pages/nos-croisieres/index.astro', 'utf8');
+    const reveal = await readFile('src/components/cruises/CruiseArchiveReveal.astro', 'utf8');
+    const card = await readFile('src/components/cruises/CruiseArchiveCard.astro', 'utf8');
+
+    expect(page).toContain('CruiseArchiveReveal');
+    expect(reveal).toContain('<CruiseArchiveCard cruise={cruise} locale={locale}');
+    expect(card).toContain('buildCruisePath(cruise.slug, locale)');
   });
 });
 

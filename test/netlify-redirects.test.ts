@@ -1,12 +1,12 @@
 import { readFile } from 'node:fs/promises';
 import { describe, expect, it } from 'vitest';
 
-describe('netlify.toml — canonical trailing-slash redirect', () => {
-  it('redirects any non-trailing-slash path to its trailing-slash form, without forcing over existing files', async () => {
+describe('netlify.toml — missing pages and native URL normalization', () => {
+  it('does not redirect unknown paths back to themselves with another slash', async () => {
     const source = await readFile('netlify.toml', 'utf8');
 
-    expect(source).toMatch(
-      /\[\[redirects\]\][^[]*from\s*=\s*"\/\*"[^[]*to\s*=\s*"\/:splat\/"[^[]*status\s*=\s*301[^[]*force\s*=\s*false/,
+    expect(source).not.toMatch(
+      /\[\[redirects\]\][^[]*from\s*=\s*"\/\*"[^[]*to\s*=\s*"\/:splat\/"/,
     );
   });
 

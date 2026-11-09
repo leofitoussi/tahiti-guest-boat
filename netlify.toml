@@ -40,11 +40,6 @@ publish = "dist"
   status = 404
   force = false
 
-# Canonical URL normalization: any path without a trailing slash redirects to
-# its trailing-slash form. force = false so exact static file matches (assets,
-# robots.txt, sitemaps) are served as-is instead of being redirected.
-[[redirects]]
-  from = "/*"
-  to = "/:splat/"
-  status = 301
-  force = false
+# Netlify Pretty URLs normalizes published directory indexes to a trailing slash.
+# Do not add a catch-all slash redirect: Netlify matches both slash variants,
+# so missing French paths would redirect indefinitely instead of serving 404.html.

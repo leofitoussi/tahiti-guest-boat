@@ -100,12 +100,17 @@ export const review = defineType({
     }),
     defineField({
       name: 'sourceUrl',
-      title: 'Source URL',
+      title: 'Original review URL',
       type: 'url',
+      description: 'For Google reviews, paste the link from Google Maps → review menu → Share review → Copy link. Use the link to this specific review, not the business listing or a Google search.',
       validation: (rule) =>
         rule.uri({
           scheme: ['http', 'https'],
-        }),
+        }).custom((value, context) =>
+          context.document?.source === 'google' && !value
+            ? 'Add the direct link to the original Google review before publishing.'
+            : true,
+        ),
     }),
     defineField({
       name: 'authorImage',

@@ -1,0 +1,184 @@
+{
+  "projectId": "hct2hzrl",
+  "dataset": "production",
+  "source": "Google Maps native review share links; five initial permalinks from preview/place. Authors and content matched to the 26 Sanity reviews.",
+  "reviews": [
+    {
+      "_id": "00b96941-9666-40fe-b921-04cb3f79e645",
+      "name": "Cloé Pedrazzini",
+      "googleName": "Cloé Pedrazzini",
+      "sourceId": "ChdDSUhNMG9nS0VJQ0FnTUNneWZiaGlBRRAB",
+      "sourceUrl": "https://maps.app.goo.gl/cSq7856fQxhAQTfd6"
+    },
+    {
+      "_id": "11f005c9-7218-401b-80ca-6389dc2a03b9",
+      "name": "Ralph CORTES",
+      "googleName": "Ralph CORTES",
+      "sourceId": "ChZDSUhNMG9nS0VJQ0FnTUNnODcybWVREAE",
+      "sourceUrl": "https://maps.app.goo.gl/3u856BJWvfCoxRrj8"
+    },
+    {
+      "_id": "122bdaae-78ee-4183-839c-c7c6fadf4b47",
+      "name": "ariane le blay",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT2tWWVozVkRiVzh3VEZFMFRHeFFPVUpUVjJ0VU9HYxAB",
+      "sourceUrl": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2tWWVozVkRiVzh3VEZFMFRHeFFPVUpUVjJ0VU9HYxAB!2m1!1s0x0:0xbae741562a65be28!3m1!1s2@1:CAIQACodChtycF9oOkVYZ3VDbW8wTFE0TGxQOUJTV2tUOGc%7C%7C?hl=fr"
+    },
+    {
+      "_id": "13ba669e-fbfa-4820-8414-ebd64e667874",
+      "name": "Didier Belrose",
+      "googleName": "Didier Belrose",
+      "sourceId": "ChZDSUhNMG9nS0VJQ0FnTUNnbmFhRE5REAE",
+      "sourceUrl": "https://maps.app.goo.gl/vFn7bmStMUHT2r7L8"
+    },
+    {
+      "_id": "146f6214-b6c8-4e6f-a036-aec988ec7c1a",
+      "name": "Matahina LEE",
+      "googleName": "matahina LEE",
+      "sourceId": "ChZDSUhNMG9nS0VJQ0FnTUR3bjVmNEF3EAE",
+      "sourceUrl": "https://maps.app.goo.gl/ugrte3JeEBzxJHUM6"
+    },
+    {
+      "_id": "15a2e75c-4f46-42b2-b4c4-3aeb1ee71e44",
+      "name": "Louise Hénoux",
+      "sourceId": "ChZDSUhNMG9nS0VJQ0FnTUNnbWR1Z0NREAE",
+      "sourceUrl": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sChZDSUhNMG9nS0VJQ0FnTUNnbWR1Z0NREAE!2m1!1s0x0:0xbae741562a65be28!3m1!1s2@1:CIHM0ogKEICAgMCgmdugCQ%7C%7C?hl=fr"
+    },
+    {
+      "_id": "179ed725-7740-40c6-85f2-2afd6b70c8a6",
+      "name": "Ari Maruani",
+      "googleName": "Ari Maruani",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT2tac2MwMXZOVWRtVEhSMU9IVndNRnBZUlhjMFFWRRAB",
+      "sourceUrl": "https://maps.app.goo.gl/rymojxjPGvEXpqsN8"
+    },
+    {
+      "_id": "19284e6e-3e85-4c4d-b32d-6f121c087ccd",
+      "name": "Maruia Vitulli",
+      "googleName": "Maruia Vitulli",
+      "sourceId": "ChZDSUhNMG9nS0VJQ0FnTURnZ0xLaU5REAE",
+      "sourceUrl": "https://maps.app.goo.gl/AKBp88dbc4yNm8oa8"
+    },
+    {
+      "_id": "5029ea22-2b1b-4b4f-a6ea-6ed457fb7196",
+      "name": "Bastien Thieffry",
+      "googleName": "Bastien Thieffry",
+      "sourceId": "ChZDSUhNMG9nS0VJQ0FnTUNneTdQQkNnEAE",
+      "sourceUrl": "https://maps.app.goo.gl/eqP3ZpiqYGMuAZYf6"
+    },
+    {
+      "_id": "507ff263-bb80-41b8-a99c-b85c88ed5acb",
+      "name": "Teanavai Puaud",
+      "googleName": "Teanavai Puaud",
+      "sourceId": "ChZDSUhNMG9nS0VJQ0FnTUNncThybWNnEAE",
+      "sourceUrl": "https://maps.app.goo.gl/d5oQagVoBEbFqXed7"
+    },
+    {
+      "_id": "50bd869f-10c4-4b16-901f-84767da34490",
+      "name": "Thierry Marchand",
+      "sourceId": "ChdDSUhNMG9nS0VJQ0FnTUNRZ2EtOXJBRRAB",
+      "sourceUrl": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sChdDSUhNMG9nS0VJQ0FnTUNRZ2EtOXJBRRAB!2m1!1s0x0:0xbae741562a65be28!3m1!1s2@1:CIHM0ogKEICAgMCQga-9rAE%7C%7C?hl=fr"
+    },
+    {
+      "_id": "5b4967cd-1614-40ae-bd66-9d4cc9a6042f",
+      "name": "Yoan Busnel",
+      "googleName": "Yoan Busnel",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT2swNU5rMUhSVkZRZWxSS05tSkRTVlJ0UlVOZmJHYxAB",
+      "sourceUrl": "https://maps.app.goo.gl/or9osfFs1Uxjjv9V8"
+    },
+    {
+      "_id": "5fddd7e5-c6e7-4920-8f82-b1e75830c328",
+      "name": "Le Neliza Beach Lodge",
+      "googleName": "Le Neliza Beach Lodge",
+      "sourceId": "ChdDSUhNMG9nS0VJQ0FnTUNJekktM2lBRRAB",
+      "sourceUrl": "https://maps.app.goo.gl/xWaUume4HyUA2Zxz5"
+    },
+    {
+      "_id": "6f64952e-7951-4641-ad80-4775752f4f8f",
+      "name": "Christian Hoffmann",
+      "googleName": "christian hoffmann",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT25vd1NWSktPVXBmYkhrNVFsRk1WRmxLUjBSV2JtYxAB",
+      "sourceUrl": "https://maps.app.goo.gl/drZAq87dUfjBoRvW8"
+    },
+    {
+      "_id": "7385eb42-4a6e-48ee-9ac3-51d601642448",
+      "name": "Debbie Labeaux",
+      "googleName": "Debbie Labeaux",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT2xJdGJHWXdSbUUxTkVKaFVsbEVkRTg0WTJwcFFtYxAB",
+      "sourceUrl": "https://maps.app.goo.gl/TBK44opfp5kTd6iT7"
+    },
+    {
+      "_id": "7790ad6b-f532-400f-93f2-b979898faee2",
+      "name": "Lindsey Walker",
+      "googleName": "Lindsey Walker",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT25CaE5uTm1jVWt5TmxCaVprUm9NVzk1UkVWWk1IYxAB",
+      "sourceUrl": "https://maps.app.goo.gl/Tsx63naMYaWVsmA86"
+    },
+    {
+      "_id": "7fe2f5bd-d9ae-418a-bbce-e0105edfc540",
+      "name": "Young Michel",
+      "googleName": "Young Michel",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT25CWFpUazVXVzlhVUVScVp6UnpORE5GVEc1eWMyYxAB",
+      "sourceUrl": "https://maps.app.goo.gl/rDsNqMiSUUubwBo86"
+    },
+    {
+      "_id": "86fd663b-a6c3-4746-ba02-a8669c122783",
+      "name": "Alexis CHUNGUES",
+      "googleName": "Alexis CHUNGUES",
+      "sourceId": "ChdDSUhNMG9nS0VJQ0FnTUNJXzVfbHZBRRAB",
+      "sourceUrl": "https://maps.app.goo.gl/cf5cztpkSQB27zEJA"
+    },
+    {
+      "_id": "8a713869-f31e-476e-929c-afe29e087897",
+      "name": "Agathe C.",
+      "googleName": "Agathe C.",
+      "sourceId": "ChdDSUhNMG9nS0VJQ0FnTUNnLWR2OHV3RRAB",
+      "sourceUrl": "https://maps.app.goo.gl/UjoT6QJ4wgrSFybS6"
+    },
+    {
+      "_id": "9134073a-7ee3-4d6f-8272-36f34f45debf",
+      "name": "Vincent Moreau (PadPanik)",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT2kwd1VEVnJVR1phYTB0NUxXSm5TbGxtY0dVeFUzYxAB",
+      "sourceUrl": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2kwd1VEVnJVR1phYTB0NUxXSm5TbGxtY0dVeFUzYxAB!2m1!1s0x0:0xbae741562a65be28!3m1!1s2@1:CAIQACodChtycF9oOi0wUDVrUGZaa0t5LWJnSllmcGUxU3c%7C%7C?hl=fr"
+    },
+    {
+      "_id": "988993d7-e949-462c-88a3-2a7876d09336",
+      "name": "Christelle Siméone",
+      "googleName": "Christelle Siméone",
+      "sourceId": "ChZDSUhNMG9nS0VJQ0FnTUNnajhxVWVREAE",
+      "sourceUrl": "https://maps.app.goo.gl/LSuKd2YpNSuEQE3J7"
+    },
+    {
+      "_id": "9c522523-88b9-4bb7-ad83-f6bebe4d5612",
+      "name": "Alphonse Moreau",
+      "googleName": "Alphonse Moreau",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT25od2JHRnJkVmhtTjB0MU9VNU5WRzlxUnpoMWNsRRAB",
+      "sourceUrl": "https://maps.app.goo.gl/32E1XbNBY4Lh3R2b6"
+    },
+    {
+      "_id": "a42ef5d5-9607-4a41-a76c-5ce647b4d50e",
+      "name": "Myhanh Sismondini",
+      "googleName": "Myhanh Sismondini",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT2tSc2FsbFdlV1k1TUdSR1prSkVkSFZqYkRaaVkyYxAB",
+      "sourceUrl": "https://maps.app.goo.gl/M8KGQxnsiGkMNtAA6"
+    },
+    {
+      "_id": "c42d432f-2d10-4ddc-bfbe-5d4dc777d16f",
+      "name": "Steve Marie",
+      "googleName": "Steve Marie",
+      "sourceId": "ChZDSUhNMG9nS0VJQ0FnTURnbDhpamFnEAE",
+      "sourceUrl": "https://maps.app.goo.gl/3Y3J9Nr4wsqoE79B7"
+    },
+    {
+      "_id": "c8d21757-00ea-4d70-ac9a-870fba441c8d",
+      "name": "Pascal COURROUX",
+      "sourceId": "Ci9DQUlRQUNvZENodHljRjlvT2sxVlJESTBkMDlqTkUxZk9ITmljemRKV0dzMVoxRRAB",
+      "sourceUrl": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2sxVlJESTBkMDlqTkUxZk9ITmljemRKV0dzMVoxRRAB!2m1!1s0x0:0xbae741562a65be28!3m1!1s2@1:CAIQACodChtycF9oOk1VRDI0d09jNE1fOHNiczdJWGs1Z1E%7C%7C?hl=fr"
+    },
+    {
+      "_id": "fd4e3a38-234e-470f-b03e-ba37f8eb39f2",
+      "name": "Maëlys Erondel",
+      "googleName": "Maëlys Erondel",
+      "sourceId": "ChZDSUhNMG9nS0VJQ0FnTUNncVlEMUNBEAE",
+      "sourceUrl": "https://maps.app.goo.gl/hSZii3EnfqWbr9Zc7"
+    }
+  ]
+}

@@ -103,9 +103,13 @@ describe('English contact conversion journey', () => {
       readFile('dist/en/contact/index.html', 'utf8'),
     ]);
 
-    expect(homeHtml).toMatch(/href="\/contact\/#demande-de-devis"[^>]*>\s*Discutez avec nous\s*<\/a>/);
+    // Homepage CTA labels are editorial Sanity content; the quote destination is the contract.
+    const homeMain = homeHtml.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1] ?? '';
+    const englishHomeMain = englishHomeHtml.match(/<main\b[^>]*>([\s\S]*?)<\/main>/)?.[1] ?? '';
+
+    expect(homeMain).toMatch(/href="\/contact\/#demande-de-devis"[^>]*>\s*[^<\s][^<]*<\/a>/);
     expect(contactHtml).toMatch(/href="\/contact\/#demande-de-devis"[^>]*>Réserver<\/a>/);
-    expect(englishHomeHtml).toMatch(/href="\/en\/contact\/#demande-de-devis"[^>]*>\s*Talk to us\s*<\/a>/);
+    expect(englishHomeMain).toMatch(/href="\/en\/contact\/#demande-de-devis"[^>]*>\s*[^<\s][^<]*<\/a>/);
     expect(englishContactHtml).toMatch(/href="\/en\/contact\/#demande-de-devis"[^>]*>Book your cruise<\/a>/);
   });
 

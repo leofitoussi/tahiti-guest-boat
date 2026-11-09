@@ -73,7 +73,16 @@ const reviewCountLabel = locale === 'en' ? 'reviews' : 'avis';
                     {copy.blocks.reviewsOriginalLabel}
                   </button>
                 )}
-                {review.sourceUrl && <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer" class="mt-5 inline-block text-sm font-bold text-primary underline underline-offset-4">{copy.blocks.reviewsLinkLabel}</a>}
+                {review.sourceUrl && (
+                  <a
+                    href={review.sourceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-5 inline-flex min-h-11 items-center text-sm font-bold text-primary underline underline-offset-4 transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+                  >
+                    {review.source === 'google' ? copy.blocks.reviewsGoogleLinkLabel : copy.blocks.reviewsLinkLabel}
+                  </a>
+                )}
               </article>
             );
           })}

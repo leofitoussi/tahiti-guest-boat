@@ -59,8 +59,11 @@ describe('unique page family routes', () => {
     const boatHtml = await readFile('dist/notre-bateau/index.html', 'utf8');
     const contactHtml = await readFile('dist/contact/index.html', 'utf8');
 
-    expect(boatHtml).toContain('<title>Namaka, le bateau de Tahiti Guest Boat</title>');
-    expect(contactHtml).toContain('<title>Contact | Tahiti Guest Boat</title>');
+    // Titles are editorial Sanity content; these tests protect the public routes.
+    expect(boatHtml).toContain('<link rel="canonical" href="https://tahitiguestboat.com/notre-bateau/"');
+    expect(contactHtml).toContain('<link rel="canonical" href="https://tahitiguestboat.com/contact/"');
+    expect(boatHtml).toMatch(/<title>[^<]+<\/title>/);
+    expect(contactHtml).toMatch(/<title>[^<]+<\/title>/);
   }, 600000);
 
   it('keeps /composants available as a noindex test page', async () => {

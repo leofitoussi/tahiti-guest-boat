@@ -110,6 +110,7 @@ export interface SiteCopy {
       reviewsTitle: string;
       reviewsFallbackDescription: string;
       reviewsLinkLabel: string;
+      reviewsGoogleLinkLabel: string;
       reviewsOriginalLabel: string;
       reviewsTranslationLabel: string;
       whyUsTitle: string;
@@ -238,6 +239,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
       reviewsTitle: 'Ils ont vécu l’expérience',
       reviewsFallbackDescription: 'Les avis voyageurs seront affichés ici prochainement.',
       reviewsLinkLabel: 'Voir plus',
+      reviewsGoogleLinkLabel: 'Voir l’avis sur Google',
       reviewsOriginalLabel: 'Voir l’original',
       reviewsTranslationLabel: 'Voir la traduction',
       whyUsTitle: 'Pourquoi naviguer avec Tahiti Guest Boat ?',
@@ -368,6 +370,7 @@ const siteCopy: Record<Locale, SiteCopy> = {
       reviewsTitle: 'They lived the experience',
       reviewsFallbackDescription: 'Traveler reviews will appear here soon.',
       reviewsLinkLabel: 'See more',
+      reviewsGoogleLinkLabel: 'Read the review on Google',
       reviewsOriginalLabel: 'View original',
       reviewsTranslationLabel: 'View translation',
       whyUsTitle: 'Why sail with Tahiti Guest Boat?',

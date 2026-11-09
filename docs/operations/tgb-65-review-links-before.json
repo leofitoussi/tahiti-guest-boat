@@ -1,0 +1,241 @@
+{
+  "projectId": "hct2hzrl",
+  "dataset": "production",
+  "capturedAt": "2026-11-08",
+  "reviews": [
+    {
+      "_id": "00b96941-9666-40fe-b921-04cb3f79e645",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Cloé Pedrazzini",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "11f005c9-7218-401b-80ca-6389dc2a03b9",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Ralph CORTES",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "122bdaae-78ee-4183-839c-c7c6fadf4b47",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "ariane le blay",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?q=avis+Tahiti+Guest+Boat"
+    },
+    {
+      "_id": "13ba669e-fbfa-4820-8414-ebd64e667874",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Didier Belrose",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "146f6214-b6c8-4e6f-a036-aec988ec7c1a",
+      "_rev": "iZmE6w6BSMCojUl5Kkb63s",
+      "isPublished": true,
+      "name": "Matahina LEE",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "15a2e75c-4f46-42b2-b4c4-3aeb1ee71e44",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Louise Hénoux",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "179ed725-7740-40c6-85f2-2afd6b70c8a6",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Ari Maruani",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "19284e6e-3e85-4c4d-b32d-6f121c087ccd",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Maruia Vitulli",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "5029ea22-2b1b-4b4f-a6ea-6ed457fb7196",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Bastien Thieffry",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "507ff263-bb80-41b8-a99c-b85c88ed5acb",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Teanavai Puaud",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?q=avis+Tahiti+Guest+Boat"
+    },
+    {
+      "_id": "50bd869f-10c4-4b16-901f-84767da34490",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Thierry Marchand",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "5b4967cd-1614-40ae-bd66-9d4cc9a6042f",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Yoan Busnel",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?q=avis+Tahiti+Guest+Boat"
+    },
+    {
+      "_id": "5fddd7e5-c6e7-4920-8f82-b1e75830c328",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Le Neliza Beach Lodge",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "6f64952e-7951-4641-ad80-4775752f4f8f",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Christian Hoffmann",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "7385eb42-4a6e-48ee-9ac3-51d601642448",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Debbie Labeaux",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?q=avis+Tahiti+Guest+Boat"
+    },
+    {
+      "_id": "7790ad6b-f532-400f-93f2-b979898faee2",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Lindsey Walker",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "7fe2f5bd-d9ae-418a-bbce-e0105edfc540",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Young Michel",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "86fd663b-a6c3-4746-ba02-a8669c122783",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Alexis CHUNGUES",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "8a713869-f31e-476e-929c-afe29e087897",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Agathe C.",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "9134073a-7ee3-4d6f-8272-36f34f45debf",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Vincent Moreau (PadPanik)",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?q=avis+Tahiti+Guest+Boat"
+    },
+    {
+      "_id": "988993d7-e949-462c-88a3-2a7876d09336",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Christelle Siméone",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "9c522523-88b9-4bb7-ad83-f6bebe4d5612",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Alphonse Moreau",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "a42ef5d5-9607-4a41-a76c-5ce647b4d50e",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Myhanh Sismondini",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "c42d432f-2d10-4ddc-bfbe-5d4dc777d16f",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Steve Marie",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "c8d21757-00ea-4d70-ac9a-870fba441c8d",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Pascal COURROUX",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    },
+    {
+      "_id": "fd4e3a38-234e-470f-b03e-ba37f8eb39f2",
+      "_rev": "eJyqTisNa5YHd4FrajYB8p",
+      "isPublished": true,
+      "name": "Maëlys Erondel",
+      "source": "google",
+      "sourceId": null,
+      "sourceUrl": "https://www.google.com/search?sa=X&sca_esv=4c9ef6af1daf4528&q=Tahiti+Guest+Boat+Avis&rflfq=1&num=20&stick=H4sIAAAAAAAAAONgkxIxNDYxM7cwMDUwsTQwsDQwMzQxNNvAyPiKUSwkMSOzJFPBvTS1uETBKT-xRMGxLLN4ESsOCQClpOMyTQAAAA&rldimm=13467805049009061416&tbm=lcl&hl=fr-FR&ved=2ahUKEwiwy4-DibqVAxU1KkQIHRaFEtYQ9fQKegQIRxAG&biw=1458&bih=814&dpr=2&sei=P4lJavOpKqfbkPIP3sifgQU#lkt=LocalPoiReviews"
+    }
+  ]
+}

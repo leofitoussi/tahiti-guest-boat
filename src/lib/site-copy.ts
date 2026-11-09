@@ -111,6 +111,8 @@ export interface SiteCopy {
       reviewsFallbackDescription: string;
       reviewsLinkLabel: string;
       reviewsGoogleLinkLabel: string;
+      reviewsExpandLabel: string;
+      reviewsCollapseLabel: string;
       reviewsOriginalLabel: string;
       reviewsTranslationLabel: string;
       whyUsTitle: string;
@@ -239,7 +241,9 @@ const siteCopy: Record<Locale, SiteCopy> = {
       reviewsTitle: 'Ils ont vécu l’expérience',
       reviewsFallbackDescription: 'Les avis voyageurs seront affichés ici prochainement.',
       reviewsLinkLabel: 'Voir plus',
-      reviewsGoogleLinkLabel: 'Voir l’avis sur Google',
+      reviewsGoogleLinkLabel: 'Voir sur Google',
+      reviewsExpandLabel: 'Voir plus',
+      reviewsCollapseLabel: 'Voir moins',
       reviewsOriginalLabel: 'Voir l’original',
       reviewsTranslationLabel: 'Voir la traduction',
       whyUsTitle: 'Pourquoi naviguer avec Tahiti Guest Boat ?',
@@ -370,7 +374,9 @@ const siteCopy: Record<Locale, SiteCopy> = {
       reviewsTitle: 'They lived the experience',
       reviewsFallbackDescription: 'Traveler reviews will appear here soon.',
       reviewsLinkLabel: 'See more',
-      reviewsGoogleLinkLabel: 'Read the review on Google',
+      reviewsGoogleLinkLabel: 'View on Google',
+      reviewsExpandLabel: 'Read more',
+      reviewsCollapseLabel: 'Read less',
       reviewsOriginalLabel: 'View original',
       reviewsTranslationLabel: 'View translation',
       whyUsTitle: 'Why sail with Tahiti Guest Boat?',

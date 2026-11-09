@@ -19,6 +19,7 @@ const average = reviews.length
   : 0;
 
 const reviewCountLabel = locale === 'en' ? 'reviews' : 'avis';
+const reviewBlockId = crypto.randomUUID();
 ---
 
 <Section padding="lg" class="bg-background pb-8 md:pb-12">
@@ -39,7 +40,7 @@ const reviewCountLabel = locale === 'en' ? 'reviews' : 'avis';
               : undefined;
             const formattedDate = formatReviewDate(review.date, locale);
             const reviewContent = getLocalizedReviewContent(review, locale);
-            const reviewBodyId = `review-body-${index}`;
+            const reviewBodyId = `review-body-${reviewBlockId}-${index}`;
 
             return (
               <article data-review-card class="snap-start shrink-0 self-start w-[300px] sm:w-[320px] lg:w-[340px] rounded-[var(--radius-surface)] border border-border/70 bg-card p-6 shadow-xs">
@@ -49,38 +50,67 @@ const reviewCountLabel = locale === 'en' ? 'reviews' : 'avis';
                   )}
                   <div>
                     <h3 class="!text-base font-semibold text-foreground">{review.name}</h3>
-                    <p class="text-sm text-muted-foreground">{review.rating || 0}/5{review.source === 'google' ? ' · Google' : ''}{formattedDate ? ` · ${formattedDate}` : ''}</p>
+                    <p class="text-sm text-muted-foreground">
+                      {review.rating || 0}/5
+                      {review.source === 'google' && (
+                        <>
+                          {' · '}
+                          {review.sourceUrl ? (
+                            <a href={review.sourceUrl} target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30">
+                              {copy.blocks.reviewsGoogleLinkLabel}
+                            </a>
+                          ) : 'Google'}
+                        </>
+                      )}
+                      {formattedDate ? ` · ${formattedDate}` : ''}
+                    </p>
                   </div>
                 </div>
                 {reviewContent.displayBody && (
-                  <p id={reviewBodyId} data-review-body aria-live="polite" class="text-base leading-relaxed text-muted-foreground line-clamp-6">
+                  <p id={reviewBodyId} data-review-body aria-live="polite" class="text-base leading-relaxed text-muted-foreground">
                     {reviewContent.displayBody}
                   </p>
                 )}
-                {reviewContent.canToggle && reviewContent.originalBody && reviewContent.displayBody && (
-                  <button
-                    type="button"
-                    hidden
-                    data-review-translation-toggle="true"
-                    data-original-body={reviewContent.originalBody}
-                    data-translated-body={reviewContent.displayBody}
-                    data-original-label={copy.blocks.reviewsOriginalLabel}
-                    data-translation-label={copy.blocks.reviewsTranslationLabel}
-                    aria-controls={reviewBodyId}
-                    aria-pressed="false"
-                    class="mt-5 inline-flex w-fit cursor-pointer border-0 bg-transparent p-0 text-sm font-bold text-primary underline underline-offset-4 transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
-                  >
-                    {copy.blocks.reviewsOriginalLabel}
-                  </button>
+                {reviewContent.displayBody && (
+                  <div data-review-actions hidden class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+                    <button
+                      type="button"
+                      hidden
+                      data-review-expand-toggle
+                      data-expand-label={copy.blocks.reviewsExpandLabel}
+                      data-collapse-label={copy.blocks.reviewsCollapseLabel}
+                      aria-controls={reviewBodyId}
+                      aria-expanded="false"
+                      class="inline-flex min-h-11 w-fit cursor-pointer items-center border-0 bg-transparent p-0 text-sm font-bold text-primary underline underline-offset-4 transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+                    >
+                      {copy.blocks.reviewsExpandLabel}
+                    </button>
+                      {reviewContent.canToggle && reviewContent.originalBody && (
+                        <button
+                          type="button"
+                          hidden
+                          data-review-translation-toggle="true"
+                          data-original-body={reviewContent.originalBody}
+                          data-translated-body={reviewContent.displayBody}
+                          data-original-label={copy.blocks.reviewsOriginalLabel}
+                          data-translation-label={copy.blocks.reviewsTranslationLabel}
+                          aria-controls={reviewBodyId}
+                          aria-pressed="false"
+                          class="inline-flex min-h-11 w-fit cursor-pointer items-center border-0 bg-transparent p-0 text-sm font-bold text-primary underline underline-offset-4 transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+                        >
+                          {copy.blocks.reviewsOriginalLabel}
+                        </button>
+                      )}
+                  </div>
                 )}
-                {review.sourceUrl && (
+                {review.source !== 'google' && review.sourceUrl && (
                   <a
                     href={review.sourceUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     class="mt-5 inline-flex min-h-11 items-center text-sm font-bold text-primary underline underline-offset-4 transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
                   >
-                    {review.source === 'google' ? copy.blocks.reviewsGoogleLinkLabel : copy.blocks.reviewsLinkLabel}
+                    {copy.blocks.reviewsLinkLabel}
                   </a>
                 )}
               </article>
@@ -98,32 +128,60 @@ const reviewCountLabel = locale === 'en' ? 'reviews' : 'avis';
 </Section>
 
 <script>
-  const initializeReviewTranslationToggles = () => {
-    document.querySelectorAll<HTMLButtonElement>('[data-review-translation-toggle]').forEach((button) => {
-      if (button.dataset.reviewToggleBound === 'true') return;
+  const initializeReviewControls = () => {
+    document.querySelectorAll<HTMLElement>('[data-review-card]').forEach((card) => {
+      if (card.dataset.reviewControlsBound === 'true') return;
 
-      button.dataset.reviewToggleBound = 'true';
-      button.hidden = false;
-      button.addEventListener('click', () => {
-        const bodyId = button.getAttribute('aria-controls');
-        const body = bodyId ? document.getElementById(bodyId) : null;
-        if (!body) return;
+      const body = card.querySelector<HTMLElement>('[data-review-body]');
+      const actions = card.querySelector<HTMLElement>('[data-review-actions]');
+      const expandButton = card.querySelector<HTMLButtonElement>('[data-review-expand-toggle]');
+      const translationButton = card.querySelector<HTMLButtonElement>('[data-review-translation-toggle]');
+      if (!body || !actions || !expandButton) return;
 
-        const showingOriginal = button.getAttribute('aria-pressed') === 'true';
+      card.dataset.reviewControlsBound = 'true';
+      // Without JavaScript, leave the complete stored text readable.
+      body.classList.add('line-clamp-6');
+      if (translationButton) translationButton.hidden = false;
+
+      const updateExpansion = () => {
+        const expanded = expandButton.getAttribute('aria-expanded') === 'true';
+        expandButton.hidden = !expanded && body.scrollHeight <= body.clientHeight + 1;
+        actions.hidden = expandButton.hidden && (!translationButton || translationButton.hidden);
+      };
+
+      expandButton.addEventListener('click', () => {
+        const expanded = expandButton.getAttribute('aria-expanded') !== 'true';
+        expandButton.setAttribute('aria-expanded', String(expanded));
+        body.classList.toggle('line-clamp-6', !expanded);
+        expandButton.textContent = expanded
+          ? expandButton.dataset.collapseLabel ?? ''
+          : expandButton.dataset.expandLabel ?? '';
+        updateExpansion();
+      });
+
+      translationButton?.addEventListener('click', () => {
+        const showingOriginal = translationButton.getAttribute('aria-pressed') === 'true';
         const shouldShowOriginal = !showingOriginal;
-        const nextBody = shouldShowOriginal ? button.dataset.originalBody : button.dataset.translatedBody;
+        const nextBody = shouldShowOriginal ? translationButton.dataset.originalBody : translationButton.dataset.translatedBody;
 
         if (!nextBody) return;
 
         body.textContent = nextBody;
-        button.setAttribute('aria-pressed', String(shouldShowOriginal));
-        button.textContent = shouldShowOriginal
-          ? button.dataset.translationLabel ?? ''
-          : button.dataset.originalLabel ?? '';
+        translationButton.setAttribute('aria-pressed', String(shouldShowOriginal));
+        translationButton.textContent = shouldShowOriginal
+          ? translationButton.dataset.translationLabel ?? ''
+          : translationButton.dataset.originalLabel ?? '';
+        updateExpansion();
       });
+
+      updateExpansion();
+      void document.fonts.ready.then(updateExpansion);
+      const observer = new ResizeObserver(updateExpansion);
+      observer.observe(body);
+      document.addEventListener('astro:before-swap', () => observer.disconnect(), { once: true });
     });
   };
 
-  initializeReviewTranslationToggles();
-  document.addEventListener('astro:page-load', initializeReviewTranslationToggles);
+  initializeReviewControls();
+  document.addEventListener('astro:page-load', initializeReviewControls);
 </script>

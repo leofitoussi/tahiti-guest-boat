@@ -16,4 +16,4 @@ Configure DATABASE_URL and APP_SECRET privately and follow ops/README.md plus op
 
 This patch is stored with the Tahiti Guest Boat source so the deployed report is backed up without pushing changes to the upstream Umami repository. The original MIT license is included.
 
-Main site release: `6b0680a53a1a45974695fb4e`; analytics release: `6b06823c4dbf8e87e63d75fb`. Native collection starts `2026-11-25T06:31:07.153Z`; the original December 6 stop is preserved.
+Main site release: `6b0680a53a1a45974695fb4e`; analytics release: `6b06823c4dbf8e87e63d75fb`. Native collection starts `2026-11-25T06:31:07.153Z`; the end was explicitly extended on November 25 to December 13, 2026 at 07:34 Tahiti. The report now contains only the chart and comparison, shared date/device filters, and automatic refresh.

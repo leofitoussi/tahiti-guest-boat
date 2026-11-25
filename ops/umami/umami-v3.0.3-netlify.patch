@@ -180,10 +180,10 @@ index 0000000..95b5905
 +pnpm exec tsx ops/verify-migration.ts https://migration-check--tgb-umami.netlify.app
 diff --git a/ops/home-experiment-report.md b/ops/home-experiment-report.md
 new file mode 100644
-index 0000000..9e6bfad
+index 0000000..326f17a
 --- /dev/null
 +++ b/ops/home-experiment-report.md
-@@ -0,0 +1,165 @@
+@@ -0,0 +1,201 @@
 +# Home A/B engagement report — TGB-64
 +
 +The authenticated Umami site menu contains **Test accueil A/B** for Tahiti Guest
@@ -349,6 +349,42 @@ index 0000000..9e6bfad
 +and deployed client bytes verified. No real post-cutover homepage visits were
 +present at the final check; synthetic six-of-six validation was isolated and
 +cleaned up. TGB-68 is Done; TGB-64 still tracks the experiment and final analysis.
++
++## Simplified live report — 25 November 2026
++
++User request: keep only the chart and observed-engagement comparison. The
++historical/coverage panels and manual refresh button are removed. The shared
++24h/7d/30d/all filter selects a rolling window, clipped to native collection start
++and the authorized stop. Both chart and table share exact bounds, deduplication
++and device segmentation. Automatic reads run on mount, focus, reconnect and every
++15 seconds while visible; a connection failure is shown rather than claiming
++stale data is current. The graph uses hourly buckets for 24h and Tahiti-day
++buckets for other periods. Empty series are zero-filled without inventing visits.
++
++The user explicitly extended the end by seven days, to 13 December 2026 07:34
++Tahiti (17:34Z). The original start is unchanged. This changes the protocol
++mid-test; earlier fourteen-day/December-6 statements above are historical.
++The main site also preserves variant cookies and active visit state issued with
++the original expiry. Root anchors are normalized: /#contact remains the homepage
++and cannot count as next-page engagement.
++
++The screenshot discrepancy is fully explained: nine homepage views over the last
++24h = three before native cutover + one on the technical Netlify hostname + five
++eligible public-domain views (A=3, B=2). No public-domain post-cutover view was
++missing. The two screenshots were not using the same dates/hostname scope.
++
++Validation commands also include:
++
++```sh
++./node_modules/.bin/jest --runInBand src/lib/__tests__/home-experiment-*.test.ts
++./node_modules/.bin/tsx ops/verify-home-pageview-query.ts
++```
++
++The component check renders the real page logic using native-element substitutes
++for the design system, without browser automation. It checks exactly two panels,
++no manual refresh action, date-dependent requests, automatic freshness settings,
++and mobile/chart/table agreement. The HTTP smoke test checks every date preset
++against direct SQL, including chart totals. It generates no analytics traffic.
 diff --git a/ops/migrate-db.py b/ops/migrate-db.py
 new file mode 100644
 index 0000000..506aea2
@@ -484,7 +520,7 @@ index 0000000..493cfba
 +console.log(bind(HOME_PAGEVIEW_TRAFFIC_SQL));
 diff --git a/ops/verify-home-experiment-query.ts b/ops/verify-home-experiment-query.ts
 new file mode 100644
-index 0000000..75ae5e7
+index 0000000..681b813
 --- /dev/null
 +++ b/ops/verify-home-experiment-query.ts
 @@ -0,0 +1,103 @@
@@ -519,8 +555,8 @@ index 0000000..75ae5e7
 +    ('m2', 'mixed', 2, 'home_intro_engaged', 'B', 'mobile', NULL, 'tahitiguestboat.com'),
 +    ('p1', 'preview', 1, 'home_intro_exposed', 'B', 'mobile', NULL, 'preview.netlify.app'),
 +    ('x1', 'before-start', -1, 'home_intro_exposed', 'B', 'mobile', NULL, 'tahitiguestboat.com'),
-+    ('x2', 'at-end', 1209600, 'home_intro_exposed', 'B', 'mobile', NULL, 'tahitiguestboat.com'),
-+    ('x3', 'after-end', 1209601, 'home_intro_exposed', 'B', 'mobile', NULL, 'tahitiguestboat.com')
++    ('x2', 'at-end', 1814400, 'home_intro_exposed', 'B', 'mobile', NULL, 'tahitiguestboat.com'),
++    ('x3', 'after-end', 1814401, 'home_intro_exposed', 'B', 'mobile', NULL, 'tahitiguestboat.com')
 +), website_event AS (
 +  SELECT id AS event_id, visit AS visit_id, name AS event_name, host AS hostname,
 +    $1::uuid AS website_id, $2::timestamptz + seconds * interval '1 second' AS created_at,
@@ -593,11 +629,11 @@ index 0000000..75ae5e7
 +}
 diff --git a/ops/verify-home-experiment.ts b/ops/verify-home-experiment.ts
 new file mode 100644
-index 0000000..f144788
+index 0000000..0b68e9a
 --- /dev/null
 +++ b/ops/verify-home-experiment.ts
-@@ -0,0 +1,112 @@
-+import { HOME_PAGEVIEW_COLLECTION_START, HOME_PAGEVIEW_REPORT_SQL, HOME_PAGEVIEW_TRAFFIC_SQL } from '../src/lib/home-pageview-report';
+@@ -0,0 +1,132 @@
++import { HOME_PAGEVIEW_COLLECTION_START, HOME_PAGEVIEW_REPORT_SQL, HOME_PAGEVIEW_TRAFFIC_SQL, HOME_PAGEVIEW_SERIES_SQL } from '../src/lib/home-pageview-report';
 +import 'dotenv/config';
 +import assert from 'node:assert/strict';
 +import { Client } from 'pg';
@@ -681,6 +717,25 @@ index 0000000..f144788
 +      assert.equal(find('all')[key], find('mobile')[key] + find('desktop')[key]);
 +    }
 +  }
++  for (const period of ['24h', '7d', '30d', 'all']) {
++    const response = await get(`${path}?period=${period}`, true);
++    assert.equal(response.status, 200);
++    const selected = await response.json();
++    assert.equal(selected.period, period);
++    const bind = (sql: string) => sql.replaceAll('{{websiteId::uuid}}', '$1::uuid')
++      .replaceAll('{{startDate}}', '$2::timestamptz').replaceAll('{{endDate}}', '$3::timestamptz')
++      .replaceAll('{{unit}}', '$4::text');
++    const args = [HOME_EXPERIMENT_WEBSITE_ID, selected.rangeStart, selected.rangeEnd];
++    const { rows: table } = await db.query(bind(HOME_PAGEVIEW_REPORT_SQL), args);
++    assert.deepEqual(selected.rows, normalize(table), `${period}: API/table differs from SQL`);
++    const { rows: series } = await db.query(bind(HOME_PAGEVIEW_SERIES_SQL), [...args, selected.unit]);
++    assert.deepEqual(selected.series, series.map(row => ({ ...row, bucket: row.bucket.toISOString() })), `${period}: API/chart differs from SQL`);
++    for (const row of selected.rows) {
++      assert.equal(selected.series.filter(point => point.variant === row.variant && point.segment === row.segment)
++        .reduce((sum, point) => sum + point.exposed_visits, 0), row.exposed_visits, `${period}: chart and table disagree`);
++    }
++  }
++  assert.equal((await get(`${path}?period=invalid`, true)).status, 400);
 +  assert.deepEqual(await (await get('/api/heartbeat')).json(), { ok: true });
 +  assert((await (await get('/script.js')).text()).length > 1000);
 +  assert((await (await get('/login')).text()).includes('<html'));
@@ -693,6 +748,7 @@ index 0000000..f144788
 +        anonymousRejected: true,
 +        databaseMatches: true,
 +        segmentTotalsReconcile: true,
++        allDateFiltersMatchDatabaseAndChart: true,
 +        heartbeat: true,
 +        tracker: true,
 +        login: true,
@@ -786,20 +842,22 @@ index 0000000..f9837b5
 +} finally {await db.end();}
 diff --git a/ops/verify-home-pageview-query.ts b/ops/verify-home-pageview-query.ts
 new file mode 100644
-index 0000000..cb992a2
+index 0000000..159d962
 --- /dev/null
 +++ b/ops/verify-home-pageview-query.ts
-@@ -0,0 +1,53 @@
+@@ -0,0 +1,62 @@
 +import 'dotenv/config';
 +import assert from 'node:assert/strict';
 +import { Client } from 'pg';
-+import { HOME_PAGEVIEW_REPORT_SQL, HOME_PAGEVIEW_TRAFFIC_SQL } from '../src/lib/home-pageview-report';
++import { HOME_PAGEVIEW_REPORT_SQL, HOME_PAGEVIEW_TRAFFIC_SQL, HOME_PAGEVIEW_SERIES_SQL } from '../src/lib/home-pageview-report';
 +
 +const fixture = `WITH fixture(id,visit,sec,kind,path,tag,screen,host) AS (VALUES
 +  ('a1','a',1,1,'/','home-intro-v2:A','390x844','tahitiguestboat.com'),
 +  ('a2','a',2,1,'/','home-intro-v2:A','390x844','tahitiguestboat.com'),
 +  ('a3','a',3,1,'/contact/',NULL,'390x844','tahitiguestboat.com'),
 +  ('b1','b',1,1,'/','home-intro-v2:B','1280x720','tahitiguestboat.com'),
++  ('b2','b',2,1,'/#contact','home-intro-v2:B','1280x720','tahitiguestboat.com'),
++  ('h1','hash',1,1,'/#contact','home-intro-v2:A','390x844','tahitiguestboat.com'),
 +  ('m1','mixed',1,1,'/','home-intro-v2:A','1280x720','tahitiguestboat.com'),
 +  ('m2','mixed',2,1,'/','home-intro-v2:B','1280x720','tahitiguestboat.com'),
 +  ('q1','qa',1,1,'/','home-intro-v2:B:qa','1280x720','tahitiguestboat.com'),
@@ -831,12 +889,19 @@ index 0000000..cb992a2
 +  const { rows } = await db.query(bind(HOME_PAGEVIEW_REPORT_SQL),args);
 +  const a=rows.find(r=>r.variant==='A'&&r.segment==='all');
 +  const b=rows.find(r=>r.variant==='B'&&r.segment==='all');
-+  assert.equal(a.exposed_visits,2); assert.equal(b.exposed_visits,2);
++  assert.equal(a.exposed_visits,3); assert.equal(b.exposed_visits,2);
 +  assert.equal(a.engaged_visits,1); assert.equal(b.engaged_visits,1);
 +  assert.equal(a.next_page_visits,1); assert.equal(b.time_and_section_visits,1);
-+  assert.equal(rows.find(r=>r.variant==='A'&&r.segment==='mobile').exposed_visits,1);
++  assert.equal(rows.find(r=>r.variant==='A'&&r.segment==='mobile').exposed_visits,2);
 +  const { rows: [coverage] } = await db.query(bind(HOME_PAGEVIEW_TRAFFIC_SQL),args);
-+  assert.deepEqual(coverage,{homepage_pageviews:7,homepage_visits:5,measured_visits:4,excluded_visits:1,unmeasured_visits:1,measured_pct:'80.0',mixed_visits:1});
++  assert.deepEqual(coverage,{homepage_pageviews:9,homepage_visits:6,measured_visits:5,excluded_visits:1,unmeasured_visits:1,measured_pct:'83.3',mixed_visits:1});
++  for (const unit of ['hour', 'day']) {
++    const { rows: series } = await db.query(bind(HOME_PAGEVIEW_SERIES_SQL).replaceAll('{{unit}}', '$4::text'), [...args, unit]);
++    for (const row of rows) {
++      assert.equal(series.filter(point => point.variant === row.variant && point.segment === row.segment)
++        .reduce((sum, point) => sum + point.exposed_visits, 0), row.exposed_visits);
++    }
++  }
 +  for (const v of ['A','B']) {
 +    assert.equal(rows.find(r=>r.variant===v&&r.segment==='all').exposed_visits,
 +      rows.filter(r=>r.variant===v&&r.segment!=='all').reduce((n,r)=>n+r.exposed_visits,0));
@@ -1086,16 +1151,19 @@ index 0000000..cf6c023
 +}
 diff --git a/src/app/(main)/websites/[websiteId]/home-experiment/HomeExperimentPage.tsx b/src/app/(main)/websites/[websiteId]/home-experiment/HomeExperimentPage.tsx
 new file mode 100644
-index 0000000..cb876ac
+index 0000000..daf651c
 --- /dev/null
 +++ b/src/app/(main)/websites/[websiteId]/home-experiment/HomeExperimentPage.tsx
-@@ -0,0 +1,217 @@
+@@ -0,0 +1,131 @@
 +'use client';
-+import { Button, Column, Row, Text } from '@umami/react-zen';
++import { Button, Column, ListItem, Row, Select, Text, useTheme } from '@umami/react-zen';
 +import { useState } from 'react';
++import { Chart } from '@/components/charts/Chart';
 +import { LoadingPanel } from '@/components/common/LoadingPanel';
 +import { Panel } from '@/components/common/Panel';
 +import { useApi } from '@/components/hooks';
++import { getThemeColors } from '@/lib/colors';
++import { HOME_EXPERIMENT_PERIODS, type HomeExperimentPeriod } from '@/lib/home-experiment-range';
 +import type { HomeExperimentReport, HomeExperimentSegment } from '@/lib/home-experiment-report';
 +import styles from './HomeExperimentPage.module.css';
 +
@@ -1106,203 +1174,114 @@ index 0000000..cb876ac
 +];
 +const number = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 });
 +const date = new Intl.DateTimeFormat('fr-FR', {
-+  dateStyle: 'medium',
-+  timeStyle: 'short',
-+  timeZone: 'Pacific/Tahiti',
++  dateStyle: 'medium', timeStyle: 'short', timeZone: 'Pacific/Tahiti',
 +});
++
++export const homeExperimentRefresh = {
++  staleTime: 0,
++  refetchOnMount: 'always' as const,
++  refetchOnWindowFocus: 'always' as const,
++  refetchOnReconnect: 'always' as const,
++  refetchInterval: 15_000,
++  refetchIntervalInBackground: false,
++  retry: 2,
++};
 +
 +export function HomeExperimentPage({ websiteId }: { websiteId: string }) {
 +  const [segment, setSegment] = useState<HomeExperimentSegment>('all');
++  const [period, setPeriod] = useState<HomeExperimentPeriod>('24h');
++  const { theme } = useTheme();
++  const { colors } = getThemeColors(theme);
 +  const { get, useQuery } = useApi();
-+  const { data, error, isLoading, isFetching, refetch } = useQuery<HomeExperimentReport>({
-+    queryKey: ['home-experiment', websiteId],
-+    queryFn: () => get(`/websites/${websiteId}/home-experiment`),
-+    refetchInterval: query => (query.state.data?.status === 'ended' ? false : 60_000),
-+    refetchIntervalInBackground: false,
++  const { data, error, isLoading } = useQuery<HomeExperimentReport>({
++    queryKey: ['home-experiment', websiteId, period],
++    queryFn: () => get(`/websites/${websiteId}/home-experiment`, { period }),
++    ...homeExperimentRefresh,
 +  });
 +  const rows = data?.rows.filter(row => row.segment === segment) ?? [];
 +  const a = rows.find(row => row.variant === 'A');
 +  const b = rows.find(row => row.variant === 'B');
-+  const difference =
-+    a?.exposed_visits && b?.exposed_visits
-+      ? 100 * (b.engaged_visits / b.exposed_visits - a.engaged_visits / a.exposed_visits)
-+      : null;
-+  const excluded = data?.rows[0]?.mixed_or_qa_visits_excluded ?? 0;
++  const difference = a?.exposed_visits && b?.exposed_visits
++    ? 100 * (b.engaged_visits / b.exposed_visits - a.engaged_visits / a.exposed_visits) : null;
++  const buckets: number[] = [];
++  if (data) {
++    const step = data.unit === 'hour' ? 3600000 : 86400000;
++    // Tahiti is UTC-10 with no daylight saving changes.
++    const offset = 10 * 3600000;
++    const first = Math.floor((Date.parse(data.rangeStart) - offset) / step) * step + offset;
++    for (let value = first; value < Date.parse(data.rangeEnd); value += step) buckets.push(value);
++  }
++  const tickDate = new Intl.DateTimeFormat('fr-FR', data?.unit === 'hour'
++    ? { hour: '2-digit', minute: '2-digit', timeZone: 'Pacific/Tahiti' }
++    : { day: 'numeric', month: 'short', timeZone: 'Pacific/Tahiti' });
++  const chartData = {
++    labels: buckets.map(value => tickDate.format(value)),
++    datasets: ['A', 'B'].map((variant, index) => ({
++      label: variant === 'A' ? 'A · Accueil actuel' : 'B · Nouvel accueil',
++      data: buckets.map(value => data?.series?.find(point => point.variant === variant
++        && point.segment === segment && Date.parse(point.bucket) === value)?.exposed_visits ?? 0),
++      ...colors.chart[index === 0 ? 'visitors' : 'views'],
++      borderWidth: 1,
++    })),
++  };
 +
 +  return (
 +    <Column gap>
 +      <Row justifyContent="space-between" alignItems="center" gap wrap="wrap">
 +        <h1 className={styles.title}>Test accueil A/B</h1>
-+        <Button
-+          onPress={() => {
-+            void refetch();
-+          }}
-+          isDisabled={isFetching}
-+        >
-+          {isFetching ? 'Actualisation…' : 'Actualiser'}
-+        </Button>
++        <Select aria-label="Période du test" value={period}
++          onChange={value => setPeriod(value as HomeExperimentPeriod)}>
++          {HOME_EXPERIMENT_PERIODS.map(item => <ListItem key={item.id} id={item.id}>{item.label}</ListItem>)}
++        </Select>
 +      </Row>
-+      <LoadingPanel data={data} isLoading={isLoading} error={error}>
-+        {data && (
-+          <>
-+            <Panel>
-+              <Row gap alignItems="center" wrap="wrap">
-+                <strong>
-+                  {data.status === 'ended'
-+                    ? 'Terminé'
-+                    : data.status === 'scheduled'
-+                      ? 'À venir'
-+                      : 'En cours'}
-+                </strong>
-+                <Text>Répartition 50/50 · 14 jours</Text>
-+              </Row>
-+              <Text>
-+                Du {date.format(new Date(data.start))} au {date.format(new Date(data.end))} — heure
-+                de Tahiti.
-+              </Text>
-+              <Text>Ce rapport couvre uniquement la période du test sur l’accueil français.</Text>
-+              <p className={styles.note}>
-+                {data.status === 'ended'
-+                  ? 'Collecte du test arrêtée. Les nouvelles visites reçoivent l’accueil actuel. Aucun gagnant n’est désigné automatiquement.'
-+                  : 'Résultats provisoires : les sessions en cours peuvent encore devenir engagées. Attendre la fin du test pour décider.'}
-+              </p>
-+            </Panel>
-+            <Panel title="Trafic de l’accueil et couverture du test">
-+              <Text>
-+                {number.format(data.coverage.homepage_visits)} visites de l’accueil français, pour{' '}
-+                {number.format(data.coverage.homepage_pageviews)} pages vues depuis la correction du{' '}
-+                {date.format(new Date(data.collectionStart))} (hors QA).
-+              </Text>
-+              <Text>
-+                {number.format(data.coverage.measured_visits)} visites retenues dans A/B
-+                {data.coverage.measured_pct === null
-+                  ? ''
-+                  : ` (${number.format(data.coverage.measured_pct)} % du trafic de l’accueil)`}
-+                {' · '}
-+                {number.format(data.coverage.excluded_visits)} visites QA exclues
-+                {' · '}
-+                {number.format(data.coverage.unmeasured_visits)} sans exposition A/B mesurée.
-+              </Text>
-+              <p className={styles.note}>
-+                La version A/B est jointe à la page vue Umami elle-même : aucune attente de
-+                consentement, de stockage local ou de focus pour compter une visite déjà reçue par
-+                Umami. Chaque visite est affectée à sa première version observée, même après un
-+                rechargement. Les bloqueurs et l’exclusion propre au tracker continuent de
-+                s’appliquer.
-+              </p>
-+              <Text>
-+                {number.format(data.coverage.mixed_visits ?? 0)} visite(s) ayant vu A et B,
-+                conservées dans leur première version observée. Sans mémorisation autorisée de
-+                l’affectation, un retour peut afficher une autre version.
-+              </Text>
-+              <Text>
-+                Une visite correspond ici à une visite Umami, pas à une personne unique ni à chaque
-+                rechargement. La répartition 50/50 est aléatoire à l’affectation ; elle ne garantit
-+                pas deux effectifs égaux.
-+              </Text>
-+            </Panel>
-+            <Panel title="Historique avant la correction">
-+              <Text>
-+                {number.format(data.legacyCoverage.homepage_visits)} visites de l’accueil, dont{' '}
-+                {number.format(data.legacyCoverage.measured_visits)} mesurées par l’ancien suivi
-+                soumis au consentement. Ces chiffres incomplets restent séparés de la nouvelle
-+                collecte.
-+              </Text>
-+              {data.legacyRows
-+                .filter(row => row.segment === 'all')
-+                .map(row => (
-+                  <Text key={row.variant}>
-+                    Version {row.variant} : {number.format(row.exposed_visits)} visites exposées,{' '}
-+                    {number.format(row.engaged_visits)} engagées.
-+                  </Text>
-+                ))}
-+            </Panel>
-+            <Panel title="Comparer l’engagement observé">
-+              <Row gap wrap="wrap" aria-label="Appareils">
-+                {segments.map(({ id, label }) => (
-+                  <Button
-+                    key={id}
-+                    variant={segment === id ? 'primary' : 'outline'}
-+                    aria-pressed={segment === id}
-+                    onPress={() => setSegment(id)}
-+                  >
-+                    {label}
-+                  </Button>
-+                ))}
-+              </Row>
-+              <div className={styles.scroll}>
-+                <table className={styles.table}>
-+                  <caption className={styles.caption}>
-+                    Visites mesurées depuis la correction —{' '}
-+                    {segments.find(item => item.id === segment)?.label}
-+                  </caption>
-+                  <thead>
-+                    <tr>
-+                      <th scope="col">Version</th>
-+                      <th scope="col">Visites exposées</th>
-+                      <th scope="col">Visites engagées</th>
-+                      <th scope="col">Taux d’engagement observé</th>
-+                    </tr>
-+                  </thead>
-+                  <tbody>
-+                    {rows.map(row => (
-+                      <tr key={row.variant}>
-+                        <th scope="row">
-+                          <strong>{row.variant}</strong>
-+                          <span className={styles.variant}>
-+                            {row.variant === 'A' ? 'Accueil actuel' : 'Nouvel accueil'}
-+                          </span>
-+                        </th>
-+                        <td>{number.format(row.exposed_visits)}</td>
-+                        <td>{number.format(row.engaged_visits)}</td>
-+                        <td className={styles.rate}>
-+                          {row.engagement_pct === null
-+                            ? '—'
-+                            : `${number.format(row.engagement_pct)} %`}
-+                        </td>
-+                      </tr>
-+                    ))}
-+                  </tbody>
-+                </table>
-+              </div>
-+              <Text>
-+                {difference === null
-+                  ? 'L’écart apparaîtra lorsqu’au moins une visite exposée aura été mesurée dans chacune des deux versions.'
-+                  : `Écart observé B − A : ${difference > 0 ? '+' : ''}${number.format(difference)} point${Math.abs(difference) === 1 ? '' : 's'} de pourcentage. Cet écart seul ne prouve pas une amélioration.`}
-+              </Text>
-+              <Text>
-+                Le taux correspond aux visites avec engagement observé divisées par toutes les
-+                visites exposées à cette version.
-+              </Text>
-+            </Panel>
-+            <Panel title="Ce qui compte comme engagement">
-+              <Text>
-+                Une autre page du site ouverte après l’accueil, ou au moins 20 secondes au premier
-+                plan sur l’accueil avec une section après l’introduction vue.
-+              </Text>
-+              <Text>
-+                Le temps passé en arrière-plan, un rechargement ou un simple défilement sans les 20
-+                secondes ne suffisent pas.
-+              </Text>
-+              <Text>
-+                Toutes les visites de l’accueil enregistrées par Umami sont incluses, sans dépendre
-+                du consentement ou du stockage local. La navigation vers une autre page est
-+                déterminée par les pages vues de la même visite. Le signal « 20 secondes et section
-+                » conserve son fonctionnement consenti : ce taux décrit donc l’engagement observé.
-+              </Text>
-+              <Text>
-+                {number.format(excluded)} session{excluded === 1 ? '' : 's'} exclue
-+                {excluded === 1 ? '' : 's'} pour QA depuis la correction.
-+              </Text>
-+            </Panel>
++      <Row gap wrap="wrap" aria-label="Appareils">
++        {segments.map(({ id, label }) => (
++          <Button key={id} variant={segment === id ? 'primary' : 'outline'}
++            aria-pressed={segment === id} onPress={() => setSegment(id)}>{label}</Button>
++        ))}
++      </Row>
++      <LoadingPanel data={data} isLoading={isLoading} error={data ? undefined : error}>
++        {data && <>
++          <Panel title="Visites par version">
 +            <p className={styles.note}>
-+              Données consultées le {date.format(new Date(data.generatedAt))} (Tahiti).
-+              {data.status === 'ended'
-+                ? ' Période du test clôturée.'
-+                : ' Actualisation chaque minute lorsque cet onglet est visible.'}
++              Accueil français · {date.format(new Date(data.rangeStart))} → {date.format(new Date(data.rangeEnd))} (Tahiti)
 +            </p>
-+          </>
-+        )}
++            <div role="img" aria-label={`Visites par version : A ${a?.exposed_visits ?? 0}, B ${b?.exposed_visits ?? 0}`}>
++              <Chart type="bar" height="300px" chartData={chartData} animationDuration={0}
++                chartOptions={{
++                  scales: {
++                    x: { grid: { display: false }, ticks: { color: colors.chart.text, maxRotation: 0, maxTicksLimit: 12 } },
++                    y: { beginAtZero: true, ticks: { precision: 0, color: colors.chart.text }, grid: { color: colors.chart.line } },
++                  },
++                  plugins: { legend: { display: false }, tooltip: { enabled: true } },
++                }} />
++            </div>
++          </Panel>
++          <Panel title="Comparer l’engagement observé">
++            <div className={styles.scroll}>
++              <table className={styles.table}>
++                <caption className={styles.caption}>{segments.find(item => item.id === segment)?.label} · même période que le graphique</caption>
++                <thead><tr>
++                  <th scope="col">Version</th><th scope="col">Visites exposées</th>
++                  <th scope="col">Visites engagées</th><th scope="col">Taux d’engagement observé</th>
++                </tr></thead>
++                <tbody>{rows.map(row => <tr key={row.variant}>
++                  <th scope="row"><strong>{row.variant}</strong><span className={styles.variant}>
++                    {row.variant === 'A' ? 'Accueil actuel' : 'Nouvel accueil'}
++                  </span></th>
++                  <td>{number.format(row.exposed_visits)}</td><td>{number.format(row.engaged_visits)}</td>
++                  <td className={styles.rate}>{row.engagement_pct === null ? '—' : `${number.format(row.engagement_pct)} %`}</td>
++                </tr>)}</tbody>
++              </table>
++            </div>
++            <Text>{difference === null ? 'Pas encore de visites dans les deux versions sur cette période.'
++              : `Écart B − A : ${difference > 0 ? '+' : ''}${number.format(difference)} point${Math.abs(difference) === 1 ? '' : 's'}.`}</Text>
++            <p className={styles.note} role="status">
++              {error ? 'Connexion interrompue · nouvelle tentative automatique.'
++                : `Mis à jour à ${date.format(new Date(data.generatedAt))} · fin du test le ${date.format(new Date(data.end))} (Tahiti).`}
++            </p>
++          </Panel>
++        </>}
 +      </LoadingPanel>
 +    </Column>
 +  );
@@ -1327,10 +1306,10 @@ index 0000000..fc98707
 +export const metadata: Metadata = { title: 'Test accueil A/B' };
 diff --git a/src/app/api/websites/[websiteId]/home-experiment/route.ts b/src/app/api/websites/[websiteId]/home-experiment/route.ts
 new file mode 100644
-index 0000000..48d91c6
+index 0000000..9a23895
 --- /dev/null
 +++ b/src/app/api/websites/[websiteId]/home-experiment/route.ts
-@@ -0,0 +1,81 @@
+@@ -0,0 +1,92 @@
 +import {
 +  HOME_EXPERIMENT_END,
 +  HOME_EXPERIMENT_REPORT_SQL,
@@ -1343,10 +1322,12 @@ index 0000000..48d91c6
 +  HOME_PAGEVIEW_COLLECTION_START,
 +  HOME_PAGEVIEW_REPORT_SQL,
 +  HOME_PAGEVIEW_TRAFFIC_SQL,
++  HOME_PAGEVIEW_SERIES_SQL,
 +} from '@/lib/home-pageview-report';
++import { homeExperimentRange } from '@/lib/home-experiment-range';
 +import prisma from '@/lib/prisma';
 +import { parseRequest } from '@/lib/request';
-+import { notFound, unauthorized } from '@/lib/response';
++import { badRequest, notFound, unauthorized } from '@/lib/response';
 +import { canViewWebsite } from '@/permissions';
 +
 +export async function GET(
@@ -1360,6 +1341,9 @@ index 0000000..48d91c6
 +  if (!(await canViewWebsite(auth, websiteId))) return unauthorized();
 +
 +  const now = Date.now();
++  const period = new URL(request.url).searchParams.get('period') ?? 'all';
++  const range = homeExperimentRange(period, now);
++  if (!range) return badRequest({ message: 'Invalid report period' });
 +  const through = new Date(Math.min(now, Date.parse(HOME_EXPERIMENT_END)));
 +  const legacyRows = await prisma.rawQuery(HOME_EXPERIMENT_REPORT_SQL, {
 +    websiteId,
@@ -1373,11 +1357,12 @@ index 0000000..48d91c6
 +  });
 +  const collectionParams = {
 +    websiteId,
-+    startDate: new Date(HOME_PAGEVIEW_COLLECTION_START),
-+    endDate: through,
++    startDate: range.start,
++    endDate: range.end,
 +  };
 +  const rows = await prisma.rawQuery(HOME_PAGEVIEW_REPORT_SQL, collectionParams);
 +  const [traffic] = await prisma.rawQuery(HOME_PAGEVIEW_TRAFFIC_SQL, collectionParams);
++  const series = await prisma.rawQuery(HOME_PAGEVIEW_SERIES_SQL, { ...collectionParams, unit: range.unit });
 +  const normalize = (rows: any[]) =>
 +    rows.map(row => ({
 +      ...row,
@@ -1391,6 +1376,11 @@ index 0000000..48d91c6
 +      generatedAt: new Date(now).toISOString(),
 +      through: through.toISOString(),
 +      status: homeExperimentStatus(now),
++      period,
++      rangeStart: range.start.toISOString(),
++      rangeEnd: range.end.toISOString(),
++      unit: range.unit,
++      series,
 +      coverage: {
 +        ...traffic,
 +        measured_pct: traffic.measured_pct === null ? null : Number(traffic.measured_pct),
@@ -1412,12 +1402,115 @@ index 0000000..48d91c6
 +    },
 +  );
 +}
+diff --git a/src/lib/__tests__/home-experiment-page.test.ts b/src/lib/__tests__/home-experiment-page.test.ts
+new file mode 100644
+index 0000000..ab462e4
+--- /dev/null
++++ b/src/lib/__tests__/home-experiment-page.test.ts
+@@ -0,0 +1,71 @@
++import { readFileSync } from 'node:fs';
++import path from 'node:path';
++import vm from 'node:vm';
++import * as React from 'react';
++import { renderToStaticMarkup } from 'react-dom/server';
++import ts from 'typescript';
++
++const source = readFileSync(path.join(process.cwd(), 'src/app/(main)/websites/[websiteId]/home-experiment/HomeExperimentPage.tsx'), 'utf8');
++const rows = ['all', 'mobile', 'desktop'].flatMap(segment => ['A', 'B'].map(variant => ({
++  segment, variant, exposed_visits: segment === 'mobile' ? 0 : variant === 'A' ? 3 : 2,
++  engaged_visits: 0, engagement_pct: segment === 'mobile' ? null : 0,
++})));
++const data = {
++  rows, series: ['all', 'desktop'].flatMap(segment => ['A', 'B'].map(variant => ({
++    segment, variant, bucket: '2026-11-25T20:00:00Z', exposed_visits: variant === 'A' ? 3 : 2,
++  }))),
++  rangeStart: '2026-11-25T19:00:00Z', rangeEnd: '2026-11-25T23:00:00Z',
++  end: '2026-12-13T17:34:00Z', generatedAt: '2026-11-25T23:00:00Z', unit: 'hour',
++};
++const get = jest.fn();
++const query = jest.fn((_options: any) => ({ data, error: null, isLoading: false }));
++const chart = jest.fn((_props: any) => React.createElement('canvas'));
++const box = ({ children }) => React.createElement('div', {}, children);
++const moduleObject = { exports: {} as any };
++const requireMock = (id: string) => {
++  if (id === '@umami/react-zen') return {
++    Column: box, Row: box, Text: box,
++    Button: ({ children }) => React.createElement('button', {}, children),
++    Select: ({ children, value }) => React.createElement('select', { defaultValue: value }, children),
++    ListItem: ({ children, id }) => React.createElement('option', { value: id }, children),
++    useTheme: () => ({ theme: 'light' }),
++  };
++  if (id === '@/components/hooks') return { useApi: () => ({ get, useQuery: query }) };
++  if (id === '@/components/charts/Chart') return { Chart: chart };
++  if (id === '@/components/common/Panel') return { Panel: ({ title, children }) => React.createElement('section', {}, React.createElement('h2', {}, title), children) };
++  if (id === '@/components/common/LoadingPanel') return { LoadingPanel: box };
++  if (id === '@/lib/colors') return { getThemeColors: () => ({ colors: { chart: { visitors: {}, views: {} } } }) };
++  if (id === '@/lib/home-experiment-range') return { HOME_EXPERIMENT_PERIODS: [{ id: '24h', label: 'Dernières 24 heures' }, { id: '7d', label: '7 derniers jours' }] };
++  if (id.endsWith('.css')) return { default: {} };
++  return require(id);
++};
++const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX } }).outputText;
++vm.runInNewContext(`(function(require,module,exports){${compiled}\n})`, {})(requireMock, moduleObject, moduleObject.exports);
++const { HomeExperimentPage } = moduleObject.exports;
++
++afterEach(() => { jest.restoreAllMocks(); jest.clearAllMocks(); });
++
++test('renders only the graph and comparison, with no refresh action or historical panels', async () => {
++  const html = renderToStaticMarkup(React.createElement(HomeExperimentPage, { websiteId: 'site' }));
++  expect((html.match(/<section>/g) || [])).toHaveLength(2);
++  expect(html).toContain('Visites par version');
++  expect(html).toContain('Comparer l’engagement observé');
++  expect(html).not.toMatch(/Actualiser|Synchroniser|Historique|couverture du test/);
++  expect(html).toContain('Dernières 24 heures');
++  expect(html).toContain('13 déc. 2026');
++  const options = query.mock.calls[0][0];
++  expect(options.queryKey).toEqual(['home-experiment', 'site', '24h']);
++  expect(options).toMatchObject({ staleTime: 0, refetchOnMount: 'always', refetchOnWindowFocus: 'always', refetchOnReconnect: 'always', refetchInterval: 15000, retry: 2 });
++  await options.queryFn();
++  expect(get).toHaveBeenCalledWith('/websites/site/home-experiment', { period: '24h' });
++  expect(chart.mock.calls[0][0].chartData.datasets.map(item => item.data.reduce((sum, n) => sum + n, 0))).toEqual([3, 2]);
++});
++
++test('a changed date gets its own request and mobile filters both the graph and table', () => {
++  jest.spyOn(require('react'), 'useState').mockReturnValueOnce(['mobile', jest.fn()] as any).mockReturnValueOnce(['7d', jest.fn()] as any);
++  const html = renderToStaticMarkup(React.createElement(HomeExperimentPage, { websiteId: 'site' }));
++  expect(query.mock.calls[0][0].queryKey).toEqual(['home-experiment', 'site', '7d']);
++  expect(html).toContain('A 0, B 0');
++  expect(chart.mock.calls[0][0].chartData.datasets.every(item => item.data.every(n => n === 0))).toBe(true);
++  expect(html).not.toContain('0 %');
++});
+diff --git a/src/lib/__tests__/home-experiment-range.test.ts b/src/lib/__tests__/home-experiment-range.test.ts
+new file mode 100644
+index 0000000..854c6d8
+--- /dev/null
++++ b/src/lib/__tests__/home-experiment-range.test.ts
+@@ -0,0 +1,20 @@
++import { homeExperimentRange } from '../home-experiment-range';
++import { HOME_EXPERIMENT_END } from '../home-experiment-report';
++import { HOME_PAGEVIEW_COLLECTION_START } from '../home-pageview-report';
++
++test('uses rolling periods, clipped to the reliable collection and authorized stop', () => {
++  const now = Date.parse('2026-11-29T23:00:00Z');
++  const last24 = homeExperimentRange('24h', now);
++  expect(last24.start.toISOString()).toBe('2026-11-28T23:00:00.000Z');
++  expect(last24.end.getTime()).toBe(now);
++  expect(last24.unit).toBe('hour');
++  expect(homeExperimentRange('7d', now).start.toISOString()).toBe(HOME_PAGEVIEW_COLLECTION_START);
++  expect(homeExperimentRange('all', now).start.toISOString()).toBe(HOME_PAGEVIEW_COLLECTION_START);
++  expect(homeExperimentRange('30d', now).unit).toBe('day');
++  expect(homeExperimentRange('bogus', now)).toBeNull();
++  expect(homeExperimentRange('all', Date.parse(HOME_EXPERIMENT_END) + 86400000).end.toISOString()).toBe(HOME_EXPERIMENT_END);
++});
++
++test('the end is explicitly extended to 13 December, preserving the original start', () => {
++  expect(HOME_EXPERIMENT_END).toBe('2026-12-13T17:34:00.000Z');
++});
 diff --git a/src/lib/__tests__/home-experiment-route.test.ts b/src/lib/__tests__/home-experiment-route.test.ts
 new file mode 100644
-index 0000000..f51a1f6
+index 0000000..3f108f4
 --- /dev/null
 +++ b/src/lib/__tests__/home-experiment-route.test.ts
-@@ -0,0 +1,150 @@
+@@ -0,0 +1,169 @@
 +import { GET } from '@/app/api/websites/[websiteId]/home-experiment/route';
 +import {
 +  HOME_EXPERIMENT_END,
@@ -1430,6 +1523,7 @@ index 0000000..f51a1f6
 +  HOME_PAGEVIEW_COLLECTION_START,
 +  HOME_PAGEVIEW_REPORT_SQL,
 +  HOME_PAGEVIEW_TRAFFIC_SQL,
++  HOME_PAGEVIEW_SERIES_SQL,
 +} from '@/lib/home-pageview-report';
 +import prisma from '@/lib/prisma';
 +import { parseRequest } from '@/lib/request';
@@ -1453,7 +1547,7 @@ index 0000000..f51a1f6
 +  canView.mockResolvedValue(true);
 +  query.mockReset();
 +  query.mockImplementation(async sql =>
-+    sql === HOME_PAGEVIEW_REPORT_SQL || sql === HOME_EXPERIMENT_REPORT_SQL
++    sql === HOME_PAGEVIEW_REPORT_SQL || sql === HOME_EXPERIMENT_REPORT_SQL || sql === HOME_PAGEVIEW_SERIES_SQL
 +      ? []
 +      : [
 +          {
@@ -1512,7 +1606,8 @@ index 0000000..f51a1f6
 +        unmeasured_visits: 0,
 +        measured_pct: null,
 +      },
-+    ]);
++    ])
++    .mockResolvedValueOnce([]);
 +  const response = await GET(request(), context());
 +  const data = await response.json();
 +  expect(response.headers.get('cache-control')).toBe('private, no-store');
@@ -1542,14 +1637,31 @@ index 0000000..f51a1f6
 +  expect(query.mock.calls[0][1].endDate).toEqual(new Date(HOME_PAGEVIEW_COLLECTION_START));
 +});
 +
-+test('uses the same half-open fourteen-day window as the homepage', () => {
++test('uses the authorized twenty-one-day window and its exact stop', () => {
 +  const start = Date.parse(HOME_EXPERIMENT_START);
 +  const end = Date.parse(HOME_EXPERIMENT_END);
-+  expect(end - start).toBe(14 * 86400_000);
++  expect(end - start).toBe(21 * 86400_000);
 +  expect(homeExperimentStatus(start - 1)).toBe('scheduled');
 +  expect(homeExperimentStatus(start)).toBe('running');
 +  expect(homeExperimentStatus(end - 1)).toBe('running');
 +  expect(homeExperimentStatus(end)).toBe('ended');
++});
++
++test('applies the same rolling period to the table, coverage and chart', async () => {
++  const now = Date.parse('2026-11-29T23:00:00Z');
++  jest.spyOn(Date, 'now').mockReturnValue(now);
++  const data = await (await GET(new Request('https://analytics.tahitiguestboat.com/api/test?period=24h'), context())).json();
++  const expected = { websiteId: HOME_EXPERIMENT_WEBSITE_ID, startDate: new Date(now - 86400000), endDate: new Date(now) };
++  expect(query.mock.calls[2][1]).toEqual(expected);
++  expect(query.mock.calls[3][1]).toEqual(expected);
++  expect(query.mock.calls[4]).toEqual([HOME_PAGEVIEW_SERIES_SQL, { ...expected, unit: 'hour' }]);
++  expect(data.rangeStart).toBe('2026-11-28T23:00:00.000Z');
++  expect(data.period).toBe('24h');
++});
++
++test('rejects invalid date filters before querying analytics', async () => {
++  expect((await GET(new Request('https://analytics.tahitiguestboat.com/api/test?period=invalid'), context())).status).toBe(400);
++  expect(query).not.toHaveBeenCalled();
 +});
 +
 +test('counts native pageviews after the correction separately from the incomplete historical cohort', async () => {
@@ -1568,16 +1680,43 @@ index 0000000..f51a1f6
 +  ]);
 +  expect(query.mock.calls[3][0]).toBe(HOME_PAGEVIEW_TRAFFIC_SQL);
 +});
+diff --git a/src/lib/home-experiment-range.ts b/src/lib/home-experiment-range.ts
+new file mode 100644
+index 0000000..dc0eee8
+--- /dev/null
++++ b/src/lib/home-experiment-range.ts
+@@ -0,0 +1,20 @@
++import { HOME_EXPERIMENT_END } from './home-experiment-report';
++import { HOME_PAGEVIEW_COLLECTION_START } from './home-pageview-report';
++
++export const HOME_EXPERIMENT_PERIODS = [
++  { id: '24h', label: 'Dernières 24 heures' },
++  { id: '7d', label: '7 derniers jours' },
++  { id: '30d', label: '30 derniers jours' },
++  { id: 'all', label: 'Toute la période du test' },
++] as const;
++export type HomeExperimentPeriod = typeof HOME_EXPERIMENT_PERIODS[number]['id'];
++
++export function homeExperimentRange(period: string, now: number) {
++  if (!HOME_EXPERIMENT_PERIODS.some(item => item.id === period)) return null;
++  const durations = { '24h': 86400000, '7d': 7 * 86400000, '30d': 30 * 86400000 };
++  const end = Math.min(now, Date.parse(HOME_EXPERIMENT_END));
++  // Rolling presets remain relative to now, including after collection ends.
++  const start = Math.max(Date.parse(HOME_PAGEVIEW_COLLECTION_START),
++    period === 'all' ? 0 : now - durations[period]);
++  return { start: new Date(start), end: new Date(end), unit: period === '24h' ? 'hour' as const : 'day' as const };
++}
 diff --git a/src/lib/home-experiment-report.ts b/src/lib/home-experiment-report.ts
 new file mode 100644
-index 0000000..f9d23fd
+index 0000000..13972c3
 --- /dev/null
 +++ b/src/lib/home-experiment-report.ts
-@@ -0,0 +1,110 @@
+@@ -0,0 +1,116 @@
 +// Fixed protocol for TGB-64. These bounds must match the live homepage release.
 +export const HOME_EXPERIMENT_WEBSITE_ID = '388d24a4-9679-4b9c-992d-5ac0427b099c';
 +export const HOME_EXPERIMENT_START = '2026-11-22T17:34:00.000Z';
-+export const HOME_EXPERIMENT_END = '2026-12-06T17:34:00.000Z';
++// User-authorized extension on 25 November; the original end was 6 December.
++export const HOME_EXPERIMENT_END = '2026-12-13T17:34:00.000Z';
 +export type HomeExperimentSegment = 'all' | 'mobile' | 'desktop';
 +export interface HomeExperimentRow {
 +  variant: 'A' | 'B';
@@ -1595,6 +1734,11 @@ index 0000000..f9d23fd
 +  generatedAt: string;
 +  through: string;
 +  status: 'scheduled' | 'running' | 'ended';
++  rangeStart: string;
++  rangeEnd: string;
++  period: '24h' | '7d' | '30d' | 'all';
++  unit: 'hour' | 'day';
++  series: { bucket: string; variant: 'A' | 'B'; segment: HomeExperimentSegment; exposed_visits: number }[];
 +  rows: HomeExperimentRow[];
 +  collectionStart: string;
 +  legacyRows: HomeExperimentRow[];
@@ -1686,16 +1830,16 @@ index 0000000..f9d23fd
 +FROM homepage h LEFT JOIN visits v USING (visit_id) LEFT JOIN excluded x USING (visit_id);`;
 diff --git a/src/lib/home-pageview-report.ts b/src/lib/home-pageview-report.ts
 new file mode 100644
-index 0000000..0bc0f97
+index 0000000..744e8ba
 --- /dev/null
 +++ b/src/lib/home-pageview-report.ts
-@@ -0,0 +1,64 @@
+@@ -0,0 +1,72 @@
 +// TGB-68: native homepage pageviews carry the variant before tracker execution.
 +// Updated to the site's actual published_at before publishing this report.
 +export const HOME_PAGEVIEW_COLLECTION_START = '2026-11-25T06:31:07.153Z';
 +
 +const VISITS = `WITH pageviews AS (
-+  SELECT e.event_id, e.visit_id, e.created_at, e.url_path, e.tag, s.screen
++  SELECT e.event_id, e.visit_id, e.created_at, split_part(e.url_path, '#', 1) AS url_path, e.tag, s.screen
 +  FROM website_event e LEFT JOIN session s ON s.session_id=e.session_id AND s.website_id=e.website_id
 +  WHERE e.website_id = {{websiteId::uuid}}
 +    AND e.hostname IN ('tahitiguestboat.com', 'www.tahitiguestboat.com')
@@ -1754,3 +1898,11 @@ index 0000000..0bc0f97
 +  (SELECT count(*)::int FROM (SELECT t.visit_id FROM tagged t JOIN exposure x USING(visit_id)
 +    GROUP BY t.visit_id HAVING count(DISTINCT t.variant)>1) mixed) AS mixed_visits
 +FROM homepage h LEFT JOIN exposure x USING(visit_id);`;
++
++// Bucket the same deduplicated exposures as the table, in Tahiti time.
++export const HOME_PAGEVIEW_SERIES_SQL = `${VISITS}
++SELECT date_trunc({{unit}}, v.exposed_at AT TIME ZONE 'Pacific/Tahiti') AT TIME ZONE 'Pacific/Tahiti' AS bucket,
++  v.variant, s.segment, count(*)::int AS exposed_visits
++FROM visits v CROSS JOIN (VALUES ('all'), ('mobile'), ('desktop')) s(segment)
++WHERE s.segment='all' OR v.viewport=s.segment
++GROUP BY bucket, v.variant, s.segment ORDER BY bucket, v.variant, s.segment;`;

@@ -1,5 +1,9 @@
 # Test de l’accueil — engagement
 
+**Décision du 25 novembre 2026 : fin prolongée au 13 décembre à 07:34 Tahiti (`2026-12-13T17:34:00Z`), soit 21 jours depuis le lancement.** L’utilisateur a explicitement demandé sept jours supplémentaires après le signalement du rapport. Les dates du 6 décembre et les 14 jours ci-dessous décrivent le protocole initial, conservé comme historique. La prolongation est une modification du protocole en cours ; ne pas présenter les 21 jours comme une durée prédéfinie au lancement.
+
+Le rapport est désormais limité au graphique et au tableau « Comparer l’engagement observé ». Les filtres 24 h, 7 jours, 30 jours et toute la période partagent les mêmes bornes pour les deux blocs ; les bornes sont limitées à la collecte native fiable depuis le 24 novembre à 20:31:07 et à la fin autorisée du test. Les données se relisent automatiquement à l’ouverture, au retour sur l’onglet, à la reconnexion et toutes les 15 secondes pendant la consultation. Aucun bouton de synchronisation.
+
 **Correction de collecte active depuis le 24 novembre à 20:31 Tahiti.** La section « Collecte v2 » ci-dessous remplace le périmètre consenti v1 pour les nouvelles expositions. Les sections historiques restent conservées pour le protocole initial.
 
 Suivi : [TGB-64](https://linear.app/tahitiguestboat/issue/TGB-64).

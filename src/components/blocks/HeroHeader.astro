@@ -2,7 +2,7 @@
 import { buttonVariants } from '../ui/button';
 import Container from '../layout/Container.astro';
 import Section from '../layout/Section.astro';
-import { heroImageSources } from '../../lib/sanity';
+import { heroImageSources, urlForImage } from '../../lib/sanity';
 import { defaultLocale, localizeHref, type Locale } from '../../lib/localization';
 
 interface Cta {
@@ -26,11 +26,15 @@ interface Props {
   secondaryCta?: Cta;
   image?: SanityImage;
   locale?: Locale;
+  layout?: 'split' | 'centered';
 }
 
-const { keywords = [], title, body, primaryCta, secondaryCta, image, locale = defaultLocale } = Astro.props;
+const { keywords = [], title, body, primaryCta, secondaryCta, image, locale = defaultLocale, layout = 'split' } = Astro.props;
 
 const hero = image ? heroImageSources(image) : undefined;
+const panorama = (width: number, ratio: number) => image
+  ? urlForImage(image)?.width(width).height(Math.round(width / ratio)).fit('crop').quality(84).auto('format').url()
+  : undefined;
 const primaryCtaHref =
   primaryCta?.href === '#contact'
     ? locale === 'en'
@@ -40,7 +44,29 @@ const primaryCtaHref =
 ---
 
 {
-  hero && (
+  hero && layout === 'centered' ? (
+    <picture class="block h-[60vh] w-full overflow-hidden bg-muted lg:h-[70vh]">
+      <source
+        media="(max-width: 639px)"
+        srcset={[480, 768, 1080].map((width) => `${panorama(width, 0.85)} ${width}w`).join(', ')}
+        sizes="100vw"
+        width="1080"
+        height="1271"
+      />
+      <img
+        src={panorama(1680, 1.5)}
+        srcset={[828, 1280, 1680, 2400].map((width) => `${panorama(width, 1.5)} ${width}w`).join(', ')}
+        sizes="100vw"
+        alt={image?.alt || ''}
+        width="1680"
+        height="1120"
+        loading="eager"
+        decoding="async"
+        fetchpriority="high"
+        class="block h-full w-full object-cover"
+      />
+    </picture>
+  ) : hero && (
     <div class="h-[60vh] w-full overflow-hidden bg-muted lg:h-[70vh]">
       <img
         src={hero.src}
@@ -58,10 +84,59 @@ const primaryCtaHref =
   )
 }
 
-<Section padding="lg" class="!pt-10 md:!pt-28">
+<Section padding="lg" class={layout === 'centered' ? 'home-hero-section--centered' : '!pt-10 md:!pt-28'}>
   <Container>
     {
-      keywords.length > 0 ? (
+      layout === 'centered' ? (
+        <div class="home-hero-centered">
+          {keywords.length > 0 && (
+            <div class="home-hero-centered__keywords">
+              {keywords.map((word, i) => (
+                <span class:list={[i > 0 && 'italic', i === keywords.length - 1 && 'font-bold']}>{word}</span>
+              ))}
+            </div>
+          )}
+          <h1 class="home-hero-centered__title">
+            <slot name="title">{title}</slot>
+          </h1>
+          {(body || Astro.slots.has('intro')) && (
+            <div class="home-hero-centered__intro">
+              <slot name="intro"><p>{body}</p></slot>
+            </div>
+          )}
+          {(primaryCta || secondaryCta) && (
+            <div class="home-hero-centered__actions">
+              {primaryCta && (
+                <a href={localizeHref(primaryCtaHref ?? primaryCta.href, locale)} class={buttonVariants({ variant: 'primary', size: 'lg' })}>
+                  {primaryCta.label}
+                </a>
+              )}
+              {secondaryCta && (
+                <a
+                  href={localizeHref(secondaryCta.href, locale)}
+                  class="inline-flex min-h-12 items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 transition hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+                >
+                  {secondaryCta.label}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M9 18l6-6-6-6" />
+                  </svg>
+                </a>
+              )}
+            </div>
+          )}
+        </div>
+      ) : keywords.length > 0 ? (
         <div class="grid gap-10 lg:grid-cols-[minmax(0,220px)_1fr] lg:items-start">
           <div class="flex flex-row flex-wrap items-center justify-center gap-x-3 text-center font-heading text-primary lg:flex-col lg:items-start lg:justify-start lg:gap-x-0 lg:text-left">
             {keywords.map((word, i) => {
@@ -160,3 +235,132 @@ const primaryCtaHref =
     }
   </Container>
 </Section>
+
+<style is:global>
+  /* Temporary centered composition, refined from the supplied Figma reference.
+     These selectors also outrank the unlayered global heading defaults. */
+  .home-hero-section--centered {
+    padding-block: var(--space-12) var(--space-20);
+  }
+
+  .home-hero-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 900px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .home-hero-centered__keywords {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-6);
+    font-family: var(--font-family-heading);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #0062aa;
+  }
+
+  .home-hero-centered__keywords span:last-child {
+    font-weight: 600;
+  }
+
+  .home-hero-centered__title {
+    width: 100%;
+    max-width: 800px;
+    margin: var(--space-8) 0 0;
+    font-family: var(--font-family-heading);
+    font-size: 64px;
+    font-weight: 550;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    color: #002b4b;
+  }
+
+  .home-hero-centered__title em {
+    font-weight: inherit;
+  }
+
+  .home-hero-centered__title-line {
+    display: block;
+  }
+
+  .home-hero-centered__intro {
+    width: 100%;
+    max-width: 860px;
+    margin-top: var(--space-10);
+    font-family: var(--font-family-body);
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 29px;
+    letter-spacing: -0.01em;
+    color: #4b545e;
+  }
+
+  .home-hero-centered__intro p {
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  .home-hero-centered__intro p + p {
+    margin-top: var(--space-2);
+  }
+
+  .home-hero-centered__intro span[aria-hidden='true'] {
+    font-size: 0.9em;
+  }
+
+  .home-hero-centered__intro strong {
+    font-weight: 600;
+  }
+
+  .home-hero-centered__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-5);
+    margin-top: var(--space-8);
+  }
+
+  @media (max-width: 1023px) {
+    .home-hero-centered__title {
+      font-size: clamp(40px, 6.25vw, 64px);
+    }
+  }
+
+  @media (max-width: 639px) {
+    .home-hero-section--centered {
+      padding-block: var(--space-10) var(--space-16);
+    }
+
+    .home-hero-centered__keywords {
+      gap: var(--space-5);
+      font-size: 24px;
+    }
+
+    .home-hero-centered__title {
+      margin-top: var(--space-6);
+      font-size: clamp(32px, 8vw, 40px);
+      line-height: 1.04;
+    }
+
+    .home-hero-centered__intro {
+      margin-top: var(--space-8);
+      font-size: 16px;
+      line-height: 26px;
+    }
+
+    .home-hero-centered__actions {
+      gap: var(--space-4);
+    }
+
+  }
+</style>

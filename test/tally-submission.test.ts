@@ -56,6 +56,15 @@ describe('Tally submission confirmation', () => {
     expect(getTallySubmissionFromMessage('https://untrusted.example', submitted, 'nPrj8V')).toBeNull();
   });
 
+  it('rejects a future proof and a forged event containing only the success string', () => {
+    const storage = createSessionStorage();
+    const submission = { formId: 'nPrj8V', submissionId: 'opaque' };
+    rememberTallySubmission(storage, submission, 2000);
+    expect(consumeTallySubmission(storage, submission, 1000)).toBe(false);
+    expect(getTallySubmissionFromMessage('https://tally.so', JSON.stringify({ eventName: 'Tally.FormLoaded', note: 'Tally.FormSubmitted', payload: { formId: 'nPrj8V', id: 'opaque' } }), 'nPrj8V')).toBeNull();
+    expect(getTallySubmissionFromMessage('https://tally.so', JSON.stringify({ event: 'Tally.FormSubmitted', payload: { formId: 'nPrj8V', id: 'opaque' } }), 'nPrj8V')).toEqual(submission);
+  });
+
   it('identifies the first form page view and the completed submission for the embedded form', () => {
     const pageView = JSON.stringify({
       eventName: 'Tally.FormPageView',

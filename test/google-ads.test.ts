@@ -28,7 +28,7 @@ describe('Google Ads configuration', () => {
     const [layout, tag, booking, confirmation] = await Promise.all([
       readFile('src/layouts/BaseLayout.astro', 'utf8'),
       readFile('src/components/analytics/GoogleAdsTag.astro', 'utf8'),
-      readFile('src/components/cruises/BookingBlock.astro', 'utf8'),
+      readFile('src/components/TallyEmbed.astro', 'utf8'),
       readFile('src/components/ConfirmationPage.astro', 'utf8'),
     ]);
 
@@ -38,7 +38,8 @@ describe('Google Ads configuration', () => {
     expect(tag).toContain('googletagmanager.com/gtag/js?id=${config.tagId}');
     expect(booking).toContain('getTallySubmissionFromMessage');
     expect(booking).toContain('rememberTallySubmission');
-    expect(confirmation).toContain('consumeTallySubmission');
+    expect(confirmation).toContain('takeTallySubmission');
+    expect(confirmation).toContain('trackConfirmedUmamiLead');
     expect(confirmation).toContain("gtag('event', 'conversion'");
   });
 });

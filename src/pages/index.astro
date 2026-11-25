@@ -34,6 +34,7 @@ const seoDescription = home?.seoDescription ?? copy.pages.home.description;
 const heroBlock = pageBuilder.find(
   (block) => block._type === 'heroHeaderBlock' || block._type === 'homeHeroBlock'
 );
+const heroIndex = pageBuilder.indexOf(heroBlock!);
 const heroImage = heroBlock?.image as Parameters<typeof heroImageSources>[0] | undefined;
 const heroSources = heroImage ? heroImageSources(heroImage) : undefined;
 const heroPreload = heroSources ? { srcset: heroSources.srcset, sizes: heroSources.sizes } : undefined;
@@ -48,7 +49,10 @@ const heroPreload = heroSources ? { srcset: heroSources.srcset, sizes: heroSourc
   heroPreload={heroPreload}
   noindex={!home?.seo?.indexable}
 >
-  <main class="bg-background">
-    <PageBuilder blocks={pageBuilder} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} activities={activities} locale={defaultLocale} />
+  <main class="bg-background" data-home-experiment-variant="A">
+    <PageBuilder blocks={pageBuilder.slice(0, heroIndex + 1)} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} activities={activities} locale={defaultLocale} />
+    <div data-home-post-intro>
+      <PageBuilder blocks={pageBuilder.slice(heroIndex + 1)} settings={settings} reviews={reviews} cruises={cruises.slice(0, 3)} activities={activities} locale={defaultLocale} />
+    </div>
   </main>
 </BaseLayout>

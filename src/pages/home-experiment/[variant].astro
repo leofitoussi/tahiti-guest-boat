@@ -1,0 +1,59 @@
+---
+import HeroHeader from '../../components/blocks/HeroHeader.astro';
+import HomeIntroSequence from '../../components/preview/HomeIntroSequence.astro';
+import PageBuilder from '../../components/blocks/PageBuilder.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { buttonVariants } from '../../components/ui/button';
+import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../../lib/cruises';
+import { getHomePagePair, resolveHomePageVersion } from '../../lib/home-page';
+import { defaultLocale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
+import '@fontsource-variable/eb-garamond/wght-italic.css';
+
+// The build includes B only when explicitly preparing the experiment. The edge
+// function still requires a separate start time to activate the public split.
+export function getStaticPaths() {
+  return process.env.HOME_INTRO_EXPERIMENT_BUILD === '1' ? [{ params: { variant: 'b' } }] : [];
+}
+const pair = await getHomePagePair();
+const home = pair ? resolveHomePageVersion(pair, defaultLocale) : null;
+const englishHome = pair ? resolveHomePageVersion(pair, 'en') : null;
+const blocks = home?.pageBuilder ?? [];
+const heroIndex = blocks.findIndex((block) => ['heroHeaderBlock', 'homeHeroBlock'].includes(String(block._type)));
+const hero = blocks[heroIndex];
+if (!hero) throw new Error('The home experiment requires the published French homepage hero.');
+const [settings, reviews, cruises, activities] = await Promise.all([
+  getSiteSettings(defaultLocale), getReviews(), getCruisePages(defaultLocale), getActivities(defaultLocale),
+]);
+const copy = getSiteCopy(defaultLocale);
+const primaryHref = String(hero.primaryCtaLink ?? '/contact/#demande-de-devis');
+const secondaryHref = String(hero.secondaryCtaLink ?? '/nos-croisieres/');
+---
+<BaseLayout title={home?.seoTitle ?? copy.pages.home.title}
+  description={home?.seoDescription ?? copy.pages.home.description}
+  settings={settings} locale={defaultLocale} canonicalPath="/"
+  alternatePaths={englishHome ? { en: '/en/' } : {}} noindex={!home?.seo?.indexable}>
+  <main class="bg-background home-beta-sequence" data-home-experiment-variant="B">
+    <HeroHeader layout="centered" keywords={['Partage', 'Polynésie', 'Plaisance']}
+      title="L’esprit et le charme d’une belle maison d’hôtes, version croisière en Polynésie"
+      image={hero.image as Parameters<typeof HeroHeader>[0]['image']}>
+      <Fragment slot="title">
+        <span class="home-hero-centered__title-line">L’esprit et le charme d’une</span>
+        <span class="home-hero-centered__title-line">belle maison d’hôtes,</span>
+        <em class="home-hero-centered__title-line">version croisière en Polynésie</em>
+      </Fragment>
+    </HeroHeader>
+    <HomeIntroSequence>
+      <a href={primaryHref === '#contact' ? '/contact/#demande-de-devis' : primaryHref}
+        class={buttonVariants({ variant: 'primary', size: 'lg' })}>Rejoindre le bord</a>
+      <a href={secondaryHref} class="inline-flex min-h-12 items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 transition hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30">
+        Découvrir l’expérience
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6" /></svg>
+      </a>
+    </HomeIntroSequence>
+    <div id="home-beta-suite" data-home-post-intro>
+      <PageBuilder blocks={blocks.filter((_, index) => index !== heroIndex)} settings={settings}
+        reviews={reviews} cruises={cruises.slice(0, 3)} activities={activities} locale={defaultLocale} />
+    </div>
+  </main>
+</BaseLayout>

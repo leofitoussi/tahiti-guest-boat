@@ -23,6 +23,7 @@ const googleAds = getGoogleAdsConfiguration(
 <BaseLayout title={copy.title} description={copy.description} settings={settings} locale={locale} noindex>
   <main
     data-confirmation
+    data-lead-measurement-enabled={String(process.env.CONTEXT === 'production')}
     data-tally-form-id={tallyFormId}
     data-google-ads-conversion={googleAds?.conversionDestination}
     class="flex min-h-[60vh] flex-col items-center justify-center bg-background px-6 py-32 text-center"
@@ -43,7 +44,8 @@ const googleAds = getGoogleAdsConfiguration(
 
 <script>
   import { formatConfirmationFirstName, getConfirmationFirstName } from '../lib/confirmation';
-  import { consumeTallySubmission } from '../lib/tally-submission';
+  import { takeTallySubmission } from '../lib/tally-submission';
+  import { trackConfirmedUmamiLead } from '../lib/confirmed-lead-client';
 
   const firstName = formatConfirmationFirstName(getConfirmationFirstName(window.location.search));
   if (firstName) {
@@ -56,16 +58,19 @@ const googleAds = getGoogleAdsConfiguration(
   const conversionDestination = confirmation?.dataset.googleAdsConversion;
   const submissionId = new URLSearchParams(window.location.search).get('tallySubmissionId');
 
-  if (formId && submissionId && conversionDestination) {
+  if (formId && submissionId) {
     try {
-      const isConfirmedSubmission = consumeTallySubmission(
+      const proof = takeTallySubmission(
         window.sessionStorage,
         { formId, submissionId },
         Date.now(),
       );
       const gtag = (window as Window & { gtag?: (...args: unknown[]) => void }).gtag;
 
-      if (isConfirmedSubmission && gtag) {
+      if (proof && confirmation?.dataset.leadMeasurementEnabled === 'true') {
+        trackConfirmedUmamiLead({ formId, submissionId, locale: formId === 'eqOGYl' ? 'en' : 'fr', formPagePath: proof.formPagePath || '/' });
+      }
+      if (proof && gtag && conversionDestination) {
         gtag('event', 'conversion', { send_to: conversionDestination });
       }
     } catch {

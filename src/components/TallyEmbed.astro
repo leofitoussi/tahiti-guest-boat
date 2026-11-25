@@ -42,7 +42,7 @@ const formId = (() => {
   window.addEventListener('message', (event) => {
     for (const form of forms) {
       const formId = form.dataset.tallyFormId;
-      if (!formId) continue;
+      if (!formId || event.source !== form.contentWindow) continue;
 
       const formEvent = getTallyFormEventFromMessage(event.origin, event.data, formId);
       if (!formEvent) continue;
@@ -61,7 +61,7 @@ const formId = (() => {
       if (!submission) continue;
 
       try {
-        rememberTallySubmission(window.sessionStorage, submission, Date.now());
+        rememberTallySubmission(window.sessionStorage, { ...submission, formPagePath: window.location.pathname }, Date.now());
       } catch {
         // Without session storage, the confirmation page cannot prove the submission.
       }

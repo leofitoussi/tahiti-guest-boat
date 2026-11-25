@@ -1,0 +1,90 @@
+---
+import HeroHeader from '../../components/blocks/HeroHeader.astro';
+import HomeIntroSequence from '../../components/preview/HomeIntroSequence.astro';
+import PageBuilder from '../../components/blocks/PageBuilder.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { buttonVariants } from '../../components/ui/button';
+import { getActivities, getCruisePages, getReviews, getSiteSettings } from '../../lib/cruises';
+import { getHomePagePair, resolveHomePageVersion } from '../../lib/home-page';
+import { defaultLocale } from '../../lib/localization';
+import { getSiteCopy } from '../../lib/site-copy';
+import '@fontsource-variable/eb-garamond/wght-italic.css';
+
+// Explicitly opt in for the temporary preview; never emit this route in production.
+export function getStaticPaths() {
+  return process.env.HOME_BETA === '1' && process.env.CONTEXT !== 'production'
+    ? [{ params: { preview: undefined } }, { params: { preview: '2' } }]
+    : [];
+}
+
+const pair = await getHomePagePair();
+const home = pair ? resolveHomePageVersion(pair, defaultLocale) : null;
+const blocks = home?.pageBuilder ?? [];
+const heroIndex = blocks.findIndex((block) => ['heroHeaderBlock', 'homeHeroBlock'].includes(String(block._type)));
+const hero = blocks[heroIndex];
+if (!hero) throw new Error('Home beta requires the published French homepage hero.');
+
+const [settings, reviews, cruises, activities] = await Promise.all([
+  getSiteSettings(defaultLocale), getReviews(), getCruisePages(defaultLocale), getActivities(defaultLocale),
+]);
+const copy = getSiteCopy(defaultLocale);
+// The temporary preview follows the exact editorial copy supplied with the mockup.
+// The published Sanity document remains the source for media, links and later blocks.
+const title = 'L’esprit et le charme d’une belle maison d’hôtes, version croisière en Polynésie';
+const isSequence = Astro.params.preview === '2';
+const primaryCta = { label: 'Rejoindre le bord', href: String(hero.primaryCtaLink ?? '/contact/#demande-de-devis') };
+const secondaryCta = { label: 'Découvrir l’expérience', href: String(hero.secondaryCtaLink ?? '/nos-croisieres/') };
+---
+
+<BaseLayout
+  title={`Home bêta${isSequence ? ' · Test 2' : ''} — ${home?.seoTitle ?? copy.pages.home.title}`}
+  description={home?.seoDescription ?? copy.pages.home.description}
+  settings={settings}
+  locale={defaultLocale}
+  noindex={true}
+>
+  <main class:list={['bg-background', isSequence && 'home-beta-sequence']}>
+    <HeroHeader
+      layout="centered"
+      keywords={['Partage', 'Polynésie', 'Plaisance']}
+      title={title}
+      image={hero.image as Parameters<typeof HeroHeader>[0]['image']}
+      primaryCta={isSequence ? undefined : primaryCta}
+      secondaryCta={isSequence ? undefined : secondaryCta}
+    >
+      <Fragment slot="title">
+        <span class="home-hero-centered__title-line">L’esprit et le charme d’une</span>
+        <span class="home-hero-centered__title-line">belle maison d’hôtes,</span>
+        <em class="home-hero-centered__title-line">version croisière en Polynésie</em>
+      </Fragment>
+      <Fragment slot="intro">
+      {!isSequence && <div>
+        <p>Pour celles et ceux…</p>
+        <p><strong>qui souhaitent découvrir</strong> ou redécouvrir le plus beau territoire de <span aria-hidden="true">⛵</span> navigation de la planète,</p>
+        <p><strong>qui veulent profiter</strong> de l’incroyable beauté des <span aria-hidden="true">🏝️</span> lagons et atolls à leur rythme et au gré de leurs envies,</p>
+        <p><strong>qui rêvent de</strong> <span aria-hidden="true">🌴</span> farniente et de <span aria-hidden="true">🤿</span> snorkeling, de <span aria-hidden="true">☀️</span> bains de soleil et de <span aria-hidden="true">👙</span> baignades dans le turquoise, de balades en <span aria-hidden="true">🛶</span> kayak, d’une session de kite ou de wing foil, d’un <span aria-hidden="true">🍹</span> apéro au <span aria-hidden="true">🌅</span> coucher de soleil rougissant et d’un <span aria-hidden="true">🍽️</span> repas aux saveurs de Tahiti…</p>
+        <p><strong>qui ont envie</strong> de vivre l’accueil <span aria-hidden="true">🌺</span> polynésien et de s’ouvrir à la culture polynésienne, et pour qui la <span aria-hidden="true">🫶</span> convivialité et le partage subliment l’expérience.</p>
+      </div>}
+      </Fragment>
+    </HeroHeader>
+    {isSequence && (
+      <HomeIntroSequence>
+        <a href={primaryCta.href === '#contact' ? '/contact/#demande-de-devis' : primaryCta.href} class={buttonVariants({ variant: 'primary', size: 'lg' })}>{primaryCta.label}</a>
+        <a href={secondaryCta.href} class="inline-flex min-h-12 items-center gap-1 text-sm font-medium text-primary underline underline-offset-4 transition hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30">
+          {secondaryCta.label}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6" /></svg>
+        </a>
+      </HomeIntroSequence>
+    )}
+    <div id="home-beta-suite" tabindex="-1">
+    <PageBuilder
+      blocks={blocks.filter((_, index) => index !== heroIndex)}
+      settings={settings}
+      reviews={reviews}
+      cruises={cruises.slice(0, 3)}
+      activities={activities}
+      locale={defaultLocale}
+    />
+    </div>
+  </main>
+</BaseLayout>

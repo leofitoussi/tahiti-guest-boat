@@ -1,6 +1,7 @@
 export interface TallySubmission {
   formId: string;
   submissionId: string;
+  formPagePath?: string;
 }
 
 export interface TallySubmissionStorage {
@@ -48,9 +49,11 @@ export function getTallySubmissionFromMessage(
   }
 
   try {
-    const payload = (JSON.parse(data) as { payload?: { formId?: unknown; id?: unknown } }).payload;
+    const message = JSON.parse(data) as { eventName?: unknown; event?: unknown; payload?: { formId?: unknown; id?: unknown } };
+    if ((message.eventName ?? message.event) !== 'Tally.FormSubmitted') return null;
+    const payload = message.payload;
 
-    if (payload?.formId !== expectedFormId || typeof payload.id !== 'string') return null;
+    if (payload?.formId !== expectedFormId || typeof payload.id !== 'string' || !/^[A-Za-z0-9_-]{1,128}$/.test(payload.id)) return null;
 
     return { formId: payload.formId, submissionId: payload.id };
   } catch {
@@ -66,7 +69,7 @@ export function rememberTallySubmission(
   storage.setItem(TALLY_SUBMISSION_STORAGE_KEY, JSON.stringify({ ...submission, submittedAt }));
 }
 
-export function consumeTallySubmission(
+export function takeTallySubmission(
   storage: TallySubmissionStorage,
   submission: TallySubmission,
   _now: number,
@@ -74,14 +77,18 @@ export function consumeTallySubmission(
   const stored = storage.getItem(TALLY_SUBMISSION_STORAGE_KEY);
   storage.removeItem(TALLY_SUBMISSION_STORAGE_KEY);
 
-  if (!stored) return false;
+  if (!stored) return null;
 
   try {
     const parsed = JSON.parse(stored) as StoredTallySubmission;
-    const isFresh = Number.isFinite(parsed.submittedAt) && _now < parsed.submittedAt + TALLY_SUBMISSION_MAX_AGE_MS;
+    const isFresh = Number.isFinite(parsed.submittedAt) && _now >= parsed.submittedAt && _now < parsed.submittedAt + TALLY_SUBMISSION_MAX_AGE_MS;
 
-    return isFresh && parsed.formId === submission.formId && parsed.submissionId === submission.submissionId;
+    return isFresh && parsed.formId === submission.formId && parsed.submissionId === submission.submissionId ? parsed : null;
   } catch {
-    return false;
+    return null;
   }
+}
+
+export function consumeTallySubmission(storage: TallySubmissionStorage, submission: TallySubmission, now: number) {
+  return takeTallySubmission(storage, submission, now) !== null;
 }

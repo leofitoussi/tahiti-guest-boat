@@ -1,0 +1,199 @@
+---
+// Local homepage experiment. The published HeroHeader content stays in Sanity.
+---
+
+<section class="home-intro-track" aria-labelledby="home-intro-invitation">
+<div class="home-intro-sequence" data-home-intro-sequence>
+  <p class="home-intro-sequence__invitation" id="home-intro-invitation">Pour celles et ceux…</p>
+  <div class="home-intro-sequence__window">
+    <p data-sequence-phrase><strong>qui souhaitent découvrir</strong> ou redécouvrir le plus beau territoire de navigation de la planète,</p>
+    <p data-sequence-phrase><strong>qui veulent profiter</strong> de l’incroyable beauté des lagons et atolls à leur rythme et au gré de leurs envies,</p>
+    <p data-sequence-phrase><strong>qui rêvent de</strong> farniente et de snorkeling, de bains de soleil et de baignades dans le turquoise, de balades en kayak, d’une session de kite ou de wing foil, d’un apéro au coucher de soleil rougissant et d’un repas aux saveurs de Tahiti…</p>
+    <p data-sequence-phrase><strong>qui ont envie</strong> de vivre l’accueil polynésien et de s’ouvrir à la culture polynésienne, et pour qui la convivialité et le partage subliment l’expérience.</p>
+    <div class="home-intro-sequence__actions" data-sequence-actions><slot /></div>
+  </div>
+</div>
+</section>
+
+<script>
+  import { initHomeIntroSequences } from '../../lib/home-intro-sequence';
+  initHomeIntroSequences();
+</script>
+
+<style is:global>
+  .home-intro-track {
+    --sequence-ink: #002b4b;
+    --sequence-text: #4b545e;
+    --sequence-stage-height: auto;
+    --sequence-edge: 48px;
+    padding-block: var(--space-6) var(--space-12);
+  }
+
+  @media (min-width: 768px) {
+    .home-intro-track {
+      margin-block-end: calc(-1 * var(--sequence-gallery-gap-reduction, 0px));
+    }
+  }
+
+  .home-beta-sequence .home-hero-section--centered {
+    padding-block: clamp(64px, 10svh, 120px) var(--space-8);
+  }
+
+  .home-beta-sequence .home-hero-centered {
+    max-width: 1100px;
+  }
+
+  .home-beta-sequence .home-hero-centered__title {
+    max-width: 1100px;
+    margin-top: var(--space-12);
+    font-size: clamp(40px, 6.5vw, 88px);
+    line-height: 1.02;
+  }
+
+  .home-beta-sequence .home-hero-centered__intro {
+    display: none;
+  }
+
+  .home-intro-sequence {
+    width: 100%;
+    max-width: 1164px;
+    margin-inline: auto;
+    padding: var(--space-6) var(--space-8);
+    text-align: center;
+  }
+
+  .home-intro-sequence__invitation {
+    margin: 0 0 var(--space-8);
+    font-size: clamp(18px, 1.6vw, 22px);
+    line-height: 1.5;
+    color: var(--sequence-text);
+  }
+
+  .home-intro-sequence__window {
+    display: grid;
+    gap: var(--space-6);
+    text-align: center;
+  }
+
+  .home-intro-sequence [data-sequence-phrase] {
+    margin: 0;
+    font-size: clamp(24px, 3vw, 42px);
+    line-height: 1.42;
+    letter-spacing: -0.015em;
+    color: var(--sequence-text);
+    text-wrap: pretty;
+  }
+
+  .home-intro-sequence [data-sequence-phrase] strong {
+    font-weight: 650;
+    color: var(--sequence-ink);
+  }
+
+  .home-intro-sequence ::selection {
+    color: var(--sequence-ink);
+    background: var(--brand-primary-soft);
+  }
+
+  .home-intro-sequence__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4) var(--space-6);
+    margin-top: calc(var(--space-10) - var(--space-1));
+  }
+
+  /* Enhancement is desktop-only, after measuring the copy and available height.
+     Mobile, no script and reduced motion keep all four paragraphs readable. */
+  .home-intro-track--enhanced {
+    height: calc(var(--sequence-panel-height) + var(--sequence-travel));
+    padding-block: 0;
+    position: relative;
+  }
+
+  .home-intro-track--enhanced > .home-intro-sequence {
+    position: sticky;
+    top: var(--sequence-top);
+  }
+
+  .home-intro-track--enhanced .home-intro-sequence__window {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    height: var(--sequence-stage-height);
+    padding-block: var(--sequence-edge);
+    gap: 0;
+    mask-image: linear-gradient(to bottom, transparent, #000 var(--sequence-edge), #000 calc(100% - var(--sequence-edge)), transparent);
+  }
+
+  .home-intro-track--enhanced [data-sequence-phrase] {
+    grid-area: 1 / 1;
+    align-self: start;
+    transform-origin: center top;
+    mask-image: linear-gradient(to bottom, #000 var(--sequence-phrase-solid, 100%), transparent var(--sequence-phrase-reveal, 100%));
+  }
+
+  .home-intro-track--enhanced .home-intro-sequence__actions {
+    position: absolute;
+    inset-inline: 0;
+    top: var(--sequence-actions-top);
+    margin-top: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  @media (max-width: 767px) {
+    .home-intro-sequence [data-sequence-phrase] {
+      font-size: 18px;
+    }
+  }
+
+  @media (max-width: 639px) {
+    .home-beta-sequence .home-hero-centered__title {
+      margin-top: var(--space-10);
+    }
+
+    .home-intro-sequence {
+      padding-inline: var(--space-5);
+    }
+
+    .home-intro-sequence__invitation {
+      margin-bottom: var(--space-6);
+    }
+
+  }
+
+  @media (max-width: 767px), (prefers-reduced-motion: reduce) {
+    .home-intro-track--enhanced {
+      height: auto;
+    }
+
+    .home-intro-track--enhanced > .home-intro-sequence {
+      position: static;
+    }
+
+    .home-intro-track--enhanced .home-intro-sequence__window {
+      height: auto;
+      gap: var(--space-6);
+      mask-image: none;
+      overflow: visible;
+      padding-block: 0;
+    }
+
+    .home-intro-track--enhanced [data-sequence-phrase] {
+      grid-area: auto;
+      opacity: 1 !important;
+      transform: none !important;
+      mask-image: none !important;
+    }
+
+    .home-intro-track--enhanced .home-intro-sequence__actions {
+      position: static;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      transform: none !important;
+    }
+  }
+</style>

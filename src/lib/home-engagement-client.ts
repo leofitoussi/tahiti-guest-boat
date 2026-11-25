@@ -1,5 +1,5 @@
 import { readStoredConsent } from './cookie-consent';
-import { HOME_EXPERIMENT, HOME_VARIANT_COOKIE, EXPERIMENT_VISIT_KEY, ENGAGEMENT_MS, VISIT_IDLE_MS, EXPERIMENT_DURATION_MS, type ExperimentRuntime } from './home-experiment';
+import { HOME_EXPERIMENT, HOME_VARIANT_COOKIE, EXPERIMENT_VISIT_KEY, ENGAGEMENT_MS, VISIT_IDLE_MS, EXPERIMENT_DURATION_MS, ORIGINAL_EXPERIMENT_DURATION_MS, type ExperimentRuntime } from './home-experiment';
 
 interface Visit extends ExperimentRuntime {
   lastSeen: number;
@@ -31,6 +31,9 @@ export function initializeHomeEngagement() {
   const readVisit = (): Visit | null => {
     try {
       const stored: Visit = JSON.parse(localStorage.getItem(EXPERIMENT_VISIT_KEY) ?? 'null');
+      if (stored?.end === stored?.start + ORIGINAL_EXPERIMENT_DURATION_MS) {
+        stored.end = stored.start + EXPERIMENT_DURATION_MS;
+      }
       if (!stored || stored.experiment !== HOME_EXPERIMENT || !['A', 'B'].includes(stored.variant)
         || !Number.isFinite(stored.start) || stored.end !== stored.start + EXPERIMENT_DURATION_MS
         || Date.now() < stored.start || Date.now() >= stored.end

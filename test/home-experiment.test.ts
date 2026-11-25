@@ -5,13 +5,13 @@ import { HOME_INTRO_TEST_START } from '../netlify/lib/home-experiment-schedule.m
 
 const start = Date.parse('2026-12-01T10:00:00Z');
 afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
-describe('fourteen-day home experiment', () => {
-  it('requires a start, has a half-open fourteen-day window and a 50/50 split', () => {
+describe('twenty-one-day home experiment', () => {
+  it('requires a start, has a half-open twenty-one-day window and a 50/50 split', () => {
     expect(experimentWindow('', start)).toBeNull();
     expect(experimentWindow('bad date', start)).toBeNull();
     expect(experimentWindow(new Date(start).toISOString(), start - 1)).toBeNull();
     expect(experimentWindow(new Date(start).toISOString(), start)).toEqual({ start, end: start + EXPERIMENT_DURATION_MS });
-    expect(EXPERIMENT_DURATION_MS).toBe(14 * 86400000);
+    expect(EXPERIMENT_DURATION_MS).toBe(21 * 86400000);
     expect(experimentWindow(new Date(start).toISOString(), start + 7 * 86400000)).not.toBeNull();
     expect(experimentWindow(new Date(start).toISOString(), start + EXPERIMENT_DURATION_MS - 1)).not.toBeNull();
     expect(experimentWindow(new Date(start).toISOString(), start + EXPERIMENT_DURATION_MS)).toBeNull();
@@ -34,7 +34,16 @@ function setup() {
   vi.stubGlobal('Netlify', { env: { get: () => new Date(start).toISOString() } });
 }
 describe('edge routing', () => {
-  it('uses the release schedule without a Netlify variable and stops exactly fourteen days later', async () => {
+  it('extends the release to 13 December and preserves assignments issued with the old end', async () => {
+    const releaseStart = Date.parse(HOME_INTRO_TEST_START);
+    vi.stubGlobal('Netlify', { env: { get: () => undefined } });
+    vi.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-12-10T17:34:00Z'));
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    const res = await handler(new Request('https://tahitiguestboat.com/'), context(`A.${releaseStart + 14 * 86400000}`));
+    expect(res?.headers.get('x-tgb-home-variant')).toBe('A');
+    expect(await res?.text()).toContain(`"end":${Date.parse('2026-12-13T17:34:00Z')}`);
+  });
+  it('uses the release schedule without a Netlify variable and stops exactly twenty-one days later', async () => {
     const releaseStart = Date.parse(HOME_INTRO_TEST_START);
     vi.stubGlobal('Netlify', { env: { get: () => undefined } });
     vi.spyOn(Date, 'now').mockReturnValue(releaseStart);

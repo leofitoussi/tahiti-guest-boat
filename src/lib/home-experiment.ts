@@ -18,7 +18,9 @@ export function tagHomePageview(html: string, variant: HomeVariant, qa = false) 
       .replace(/>$/, ` ${attribute}="${tag}">`);
   });
 }
-export const EXPERIMENT_DURATION_MS = 14 * 24 * 60 * 60 * 1000;
+export const ORIGINAL_EXPERIMENT_DURATION_MS = 14 * 24 * 60 * 60 * 1000;
+// Explicitly extended by the user on 25 November, to 13 December 07:34 Tahiti.
+export const EXPERIMENT_DURATION_MS = 21 * 24 * 60 * 60 * 1000;
 export const VISIT_IDLE_MS = 30 * 60 * 1000;
 export const ENGAGEMENT_MS = 20_000;
 
@@ -41,7 +43,8 @@ export function experimentWindow(startValue: string | undefined, now: number) {
 
 export function parseVariantCookie(value: string | undefined, end: number): HomeVariant | null {
   const [variant, expiry] = (value ?? '').split('.');
-  return (variant === 'A' || variant === 'B') && expiry === String(end) ? variant : null;
+  const previousEnd = end - (EXPERIMENT_DURATION_MS - ORIGINAL_EXPERIMENT_DURATION_MS);
+  return (variant === 'A' || variant === 'B') && (expiry === String(end) || expiry === String(previousEnd)) ? variant : null;
 }
 
 export function chooseHomeVariant(sample: number): HomeVariant {

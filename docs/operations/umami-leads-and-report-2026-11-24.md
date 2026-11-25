@@ -97,3 +97,14 @@ Sources : [Tracker functions](https://docs.umami.is/docs/tracker-functions), [Tr
 
 
 Collecte et rapport v2 publiés et contrôlés : site `6b0680a53a1a45974695fb4e`, Umami `6b06823c4dbf8e87e63d75fb`. API de production et asset client identiques au build validé ; deux cohortes comparées aux SELECT directs et sommes réconciliées. Au contrôle final, aucune visite réelle encore enregistrée après le cutover ; les six visites de validation étaient synthétiques et ont été nettoyées. TGB-68 **Done** ; TGB-64 reste le suivi du test jusqu’au bilan. Ne pas confondre cette absence initiale de nouveau trafic avec une absence de collecte : le parcours réel vers le collecteur et Neon a été validé dans le site QA.
+
+
+## Simplification et prolongation — 25 novembre 2026
+
+Les captures utilisateur ont permis de réconcilier l’écart exact : Overview, Path is `/`, Last 24 hours = 9 visiteurs / 9 visites / 9 pages vues. Parmi ces neuf vues, trois précèdent le cutover du 24 novembre à 20:31:07 Tahiti, une provient de `tahiti-guest-boat.netlify.app` (07:21:29Z, sans variante), et cinq du domaine public dans la nouvelle phase (A=3, B=2). Pas de visite du domaine public perdue après correction ; aucun engagement observé sur ces cinq visites au contrôle. La différence était celle de la fenêtre et des hôtes retenus, pas celle des autres pages du site.
+
+Demande utilisateur appliquée : seulement graphique et bloc de comparaison, filtre commun 24 h / 7 jours / 30 jours / toute la période, suppression de l’actualisation manuelle et des panneaux d’historique/couverture. Relecture automatique au montage, au retour sur l’onglet, à la reconnexion et toutes les 15 secondes pendant la consultation. Le graphique compte les premières expositions de la même requête SQL que le tableau et la ventilation par appareil filtre les deux blocs. Les ancres `/#…` restent l’accueil, y compris pour éviter un faux engagement de navigation.
+
+L’utilisateur a confirmé le report de la fin du 6 au **13 décembre 2026 à 07:34 Tahiti**. Début du 22 novembre inchangé, durée totale 21 jours. Cette modification du protocole en cours est consignée, sans effacer les résultats passés. Les cookies et visites consenties émis avec l’ancienne échéance sont reconnus et prolongés pour conserver les variantes et la déduplication.
+
+Le patch de l’application Umami est sauvegardé dans `ops/umami/umami-v3.0.3-netlify.patch`. Les résultats de publication et de validation sont consignés dans TGB-68.

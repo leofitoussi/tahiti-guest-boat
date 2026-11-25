@@ -26,6 +26,15 @@ beforeEach(() => {
 });
 afterEach(() => { dispose?.(); window.removeEventListener('tgb:home-experiment-preview', preview); vi.useRealTimers(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 describe('engagement measured after real exposure', () => {
+  it('preserves an in-progress visit when the authorized end is extended', async () => {
+    consent(true); dispose = initializeHomeEngagement(); await advance(0); dispose?.();
+    const stored = JSON.parse(localStorage.getItem(EXPERIMENT_VISIT_KEY)!);
+    stored.end = stored.start + 14 * 86400000;
+    localStorage.setItem(EXPERIMENT_VISIT_KEY, JSON.stringify(stored));
+    dispose = initializeHomeEngagement(); await advance(0);
+    expect(events.map(e => e.name)).toEqual(['home_intro_exposed']);
+    expect(JSON.parse(localStorage.getItem(EXPERIMENT_VISIT_KEY)!).end).toBe(start + 21 * 86400000);
+  });
   it('requires both twenty foreground seconds and a real section, then sends only one event even after reload', async () => {
     consent(true); dispose = initializeHomeEngagement(); await advance(0);
     expect(events.map(e => e.name)).toEqual(['home_intro_exposed']);
@@ -59,7 +68,7 @@ describe('engagement measured after real exposure', () => {
     consent(false); await advance(20_000); expect(events).toHaveLength(1);
     expect(localStorage.getItem(EXPERIMENT_VISIT_KEY)).toBeNull();
   });
-  it('never calls production Umami from preview and stops after fourteen days', async () => {
+  it('never calls production Umami from preview and stops after twenty-one days', async () => {
     const track = vi.fn(); vi.stubGlobal('umami', { track });
     consent(true); dispose = initializeHomeEngagement(); section(); await advance(20_000);
     expect(track).not.toHaveBeenCalled();
@@ -78,7 +87,7 @@ describe('engagement measured after real exposure', () => {
     dispose = initializeHomeEngagement(); await advance(0); expect(track).toHaveBeenCalledTimes(2);
     dispose?.(); dispose = initializeHomeEngagement(); await advance(0); expect(track).toHaveBeenCalledTimes(2);
   });
-  it('expires an idle visit without discarding the fourteen-day assignment for a consented returning visitor', async () => {
+  it('expires an idle visit without discarding the twenty-one-day assignment for a consented returning visitor', async () => {
     consent(true); dispose = initializeHomeEngagement(); await advance(0); dispose?.();
     vi.setSystemTime(start + 31 * 60_000);
     document.getElementById('home-experiment-runtime')?.remove();

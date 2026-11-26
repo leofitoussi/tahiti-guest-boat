@@ -180,10 +180,10 @@ index 0000000..95b5905
 +pnpm exec tsx ops/verify-migration.ts https://migration-check--tgb-umami.netlify.app
 diff --git a/ops/home-experiment-report.md b/ops/home-experiment-report.md
 new file mode 100644
-index 0000000..326f17a
+index 0000000..bc112ea
 --- /dev/null
 +++ b/ops/home-experiment-report.md
-@@ -0,0 +1,201 @@
+@@ -0,0 +1,222 @@
 +# Home A/B engagement report — TGB-64
 +
 +The authenticated Umami site menu contains **Test accueil A/B** for Tahiti Guest
@@ -385,6 +385,27 @@ index 0000000..326f17a
 +no manual refresh action, date-dependent requests, automatic freshness settings,
 +and mobile/chart/table agreement. The HTTP smoke test checks every date preset
 +against direct SQL, including chart totals. It generates no analytics traffic.
++
++## Universal foreground attention — user request, 25 November 2026
++
++`home_intro_attention` now supplies bounded, disjoint foreground-time deltas
++and a section-seen flag from page memory, regardless of the specific consent
++choice. No client visit storage or extra identifier is used. Native visit IDs
++join the deltas across reloads; the report requires >=20,000 ms AND a section
++seen, and counts one engagement per visit. The original consented event remains
++accepted for history. No past time is reconstructed. Existing native next-page
++calculation, QA exclusions, date/device filters, two-panel UI and December 13
++stop are retained. Mixed visits keep their first observed assignment.
++
++`ops/verify-home-attention-query.ts` tests read-only CTE fixtures, including partial
++time across a reload/variant change, 19.999 seconds, time alone, section alone,
++QA, orphan events, ordering, invalid values and the exact time boundary.
++`ops/verify-home-attention-delivery.ts MAIN_SITE_ROOT [--published]` runs the real
++tracker and compiled candidate/published client in an isolated DOM, uses only a
++temporary Umami website, and removes it and all its data in finally. Seven
++visits/seven engagements cover A/B × undecided/refused/granted plus a mixed reload
++with 12+8 seconds. Hidden/unfocused time, time alone and native opt-out are checked.
++No browser automation or production-site events, form submissions or emails.
 diff --git a/ops/migrate-db.py b/ops/migrate-db.py
 new file mode 100644
 index 0000000..506aea2
@@ -518,6 +539,165 @@ index 0000000..493cfba
 +console.log('-- Native homepage A/B phase, separate from the incomplete consented history.');
 +console.log(bind(HOME_PAGEVIEW_REPORT_SQL));
 +console.log(bind(HOME_PAGEVIEW_TRAFFIC_SQL));
+diff --git a/ops/verify-home-attention-delivery.ts b/ops/verify-home-attention-delivery.ts
+new file mode 100644
+index 0000000..0317a52
+--- /dev/null
++++ b/ops/verify-home-attention-delivery.ts
+@@ -0,0 +1,106 @@
++import 'dotenv/config';
++import assert from 'node:assert/strict';
++import { randomUUID } from 'node:crypto';
++import { createRequire } from 'node:module';
++import { readdirSync } from 'node:fs';
++import path from 'node:path';
++import { build } from 'esbuild';
++import { Client } from 'pg';
++import { secret } from '../src/lib/crypto';
++import { createSecureToken } from '../src/lib/jwt';
++import { HOME_EXPERIMENT_END } from '../src/lib/home-experiment-report';
++import { HOME_PAGEVIEW_REPORT_SQL } from '../src/lib/home-pageview-report';
++
++// Execute actual candidate/published JS and the real tracker in an isolated DOM.
++// All collection is on one temporary QA website, removed in finally. No browser,
++// production-site analytics event, form submission or email.
++const root=process.argv[2];assert(root?.startsWith('/'),'Pass the absolute main-site checkout');
++const published=process.argv.includes('--published');
++const {JSDOM}=createRequire(path.join(root,'package.json'))('jsdom');
++const localFile=readdirSync(path.join(root,'dist/_astro')).find(name=>name.startsWith('HomeEngagement.')&&name.endsWith('.js'));
++assert(localFile,'Build the production candidate first');
++const localClient=(await build({entryPoints:[path.join(root,'dist/_astro',localFile)],bundle:true,write:false,format:'iife',platform:'browser'})).outputFiles[0].text;
++const base='https://analytics.tahitiguestboat.com';const id=randomUUID();const started=new Date(Date.now()-1000);
++const db=new Client({connectionString:process.env.DATABASE_URL});await db.connect();
++try {
++ const {rows:[admin]}=await db.query(`SELECT user_id,role FROM public."user" WHERE role='admin' AND deleted_at IS NULL LIMIT 1`);
++ const token=createSecureToken({userId:admin.user_id,role:admin.role},secret(),{expiresIn:'5m'});
++ const headers={authorization:`Bearer ${token}`,'content-type':'application/json'};
++ assert.equal((await fetch(base+'/api/websites',{method:'POST',headers,body:JSON.stringify({id,name:'Temporary universal attention QA',domain:'qa.invalid'})})).status,200);
++ try {
++  const tracker=await(await fetch(base+'/script.js')).text();
++  const cases:any[]=[];
++  for(const variant of ['A','B']){
++   const res=await fetch('https://tahitiguestboat.com/',{headers:{cookie:`tgb_home_intro_v1=${variant}.${Date.parse(HOME_EXPERIMENT_END)}`,'user-agent':'Mozilla/5.0'}});
++   assert.equal(res.headers.get('x-tgb-home-variant'),variant);const html=await res.text();
++   const opening=html.match(/<script\b[^>]*src="https:\/\/analytics\.tahitiguestboat\.com\/script\.js"[^>]*>/)?.[0];assert(opening);
++   const runtime=html.match(/<script[^>]*id="home-experiment-runtime"[^>]*>([\s\S]*?)<\/script>/)?.[1];assert(runtime);
++   let client=localClient;
++   if(published){
++    const src=html.match(/<script[^>]*src="([^"]*HomeEngagement[^\"]*\.js)"[^>]*>/)?.[1];assert(src);
++    const code=await(await fetch(new URL(src,'https://tahitiguestboat.com'))).text();
++    assert(code.includes('home_intro_attention'),'Published attention collector missing');
++    client=(await build({stdin:{contents:code,resolveDir:path.join(root,'dist/_astro')},bundle:true,write:false,format:'iife',platform:'browser'})).outputFiles[0].text;
++   }
++   for(const choice of ['undecided','denied','granted']) cases.push({variant,choice,opening,runtime,client});
++  }
++  let major=151;
++  const makeDom=async (fixture:any,userAgent:string,optout=false)=>{
++   const dom=new JSDOM(`${fixture.opening.replace('388d24a4-9679-4b9c-992d-5ac0427b099c',id)}</script><script type="application/json" id="home-experiment-runtime">${fixture.runtime}</script><div data-home-post-intro><section>Section</section></div>`,{url:'https://tahitiguestboat.com/',runScripts:'outside-only'});
++   const w=dom.window;let clock=0,visible=true,focused=true,observe:any;const intervals=new Map<number,()=>void>();let next=1;
++   w.setInterval=(cb:any)=>{intervals.set(next,cb);return next++;};w.clearInterval=(key:number)=>intervals.delete(key);
++   Object.defineProperty(w.performance,'now',{value:()=>clock});
++   Object.defineProperty(w.document,'currentScript',{value:w.document.querySelector('script')});
++   Object.defineProperty(w.document,'readyState',{value:'complete'});
++   Object.defineProperty(w.document,'visibilityState',{get:()=>visible?'visible':'hidden'});
++   w.document.hasFocus=()=>focused;w.matchMedia=()=>({matches:false});
++   w.IntersectionObserver=class{constructor(cb:any){observe=cb;}observe(){}disconnect(){}};
++   if(fixture.choice!=='undecided')w.localStorage.setItem('tgb_cookie_consent',JSON.stringify({analytics:fixture.choice==='granted',advertising:false,savedAt:Date.now()}));
++   if(optout)w.localStorage.setItem('umami.disabled','1');
++   const initialStorage=JSON.stringify({...w.localStorage});const pending:Promise<any>[]=[];const bodies:any[]=[];const sends:any[]=[];
++   w.fetch=(url:string,init:any)=>{sends.push(JSON.parse(init.body));const p=fetch(url,{...init,headers:{...init.headers,'user-agent':userAgent}}).then(async response=>{assert.equal(response.status,200);bodies.push(await response.clone().json());return response;});pending.push(p);return p;};
++   w.eval(tracker);await Promise.all(pending);w.eval(fixture.client);
++   const advance=(ms:number)=>{for(let left=ms;left>0;left-=Math.min(1000,left)){clock+=Math.min(1000,left);for(const cb of intervals.values())cb();}};
++   return {w,dom,bodies,sends,advance,
++    section:()=>observe([{isIntersecting:true,intersectionRect:{height:150},boundingClientRect:{height:600}}]),
++    visible:(value:boolean)=>{visible=value;w.document.dispatchEvent(new w.Event('visibilitychange'));},
++    focus:(value:boolean)=>{focused=value;w.dispatchEvent(new w.Event(value?'focus':'blur'));},
++    drain:()=>Promise.all(pending),
++    close:()=>{assert.equal(JSON.stringify({...w.localStorage}),initialStorage,'Attention must not create visit storage');if(fixture.choice!=='granted')assert.equal(w.document.cookie,'');dom.window.close();},
++   };
++  };
++  const ua=()=>`Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${major++}.0.0.0 Safari/537.36`;
++  for(const fixture of cases){
++   const c=await makeDom(fixture,ua());
++   if(fixture.choice==='denied'){
++    c.section();c.visible(false);c.advance(30_000);c.visible(true);c.focus(false);c.advance(30_000);
++    assert.equal(c.sends.filter(e=>e.payload.name).length,0);c.focus(true);
++   }
++   if(fixture.choice!=='granted')c.section();
++   c.advance(19_000);assert.equal(c.sends.filter(e=>e.payload.name).length,0);
++   c.advance(1000);await c.drain();
++   if(fixture.choice==='granted'){
++    assert.equal(c.sends.at(-1).payload.data.section_seen,'false');c.section();await c.drain();
++    assert.equal(c.sends.at(-1).payload.data.active_ms,'0');
++   }
++   c.section();c.advance(5000);await c.drain();
++   const signals=c.sends.filter(e=>e.payload.name==='home_intro_attention');
++   assert.equal(signals.reduce((sum,e)=>sum+Number(e.payload.data.active_ms),0),20_000);
++   assert(signals.some(e=>e.payload.data.section_seen==='true'));assert(signals.every(e=>e.payload.url==='/'));
++   c.close();
++  }
++  // Same native visit through a reload and a variant change, with no client visit storage.
++  const userAgent=ua();const first=await makeDom(cases[0],userAgent);first.advance(12_000);first.w.dispatchEvent(new first.w.Event('pagehide'));await first.drain();const visitId=first.bodies[0].visitId;first.close();
++  const second=await makeDom(cases[3],userAgent);assert.equal(second.bodies[0].visitId,visitId);second.section();second.advance(8000);second.w.dispatchEvent(new second.w.Event('pagehide'));await second.drain();second.close();
++  const disabled=await makeDom(cases[0],ua(),true);disabled.section();disabled.advance(30_000);disabled.w.dispatchEvent(new disabled.w.Event('pagehide'));await disabled.drain();assert.equal(disabled.sends.length,0);disabled.close();
++  const sql=HOME_PAGEVIEW_REPORT_SQL.replaceAll('{{websiteId::uuid}}','$1::uuid').replaceAll('{{startDate}}','$2::timestamptz').replaceAll('{{endDate}}','$3::timestamptz');
++  const {rows}=await db.query(sql,[id,started,new Date(Date.now()+1000)]);
++  const a=rows.find(r=>r.variant==='A'&&r.segment==='all');const b=rows.find(r=>r.variant==='B'&&r.segment==='all');
++  assert.equal(a.exposed_visits,4);assert.equal(a.engaged_visits,4);assert.equal(b.exposed_visits,3);assert.equal(b.engaged_visits,3);
++  console.log(JSON.stringify({publishedClient:published,nativeVisits:7,engagedVisits:7,choices:['undecided','denied','granted'],variants:['A','B'],foregroundOnly:true,timeAndSectionRequired:true,reloadTimeSummed:true,optOutRespected:true,newVisitStorage:false,productionEventsSent:0}));
++ }finally{
++  assert.equal((await fetch(base+`/api/websites/${id}`,{method:'DELETE',headers})).status,200);
++  const {rows:[row]}=await db.query('SELECT count(*)::int AS n FROM website WHERE website_id=$1',[id]);assert.equal(row.n,0);
++  console.log('Temporary QA website and data removed.');
++ }
++}finally{await db.end();}
+diff --git a/ops/verify-home-attention-query.ts b/ops/verify-home-attention-query.ts
+new file mode 100644
+index 0000000..1e009bc
+--- /dev/null
++++ b/ops/verify-home-attention-query.ts
+@@ -0,0 +1,41 @@
++import 'dotenv/config';
++import assert from 'node:assert/strict';
++import { Client } from 'pg';
++import { HOME_PAGEVIEW_REPORT_SQL } from '../src/lib/home-pageview-report';
++
++const fixture = `WITH homes(visit,variant,sec) AS (VALUES
++ ('split','A',1),('time-only','A',1),('section-only','B',1),('short','B',1),
++ ('complete','B',1),('mixed','A',1),('mixed','B',17),('qa','A:qa',1),
++ ('qa-event','B',1),('early','A',10),('boundary','B',1),('invalid','A',1)
++), signals(id,visit,sec,ms,section,variant,qa) AS (VALUES
++ ('s1','split',11,'10000','true','A','false'),('s2','split',21,'10000','false','A','false'),
++ ('t','time-only',21,'20000','false','A','false'),('v','section-only',2,'0','true','B','false'),
++ ('sh','short',21,'19999','true','B','false'),
++ ('c1','complete',21,'20000','true','B','false'),('c2','complete',22,'0','true','B','false'),
++ ('m1','mixed',16,'15000','false','A','false'),('m2','mixed',22,'5000','true','B','false'),
++ ('q','qa',21,'20000','true','A','true'),('qe','qa-event',21,'20000','true','B','true'),
++ ('o','orphan',21,'20000','true','A','false'),('e','early',9,'20000','true','A','false'),
++ ('b','boundary',100,'20000','true','B','false'),('bad','invalid',21,'99999999999999','true','A','false')
++), website_event AS (
++ SELECT visit||sec::text AS event_id,visit AS visit_id,'/' AS url_path,'home-intro-v2:'||variant AS tag,
++  $2::timestamptz+sec*interval '1 second' AS created_at,1 AS event_type,NULL::text AS event_name,
++  visit AS session_id,'tahitiguestboat.com' AS hostname,$1::uuid AS website_id FROM homes
++ UNION ALL SELECT id,visit,'/',NULL,$2::timestamptz+sec*interval '1 second',2,'home_intro_attention',
++  visit,'tahitiguestboat.com',$1::uuid FROM signals
++), session AS (SELECT DISTINCT visit AS session_id,'390x844'::text AS screen,$1::uuid AS website_id FROM homes),
++ event_data AS (
++ SELECT id AS website_event_id,d.key AS data_key,d.value AS string_value FROM signals,
++ LATERAL jsonb_each_text(jsonb_build_object('experiment','home-intro-v1','variant',variant,'viewport','mobile',
++  'active_ms',ms,'section_seen',section,'qa',qa)) d
++), `;
++const sql=fixture+HOME_PAGEVIEW_REPORT_SQL.slice(5).replaceAll('{{websiteId::uuid}}','$1::uuid').replaceAll('{{startDate}}','$2::timestamptz').replaceAll('{{endDate}}','$3::timestamptz');
++const db=new Client({connectionString:process.env.DATABASE_URL});await db.connect();
++try {
++ await db.query('BEGIN READ ONLY');
++ const {rows}=await db.query(sql,['388d24a4-9679-4b9c-992d-5ac0427b099c','2026-11-25T00:00:00Z','2026-11-25T00:01:40Z']);
++ const a=rows.find(r=>r.variant==='A'&&r.segment==='all');const b=rows.find(r=>r.variant==='B'&&r.segment==='all');
++ assert.equal(a.exposed_visits,5);assert.equal(a.time_and_section_visits,2);assert.equal(a.engaged_visits,2);
++ assert.equal(b.exposed_visits,5);assert.equal(b.time_and_section_visits,1);assert.equal(b.engaged_visits,1);
++ assert.equal(a.mixed_or_qa_visits_excluded,1);
++ console.log('Read-only attention fixtures passed: 20s + section, partial/reloaded/mixed visits summed, time-only/section-only/19.999s rejected, one engagement per visit, QA/orphans/order/date boundaries/invalid durations excluded.');
++}finally{await db.query('ROLLBACK');await db.end();}
 diff --git a/ops/verify-home-experiment-query.ts b/ops/verify-home-experiment-query.ts
 new file mode 100644
 index 0000000..681b813
@@ -1830,10 +2010,10 @@ index 0000000..13972c3
 +FROM homepage h LEFT JOIN visits v USING (visit_id) LEFT JOIN excluded x USING (visit_id);`;
 diff --git a/src/lib/home-pageview-report.ts b/src/lib/home-pageview-report.ts
 new file mode 100644
-index 0000000..744e8ba
+index 0000000..96ec80f
 --- /dev/null
 +++ b/src/lib/home-pageview-report.ts
-@@ -0,0 +1,72 @@
+@@ -0,0 +1,94 @@
 +// TGB-68: native homepage pageviews carry the variant before tracker execution.
 +// Updated to the site's actual published_at before publishing this report.
 +export const HOME_PAGEVIEW_COLLECTION_START = '2026-11-25T06:31:07.153Z';
@@ -1859,6 +2039,27 @@ index 0000000..744e8ba
 +  SELECT DISTINCT ON (t.visit_id) t.visit_id, t.variant, t.viewport, t.created_at AS exposed_at
 +  FROM tagged t WHERE NOT EXISTS (SELECT 1 FROM qa WHERE qa.visit_id = t.visit_id)
 +  ORDER BY t.visit_id, t.created_at, t.event_id
++), attention_events AS (
++  SELECT e.event_id, e.visit_id, e.created_at,
++    max(d.string_value) FILTER (WHERE d.data_key='experiment') AS experiment,
++    max(d.string_value) FILTER (WHERE d.data_key='variant') AS variant,
++    max(d.string_value) FILTER (WHERE d.data_key='active_ms') AS active_ms,
++    max(d.string_value) FILTER (WHERE d.data_key='section_seen') AS section_seen,
++    max(d.string_value) FILTER (WHERE d.data_key='qa') AS qa
++  FROM website_event e JOIN event_data d ON d.website_event_id=e.event_id
++  WHERE e.website_id={{websiteId::uuid}} AND e.event_name='home_intro_attention'
++    AND e.hostname IN ('tahitiguestboat.com', 'www.tahitiguestboat.com')
++    AND split_part(e.url_path, '#', 1)='/'
++    AND e.created_at >= {{startDate}} AND e.created_at < {{endDate}}
++  GROUP BY e.event_id, e.visit_id, e.created_at
++), attention_visits AS (
++  SELECT x.visit_id FROM exposure x JOIN attention_events a ON a.visit_id=x.visit_id
++    AND a.created_at >= x.exposed_at
++  WHERE a.experiment='home-intro-v1' AND a.variant IN ('A','B') AND coalesce(a.qa,'false') <> 'true'
++  GROUP BY x.visit_id
++  HAVING sum(CASE WHEN a.active_ms ~ '^[0-9]{1,5}$'
++    THEN least(20000, a.active_ms::int) ELSE 0 END) >= 20000
++    AND bool_or(a.section_seen='true')
 +), visits AS (
 +  SELECT x.*,
 +    EXISTS (SELECT 1 FROM pageviews p WHERE p.visit_id = x.visit_id
@@ -1871,7 +2072,8 @@ index 0000000..744e8ba
 +      WHERE e.website_id = {{websiteId::uuid}} AND e.visit_id=x.visit_id
 +        AND e.hostname IN ('tahitiguestboat.com', 'www.tahitiguestboat.com')
 +        AND e.event_name='home_intro_engaged' AND e.created_at >= x.exposed_at
-+        AND e.created_at < {{endDate}}) AS time_and_section
++        AND e.created_at < {{endDate}})
++      OR EXISTS (SELECT 1 FROM attention_visits a WHERE a.visit_id=x.visit_id) AS time_and_section
 +  FROM exposure x
 +)`;
 +

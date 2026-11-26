@@ -52,7 +52,7 @@ export function chooseHomeVariant(sample: number): HomeVariant {
 }
 
 export function sanitizeHomeExperimentEvent(name: unknown, data: unknown): Record<string, string> | null {
-  if (name !== 'home_intro_exposed' && name !== 'home_intro_engaged') return null;
+  if (name !== 'home_intro_exposed' && name !== 'home_intro_engaged' && name !== 'home_intro_attention') return null;
   if (!data || typeof data !== 'object') return null;
   const value = data as Record<string, unknown>;
   if (value.experiment !== HOME_EXPERIMENT || !['A', 'B'].includes(String(value.variant))) return null;
@@ -64,6 +64,12 @@ export function sanitizeHomeExperimentEvent(name: unknown, data: unknown): Recor
   if (name === 'home_intro_engaged') {
     if (!['next_page', '20s_and_section'].includes(String(value.reason))) return null;
     clean.reason = String(value.reason);
+  }
+  if (name === 'home_intro_attention') {
+    if (!/^[0-9]{1,5}$/.test(String(value.active_ms)) || Number(value.active_ms) > ENGAGEMENT_MS
+      || !['true', 'false'].includes(String(value.section_seen))) return null;
+    clean.active_ms = String(value.active_ms);
+    clean.section_seen = String(value.section_seen);
   }
   return clean;
 }

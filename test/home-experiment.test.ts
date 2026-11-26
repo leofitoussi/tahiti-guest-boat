@@ -21,6 +21,8 @@ describe('twenty-one-day home experiment', () => {
     expect(parseVariantCookie(`B.${start}`, start + EXPERIMENT_DURATION_MS)).toBeNull();
   });
   it('only allows bounded experiment event properties', () => {
+    expect(sanitizeHomeExperimentEvent('home_intro_attention', { experiment: 'home-intro-v1', variant: 'A', viewport: 'mobile', active_ms: '12000', section_seen: 'true', email: 'private' })).toEqual({ experiment: 'home-intro-v1', variant: 'A', viewport: 'mobile', active_ms: '12000', section_seen: 'true' });
+    expect(sanitizeHomeExperimentEvent('home_intro_attention', { experiment: 'home-intro-v1', variant: 'A', viewport: 'mobile', active_ms: '99999', section_seen: 'true' })).toBeNull();
     expect(sanitizeHomeExperimentEvent('home_intro_engaged', { experiment: 'home-intro-v1', variant: 'B', viewport: 'mobile', reason: '20s_and_section', email: 'private' })).toEqual({ experiment: 'home-intro-v1', variant: 'B', viewport: 'mobile', reason: '20s_and_section' });
     expect(sanitizeHomeExperimentEvent('home_intro_engaged', { experiment: 'home-intro-v1', variant: 'B', viewport: 'mobile', reason: 'timer_only' })).toBeNull();
   });

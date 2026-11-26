@@ -1,155 +1,120 @@
 import { readStoredConsent } from './cookie-consent';
-import { HOME_EXPERIMENT, HOME_VARIANT_COOKIE, EXPERIMENT_VISIT_KEY, ENGAGEMENT_MS, VISIT_IDLE_MS, EXPERIMENT_DURATION_MS, ORIGINAL_EXPERIMENT_DURATION_MS, type ExperimentRuntime } from './home-experiment';
+import { HOME_EXPERIMENT, HOME_VARIANT_COOKIE, EXPERIMENT_VISIT_KEY, ENGAGEMENT_MS, EXPERIMENT_DURATION_MS, type ExperimentRuntime } from './home-experiment';
 
-interface Visit extends ExperimentRuntime {
-  lastSeen: number;
+type Payload = Record<string, unknown>;
+type TrackedWindow = Window & { umami?: { track: (payload: (defaults: Payload) => Payload) => unknown } };
+interface Attention {
   activeMs: number;
+  sentMs: number;
   sectionSeen: boolean;
-  exposed: boolean;
-  engaged: boolean;
-  viewport: 'mobile' | 'desktop';
+  sentSection: boolean;
 }
-type TrackedWindow = Window & { umami?: { track: (name: string, data: Record<string, string>) => unknown } };
+// Only page memory. A reload gets a new state; Umami joins the received deltas
+// to its existing visit on the server. Reinitializing the same document cannot
+// resend the same time or section signal.
+const attention = new WeakMap<Element, Attention>();
 
 export function initializeHomeEngagement() {
+  if (location.pathname !== '/') return;
+  const element = document.getElementById('home-experiment-runtime');
   let runtime: ExperimentRuntime | null = null;
-  try { runtime = JSON.parse(document.getElementById('home-experiment-runtime')?.textContent ?? 'null'); } catch { /* no experiment */ }
-  const onHome = location.pathname === '/';
-  let sectionVisible = false;
-  let disposed = false;
-  let lastTick = performance.now();
-  let visitor: Visit | null = null;
-  let locks = Promise.resolve();
-  const clean = (forgetAssignment = true) => {
-    try { localStorage.removeItem(EXPERIMENT_VISIT_KEY); } catch { /* blocked storage */ }
-    if (forgetAssignment) document.cookie = `${HOME_VARIANT_COOKIE}=; Max-Age=0; Path=/; SameSite=Lax`;
-    visitor = null;
-  };
-  const consented = () => {
-    try { return readStoredConsent(localStorage, Date.now())?.analytics === true; } catch { return false; }
-  };
-  const readVisit = (): Visit | null => {
-    try {
-      const stored: Visit = JSON.parse(localStorage.getItem(EXPERIMENT_VISIT_KEY) ?? 'null');
-      if (stored?.end === stored?.start + ORIGINAL_EXPERIMENT_DURATION_MS) {
-        stored.end = stored.start + EXPERIMENT_DURATION_MS;
-      }
-      if (!stored || stored.experiment !== HOME_EXPERIMENT || !['A', 'B'].includes(stored.variant)
-        || !Number.isFinite(stored.start) || stored.end !== stored.start + EXPERIMENT_DURATION_MS
-        || Date.now() < stored.start || Date.now() >= stored.end
-        || !Number.isFinite(stored.lastSeen) || stored.lastSeen > Date.now()
-        || Date.now() - stored.lastSeen >= VISIT_IDLE_MS
-        || !Number.isFinite(stored.activeMs) || stored.activeMs < 0
-        || typeof stored.sectionSeen !== 'boolean' || typeof stored.exposed !== 'boolean'
-        || typeof stored.engaged !== 'boolean' || typeof stored.measure !== 'boolean'
-        || !['mobile', 'desktop'].includes(stored.viewport)) return null;
-      return stored;
-    } catch { return null; }
-  };
-  const validRuntime = (value: ExperimentRuntime | null): value is ExperimentRuntime => !!value
+  try { runtime = JSON.parse(element?.textContent ?? 'null'); } catch { return; }
+  const valid = (value: ExperimentRuntime | null): value is ExperimentRuntime => !!value
     && value.experiment === HOME_EXPERIMENT && ['A', 'B'].includes(value.variant)
     && Number.isFinite(value.start) && value.end === value.start + EXPERIMENT_DURATION_MS
     && Date.now() >= value.start && Date.now() < value.end && typeof value.measure === 'boolean';
-  const persist = (visit: Visit) => {
-    try { localStorage.setItem(EXPERIMENT_VISIT_KEY, JSON.stringify(visit)); return true; } catch { return false; }
+  if (!element || !valid(runtime)) return;
+  const visit = runtime;
+  if (visit.measure && !['tahitiguestboat.com', 'www.tahitiguestboat.com'].includes(location.hostname)) return;
+  try { localStorage.removeItem(EXPERIMENT_VISIT_KEY); } catch { /* obsolete visit storage may be blocked */ }
+  const state = attention.get(element) ?? { activeMs: 0, sentMs: 0, sectionSeen: false, sentSection: false };
+  attention.set(element, state);
+  const viewport = matchMedia('(max-width: 767px)').matches ? 'mobile' : 'desktop';
+  let disposed = false;
+  let frozen = false;
+  let sectionVisible = false;
+  let lastTick = performance.now();
+  const foreground = () => !frozen && document.visibilityState === 'visible' && document.hasFocus();
+  let wasForeground = foreground();
+  const optedOut = () => {
+    try { return !!localStorage.getItem('umami.disabled'); } catch { return false; }
   };
-  const send = (visit: Visit, name: string, reason?: string) => {
-    const data = { experiment: HOME_EXPERIMENT, variant: visit.variant, viewport: visit.viewport, ...(reason ? { reason } : {}), ...(visit.qa ? { qa: 'true' } : {}) };
-    if (!visit.measure) {
-      // QA observes these local events; production Umami never receives them.
-      window.dispatchEvent(new CustomEvent('tgb:home-experiment-preview', { detail: { name, data } }));
-      console.info('[home-intro QA]', name, data);
-      return true;
-    }
-    if (!['tahitiguestboat.com', 'www.tahitiguestboat.com'].includes(location.hostname)) return false;
+  const updateAssignment = () => {
+    // Stable assignment remains optional. The attention timer never reads or
+    // writes visit state, cookies or sessionStorage to measure time.
+    let consented = false;
+    try { consented = readStoredConsent(localStorage, Date.now())?.analytics === true; } catch { /* blocked storage */ }
+    document.cookie = consented && valid(visit)
+      ? `${HOME_VARIANT_COOKIE}=${visit.variant}.${visit.end}; Max-Age=${Math.max(0, Math.floor((visit.end - Date.now()) / 1000))}; Path=/; SameSite=Lax; Secure`
+      : `${HOME_VARIANT_COOKIE}=; Max-Age=0; Path=/; SameSite=Lax`;
+  };
+  const flush = (partial = false) => {
+    if (disposed || !valid(visit) || optedOut()) return;
+    const delta = Math.max(0, Math.floor(state.activeMs) - state.sentMs);
+    if ((!partial && state.activeMs < ENGAGEMENT_MS) || (!delta && !(state.sectionSeen && !state.sentSection))) return;
     const tracker = (window as TrackedWindow).umami;
-    if (!tracker) return false;
-    try { void tracker.track(name, data); return true; } catch { return false; }
-  };
-  const runTick = (elapsed: number) => {
-    if (disposed) return;
-    if (!consented()) { clean(); lastTick = performance.now(); return; }
-    const stored = readVisit();
-    if (onHome && validRuntime(runtime)) {
-      visitor = stored && stored.start === runtime.start && stored.variant === runtime.variant ? stored : {
-        ...runtime, lastSeen: Date.now(), activeMs: 0, sectionSeen: false, exposed: false, engaged: false,
-        viewport: matchMedia('(max-width: 767px)').matches ? 'mobile' : 'desktop',
-      };
-      visitor.qa ||= runtime.qa;
-      if (visitor.measure) {
-        document.cookie = `${HOME_VARIANT_COOKIE}=${visitor.variant}.${visitor.end}; Max-Age=${Math.max(0, Math.floor((visitor.end - Date.now()) / 1000))}; Path=/; SameSite=Lax; Secure`;
-      }
-    } else {
-      // Preview pages, a home with no active experiment, and internal URLs
-      // cannot masquerade as the second public page of a production visit.
-      visitor = !onHome && !location.pathname.startsWith('/home-') ? stored : null;
+    if (visit.measure && !tracker) return;
+    const data = {
+      experiment: HOME_EXPERIMENT, variant: visit.variant, viewport,
+      active_ms: String(delta), section_seen: String(state.sectionSeen), ...(visit.qa ? { qa: 'true' } : {}),
+    };
+    // A single attempt per delta, like the native tracker. SQL deduplicates the
+    // resulting engagement by visit, including reloads and other home tabs.
+    state.sentMs += delta;
+    state.sentSection ||= state.sectionSeen;
+    if (!visit.measure) {
+      window.dispatchEvent(new CustomEvent('tgb:home-experiment-preview', { detail: { name: 'home_intro_attention', data } }));
+      return;
     }
-    if (!visitor || !validRuntime(visitor)) { clean(onHome); return; }
-    if (visitor.measure && !['tahitiguestboat.com', 'www.tahitiguestboat.com'].includes(location.hostname)) return;
-    const foreground = document.visibilityState === 'visible' && document.hasFocus();
-    // Store before sending and serialize across tabs with Web Locks when available.
-    if (foreground && !visitor.exposed && onHome) {
-      const trackerReady = !visitor.measure || !!(window as TrackedWindow).umami;
-      if (trackerReady) {
-        visitor.exposed = true;
-        if (!persist(visitor) || !send(visitor, 'home_intro_exposed')) visitor.exposed = false;
-      }
-    }
-    if (!visitor.exposed) { persist(visitor); return; }
-    if (foreground) {
-      if (onHome) {
-        visitor.activeMs += elapsed;
-        visitor.sectionSeen ||= sectionVisible;
-      }
-      visitor.lastSeen = Date.now();
-      const reason = !onHome ? 'next_page' : visitor.activeMs >= ENGAGEMENT_MS && visitor.sectionSeen ? '20s_and_section' : null;
-      if (reason && !visitor.engaged) {
-        const trackerReady = !visitor.measure || !!(window as TrackedWindow).umami;
-        if (trackerReady) {
-          visitor.engaged = true;
-          if (!persist(visitor) || !send(visitor, 'home_intro_engaged', reason)) visitor.engaged = false;
-        }
-      }
-    }
-    persist(visitor);
+    try {
+      void Promise.resolve(tracker!.track(defaults => ({
+        website: defaults.website, hostname: location.hostname,
+        screen: defaults.screen, language: defaults.language, tag: defaults.tag,
+        url: '/', title: 'Tahiti Guest Boat', referrer: '',
+        name: 'home_intro_attention', data,
+      }))).catch(() => {});
+    } catch { /* Analytics must never affect the page. */ }
   };
   const tick = () => {
+    if (disposed || frozen) return;
     const now = performance.now();
-    // No background/sleep catch-up. Visibility/focus transitions flush the clock.
     const elapsed = Math.max(0, Math.min(1100, now - lastTick));
     lastTick = now;
-    const job = () => runTick(elapsed);
-    locks = locks.then(() => navigator.locks ? navigator.locks.request(HOME_EXPERIMENT, job) : job()).catch(() => {});
+    if (optedOut()) {
+      state.activeMs = 0; state.sentMs = 0; state.sectionSeen = false; state.sentSection = false;
+      wasForeground = foreground();
+      return;
+    }
+    if (wasForeground) state.activeMs = Math.min(ENGAGEMENT_MS, state.activeMs + elapsed);
+    wasForeground = foreground();
+    if (wasForeground && sectionVisible) state.sectionSeen = true;
+    flush();
   };
-  const resetClock = () => { lastTick = performance.now(); tick(); };
+  const onHide = () => {
+    if (frozen) return;
+    tick(); flush(true); frozen = true; wasForeground = false;
+  };
+  const onShow = () => { frozen = false; lastTick = performance.now(); wasForeground = foreground(); };
   const onStorage = (event: StorageEvent) => {
-    if (event.key === 'tgb_cookie_consent' || event.key === null) resetClock();
+    if (event.key === 'tgb_cookie_consent' || event.key === null) updateAssignment();
   };
-  // Most pages are outside an experiment; avoid a site-wide background timer.
-  if (!validRuntime(runtime) && !readVisit()) {
-    try { if (localStorage.getItem(EXPERIMENT_VISIT_KEY)) clean(!consented()); } catch { /* blocked storage */ }
-    return;
-  }
   const target = document.querySelector('[data-home-post-intro] section');
   const observer = target ? new IntersectionObserver(([entry]) => {
-    // At least 120px of the next real section must be on screen, not a marker.
     sectionVisible = entry.isIntersecting && entry.intersectionRect.height >= Math.min(120, entry.boundingClientRect.height);
     tick();
   }, { threshold: [0, 0.1, 0.25, 0.5, 1] }) : null;
   if (target) observer?.observe(target);
+  updateAssignment();
   const timer = window.setInterval(tick, 1000);
-  document.addEventListener('visibilitychange', resetClock);
-  window.addEventListener('focus', resetClock);
-  window.addEventListener('blur', resetClock);
-  window.addEventListener('storage', onStorage);
-  window.addEventListener('tgb:consent-changed', resetClock);
-  window.addEventListener('pagehide', tick);
-  tick();
+  document.addEventListener('visibilitychange', tick);
+  window.addEventListener('focus', tick); window.addEventListener('blur', tick);
+  window.addEventListener('pagehide', onHide); window.addEventListener('pageshow', onShow);
+  window.addEventListener('storage', onStorage); window.addEventListener('tgb:consent-changed', updateAssignment);
   return () => {
     disposed = true; clearInterval(timer); observer?.disconnect();
-    document.removeEventListener('visibilitychange', resetClock);
-    window.removeEventListener('focus', resetClock); window.removeEventListener('blur', resetClock);
-    window.removeEventListener('storage', onStorage); window.removeEventListener('tgb:consent-changed', resetClock);
-    window.removeEventListener('pagehide', tick);
+    document.removeEventListener('visibilitychange', tick);
+    window.removeEventListener('focus', tick); window.removeEventListener('blur', tick);
+    window.removeEventListener('pagehide', onHide); window.removeEventListener('pageshow', onShow);
+    window.removeEventListener('storage', onStorage); window.removeEventListener('tgb:consent-changed', updateAssignment);
   };
 }
